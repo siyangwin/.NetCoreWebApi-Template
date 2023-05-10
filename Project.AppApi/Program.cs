@@ -3,6 +3,7 @@ using MvcCore.Extension.AutoFac;
 using MvcCore.Extension.Swagger;
 using IService;
 using Service;
+using Autofac.Core;
 
 var ApiName = "Project.AppApi";
 
@@ -21,7 +22,7 @@ var getconfig = builder.Configuration.GetValue<bool>("ConfigSettings:SwaggerEnab
 //Swagger
 if (getconfig)
 {
-    builder.Services.AddSwaggerGens(ApiName, new string[] { "Project.AppApi.xml" });
+    builder.Services.AddSwaggerGens(ApiName, new string[] { "ViewModel.xml" });
 }
 
 //×¢ÈëDBÁ´½Ó
