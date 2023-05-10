@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\IService\IService.csproj" />
+    <ProjectReference Include="..\Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.Mssql.csproj" />
+    <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj" />
+    <ProjectReference Include="..\Kogel.Repository\Kogel.Repository.csproj" />
+  </ItemGroup>
+
+</Project>
