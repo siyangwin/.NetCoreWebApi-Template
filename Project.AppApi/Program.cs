@@ -4,6 +4,8 @@ using MvcCore.Extension.Swagger;
 using IService;
 using Service;
 using Autofac.Core;
+using Microsoft.AspNetCore.Mvc.Filters;
+using MvcCore.Extension.Filter;
 
 var ApiName = "Project.AppApi";
 
@@ -16,8 +18,7 @@ GlobalConfig.ConnectionString = builder.Configuration.GetValue<string>("Connecti
 
 builder.Services.AddControllers();
 
-//获取appsettings.json的值 是否开启Swagger
-//var getconfig = builder.Configuration["ConfigSettings:SwaggerEnable"];
+//是否开启Swagger
 var getconfig = builder.Configuration.GetValue<bool>("ConfigSettings:SwaggerEnable");
 //Swagger
 if (getconfig)
@@ -25,11 +26,23 @@ if (getconfig)
     builder.Services.AddSwaggerGens(ApiName, new string[] { "ViewModel.xml" });
 }
 
+
 //注入DB链接
 builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<ISystemLogService, SystemLogService>();
+
+// 将 MyActionFilter 注册为全局过滤器
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add(typeof(ApiFilterAttribute));
+});
+
+//GlobalConfig方法注入
+//注入配置日志
+//GlobalConfig.SystemLogService = new SystemLogService(ILogger<SystemLogService> _logger);
 
 // 批量注册服务
-builder.Services.AddAutoFacs(new string[] { "Service.dll" });
+//builder.Services.AddAutoFacs(new string[] { "Service.dll" });
 
 var app = builder.Build();
 
@@ -37,7 +50,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-//Swagger
+//是否开启Swagger
 if (getconfig)
 {
     app.UseSwaggers(ApiName);

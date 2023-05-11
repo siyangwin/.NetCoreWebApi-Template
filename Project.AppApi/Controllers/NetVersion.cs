@@ -1,8 +1,6 @@
 using IService;
 using Microsoft.AspNetCore.Mvc;
 using Model.Table;
-using Newtonsoft.Json;
-using Service;
 using ViewModel.App;
 
 namespace Project.AppApi.Controllers
@@ -21,11 +19,13 @@ namespace Project.AppApi.Controllers
         private IRepository connection;
 
         private ISystemLogService systemLogService { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="connection"></param>
+
+       /// <summary>
+       /// 
+       /// </summary>
+       /// <param name="logger"></param>
+       /// <param name="connection"></param>
+       /// <param name="systemLogService"></param>
         public NetVersion(ILogger<NetVersion> logger, IRepository connection, ISystemLogService systemLogService)  //, IRepository connection
         {
             _logger = logger;
@@ -47,6 +47,7 @@ namespace Project.AppApi.Controllers
             _logger.LogInformation("INFO");
             _logger.LogError("ERROR");
             _logger.LogWarning("WARNING");
+            _logger.LogDebug("DEBUG");
 
             AuthorizationTokenResDto systemLog = new AuthorizationTokenResDto();
             systemLog.UserId = 1;

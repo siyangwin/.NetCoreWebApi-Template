@@ -5,7 +5,6 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Model.Table;
 using Core;
-using System.Diagnostics;
 
 namespace MvcCore.Extension.Filter
 {
@@ -20,7 +19,7 @@ namespace MvcCore.Extension.Filter
         /// <param name="context"></param>
         public void OnActionExecuting(ActionExecutingContext context)
         {
-             //Console.Out.WriteLineAsync("OnActionExecuting");
+             Console.Out.WriteLineAsync("OnActionExecuting");
 
             //驗證參數
             if (!context.ModelState.IsValid)
@@ -44,7 +43,7 @@ namespace MvcCore.Extension.Filter
         /// <param name="context"></param>
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            //Console.Out.WriteLineAsync("OnActionExecuted");
+            Console.Out.WriteLineAsync("OnActionExecuted");
         }
 
 
@@ -56,7 +55,7 @@ namespace MvcCore.Extension.Filter
         /// <returns></returns>
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
         {
-            //await Console.Out.WriteLineAsync("OnResourceExecutionAsync - Before");
+            await Console.Out.WriteLineAsync("OnResourceExecutionAsync - Before");
 
             List<object> apiRequest = new List<object>();
 
@@ -90,7 +89,7 @@ namespace MvcCore.Extension.Filter
                 
 
                 var executedContext = await next.Invoke();
-                //await Console.Out.WriteLineAsync("OnResourceExecutionAsync - After");
+                await Console.Out.WriteLineAsync("OnResourceExecutionAsync - After");
 
                 responseValue = executedContext.Result;
                 responseJson = JsonConvert.SerializeObject((responseValue as ObjectResult) is null ? responseValue : (responseValue as ObjectResult).Value);
@@ -119,8 +118,8 @@ namespace MvcCore.Extension.Filter
                 //获取IP
                 string ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
 
-                ////写入日志
-                //await GlobalConfig.SystemLogService.LocalAndSqlLogAdd(new SystemLog { Guid = context.HttpContext.Request.Headers["Guid"].ToString(), ClientType = context.HttpContext.Request.Headers["ClientType"].ToString(), APIName = context.HttpContext.Request.Path, UserId = context.HttpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(context.HttpContext.Request.Headers["UserId"]), DeviceId = context.HttpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : context.HttpContext.Request.Headers["DeviceId"].ToString(), Instructions = "请求-返回", ReqParameter = JsonConvert.SerializeObject(logData), ResParameter = responseJson, Time = Time, IP = ip });
+                //写入日志
+                await GlobalConfig.SystemLogService.LocalAndSqlLogAdd(new SystemLog { Guid = context.HttpContext.Request.Headers["Guid"].ToString(), ClientType = context.HttpContext.Request.Headers["ClientType"].ToString(), APIName = context.HttpContext.Request.Path, UserId = context.HttpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(context.HttpContext.Request.Headers["UserId"]), DeviceId = context.HttpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : context.HttpContext.Request.Headers["DeviceId"].ToString(), Instructions = "请求-返回", ReqParameter = JsonConvert.SerializeObject(logData), ResParameter = responseJson, Time = Time, IP = ip });
             }
         }
 

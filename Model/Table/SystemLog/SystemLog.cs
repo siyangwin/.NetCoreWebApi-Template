@@ -8,7 +8,7 @@ namespace Model.Table
     /// <summary>
     /// 系統日志
     /// </summary>
-    [Display(Rename = "SystemLog")]
+    [Display(Rename = "Ecomm_SystemLog")]
     public class SystemLog
     {
         #region Model
