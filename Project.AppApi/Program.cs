@@ -30,6 +30,7 @@ if (getconfig)
 //注入DB链接
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<ISystemLogService, SystemLogService>();
+//builder.Services.AddScoped<ILogService, SystemLogService>();
 
 // 将 MyActionFilter 注册为全局过滤器
 builder.Services.AddMvc(options =>
@@ -39,7 +40,7 @@ builder.Services.AddMvc(options =>
 
 //GlobalConfig方法注入
 //注入配置日志
-//GlobalConfig.SystemLogService = new SystemLogService(ILogger<SystemLogService> _logger);
+//GlobalConfig.SystemLogService()
 
 // 批量注册服务
 //builder.Services.AddAutoFacs(new string[] { "Service.dll" });

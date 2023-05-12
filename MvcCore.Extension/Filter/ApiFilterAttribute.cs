@@ -5,6 +5,8 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Model.Table;
 using Core;
+using Microsoft.Extensions.Logging;
+using IService;
 
 namespace MvcCore.Extension.Filter
 {
@@ -13,6 +15,20 @@ namespace MvcCore.Extension.Filter
     /// </summary>
     public class ApiFilterAttribute : Attribute, IActionFilter, IAsyncResourceFilter
     {
+
+        //ILog logger;
+        // private readonly ILogger _logger;
+        private readonly ISystemLogService logService;
+        public ApiFilterAttribute(ISystemLogService logService)  //ILog logger
+        {
+            //最大连接数
+            //System.Net.ServicePointManager.DefaultConnectionLimit = 512;
+            //日志
+            //this.logger = logger;
+            this.logService = logService;
+        }
+
+
         /// <summary>
         /// 執行前
         /// </summary>
@@ -119,7 +135,7 @@ namespace MvcCore.Extension.Filter
                 string ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
 
                 //写入日志
-                await GlobalConfig.SystemLogService.LocalAndSqlLogAdd(new SystemLog { Guid = context.HttpContext.Request.Headers["Guid"].ToString(), ClientType = context.HttpContext.Request.Headers["ClientType"].ToString(), APIName = context.HttpContext.Request.Path, UserId = context.HttpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(context.HttpContext.Request.Headers["UserId"]), DeviceId = context.HttpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : context.HttpContext.Request.Headers["DeviceId"].ToString(), Instructions = "请求-返回", ReqParameter = JsonConvert.SerializeObject(logData), ResParameter = responseJson, Time = Time, IP = ip });
+                await logService.LocalAndSqlLogAdd(new SystemLog { Guid = context.HttpContext.Request.Headers["Guid"].ToString(), ClientType = context.HttpContext.Request.Headers["ClientType"].ToString(), APIName = context.HttpContext.Request.Path, UserId = context.HttpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(context.HttpContext.Request.Headers["UserId"]), DeviceId = context.HttpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : context.HttpContext.Request.Headers["DeviceId"].ToString(), Instructions = "请求-返回", ReqParameter = JsonConvert.SerializeObject(logData), ResParameter = responseJson, Time = Time, IP = ip });
             }
         }
 

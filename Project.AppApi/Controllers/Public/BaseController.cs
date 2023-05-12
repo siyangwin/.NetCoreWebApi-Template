@@ -8,7 +8,7 @@ namespace Project.AppApi.Controllers
 	/// <summary>
 	/// 控制器基類
 	/// </summary>
-	[ApiFilter]
+	//[ApiFilter]
 	[ErrorFilter]
 	//[AuthValidator]
 	[ApiController]

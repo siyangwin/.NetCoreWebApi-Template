@@ -13,6 +13,7 @@ namespace Service
         //ILog logger;
         // private readonly ILogger _logger;
         private readonly ILogger<SystemLogService> _logger;
+
         public SystemLogService(ILogger<SystemLogService> _logger)  //ILog logger
         {
 			//最大连接数
