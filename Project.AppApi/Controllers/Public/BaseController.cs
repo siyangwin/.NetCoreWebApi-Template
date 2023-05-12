@@ -9,7 +9,7 @@ namespace Project.AppApi.Controllers
 	/// 控制器基類
 	/// </summary>
 	//[ApiFilter]
-	[ErrorFilter]
+	//[ErrorFilter]
 	//[AuthValidator]
 	[ApiController]
 	public class BaseController : ControllerBase

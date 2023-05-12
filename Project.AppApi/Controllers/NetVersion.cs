@@ -44,17 +44,18 @@ namespace Project.AppApi.Controllers
         {
             //var connection = new Repository();
             //var SystemLog = connection.QuerySet<SystemLog>().Get();
-            _logger.LogInformation("INFO");
-            _logger.LogError("ERROR");
-            _logger.LogWarning("WARNING");
-            _logger.LogDebug("DEBUG");
+            //_logger.LogInformation("INFO");
+            //_logger.LogError("ERROR");
+            //_logger.LogWarning("WARNING");
+            //_logger.LogDebug("DEBUG");
 
             AuthorizationTokenResDto systemLog = new AuthorizationTokenResDto();
             systemLog.UserId = 1;
             systemLog.Token = Guid.NewGuid().ToString();
 
-            systemLogService.LocalAndSqlLogAdd(new SystemLog { Guid = HttpContext.Request.Headers["Guid"].ToString(), ClientType = HttpContext.Request.Headers["ClientType"].ToString(), APIName = HttpContext.Request.Path, UserId = HttpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(HttpContext.Request.Headers["UserId"]), DeviceId = HttpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : HttpContext.Request.Headers["DeviceId"].ToString(), Instructions = "«Î«Û-∑µªÿ", ReqParameter = "", ResParameter = "", Time = "", IP = "" });
+            //int a = 1;int b = 0;
 
+            //int c = a / b;
             return systemLog;
         }
     }

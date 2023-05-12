@@ -4,6 +4,7 @@ using Model.Table;
 using Model.EnumModel;
 using IService;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Service
 {
@@ -12,15 +13,15 @@ namespace Service
 
         //ILog logger;
         // private readonly ILogger _logger;
-        private readonly ILogger<SystemLogService> _logger;
+        //private readonly ILogger<SystemLogService> _logger;                                                                                  
 
-        public SystemLogService(ILogger<SystemLogService> _logger)  //ILog logger
+        public SystemLogService()  //ILog logger  //ILogger<SystemLogService> _logger
         {
 			//最大连接数
 			//System.Net.ServicePointManager.DefaultConnectionLimit = 512;
 			//日志
 			//this.logger = logger;
-			this._logger = _logger;
+			//this._logger = _logger;
         }
 
 
@@ -31,7 +32,7 @@ namespace Service
 		/// <returns></returns>
 		public async Task LogAdd(SystemLog log)
 		{
-			var repository = new Repository();
+            var repository = new Repository();
 			log.CreateTime = DateTime.Now;
 			log.CreateUser = "System";
 			repository.CommandSet<SystemLog>().Insert(log);
@@ -44,23 +45,22 @@ namespace Service
 		/// <returns></returns>
 		public async Task LocalLogAdd(SystemLog log)
 		{
-			_logger.LogInformation("SystemLogService");
             //写入本地
             //记录请求日志
-            //logger.Debug(JsonConvert.SerializeObject(new
-            //{
-            //	Guid = log.Guid,
-            //	ClientType = log.ClientType,
-            //	APIName = log.APIName,
-            //	Instructions = log.Instructions,
-            //	ReqParameter = log.ReqParameter,
-            //	ResParameter = log.ResParameter,
-            //	UserId = log.UserId,
-            //	DeviceId = log.DeviceId,
-            //	Time = log.Time,
-            //	log.IP
-            //}));
-        }
+            Log.Information(JsonConvert.SerializeObject(new
+			{
+				Guid = log.Guid,
+				ClientType = log.ClientType,
+				APIName = log.APIName,
+				Instructions = log.Instructions,
+				ReqParameter = log.ReqParameter,
+				ResParameter = log.ResParameter,
+				UserId = log.UserId,
+				DeviceId = log.DeviceId,
+				Time = log.Time,
+				log.IP
+			}));
+		}
 
 		/// <summary>
 		/// 写入本地和数据库日志
@@ -69,29 +69,33 @@ namespace Service
 		/// <returns></returns>
 		public async Task LocalAndSqlLogAdd(SystemLog log)
 		{
-            _logger.LogInformation("SystemLogService");
+            //_logger.LogInformation("SystemLogService");
+
+            // Log.Information("LocalLogAdd");
+            //Log.Error("LocalLogAdd1");
+            // Log.CloseAndFlush();
+
             //写入本地
             //记录请求日志
-            //logger.Debug(JsonConvert.SerializeObject(new
-            //{
-            //	Guid = log.Guid,
-            //	ClientType = log.ClientType,
-            //	APIName = log.APIName,
-            //	Instructions = log.Instructions,
-            //	ReqParameter = log.ReqParameter,
-            //	ResParameter = log.ResParameter,
-            //	UserId = log.UserId,
-            //	DeviceId = log.DeviceId,
-            //	Time = log.Time,
-            //	log.IP
-            //}));
+            Log.Information(JsonConvert.SerializeObject(new
+			{
+				Guid = log.Guid,
+				ClientType = log.ClientType,
+				APIName = log.APIName,
+				Instructions = log.Instructions,
+				ReqParameter = log.ReqParameter,
+				ResParameter = log.ResParameter,
+				UserId = log.UserId,
+				DeviceId = log.DeviceId,
+				Time = log.Time,
+				log.IP
+			}));
 
-            ////写入数据库
-            var repository = new Repository();
+			////写入数据库
+			var repository = new Repository();
 			log.CreateTime = DateTime.Now;
 			log.CreateUser = "System";
 			repository.CommandSet<SystemLog>().Insert(log);
-
 		}
 
 
