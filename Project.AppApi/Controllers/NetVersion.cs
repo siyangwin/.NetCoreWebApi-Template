@@ -1,6 +1,7 @@
 using IService;
 using Microsoft.AspNetCore.Mvc;
 using Model.Table;
+using ViewModel;
 using ViewModel.App;
 
 namespace Project.AppApi.Controllers
@@ -40,8 +41,9 @@ namespace Project.AppApi.Controllers
         /// <returns></returns>
         [Route("/api/WeatherForecast/get-log")]
         [HttpGet]
-        public AuthorizationTokenResDto Log()
+        public async Task<ResultModel<AuthorizationTokenResDto>> Log()
         {
+            ResultModel<AuthorizationTokenResDto> resultModel = new ResultModel<AuthorizationTokenResDto>();
             //var connection = new Repository();
             //var SystemLog = connection.QuerySet<SystemLog>().Get();
             //_logger.LogInformation("INFO");
@@ -53,10 +55,13 @@ namespace Project.AppApi.Controllers
             systemLog.UserId = 1;
             systemLog.Token = Guid.NewGuid().ToString();
 
-            //int a = 1;int b = 0;
 
+            //π “‚÷∆‘Ï¥ÌŒÛ
+            //int a = 1;int b = 0;
             //int c = a / b;
-            return systemLog;
+
+            resultModel.data = systemLog;
+            return resultModel;
         }
     }
 }

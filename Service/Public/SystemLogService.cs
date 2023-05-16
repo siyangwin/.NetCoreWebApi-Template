@@ -11,17 +11,8 @@ namespace Service
 	public class SystemLogService : ISystemLogService
 	{
 
-        //ILog logger;
-        // private readonly ILogger _logger;
-        //private readonly ILogger<SystemLogService> _logger;                                                                                  
-
-        public SystemLogService()  //ILog logger  //ILogger<SystemLogService> _logger
+        public SystemLogService() 
         {
-			//最大连接数
-			//System.Net.ServicePointManager.DefaultConnectionLimit = 512;
-			//日志
-			//this.logger = logger;
-			//this._logger = _logger;
         }
 
 
@@ -44,37 +35,31 @@ namespace Service
 		/// <param name="log">日志内容</param>
 		/// <returns></returns>
 		public async Task LocalLogAdd(SystemLog log)
-		{
+        {
             //写入本地
             //记录请求日志
             Log.Information(JsonConvert.SerializeObject(new
 			{
-				Guid = log.Guid,
-				ClientType = log.ClientType,
-				APIName = log.APIName,
-				Instructions = log.Instructions,
-				ReqParameter = log.ReqParameter,
-				ResParameter = log.ResParameter,
-				UserId = log.UserId,
-				DeviceId = log.DeviceId,
-				Time = log.Time,
+				log.Guid,
+				log.ClientType,
+				log.APIName,
+				log.Instructions,
+				log.ReqParameter,
+				log.ResParameter,
+				log.UserId,
+				log.DeviceId,
+				log.Time,
 				log.IP
 			}));
-		}
+        }
 
-		/// <summary>
-		/// 写入本地和数据库日志
-		/// </summary>
-		/// <param name="log">日志内容</param>
-		/// <returns></returns>
-		public async Task LocalAndSqlLogAdd(SystemLog log)
+        /// <summary>
+        /// 写入本地和数据库日志
+        /// </summary>
+        /// <param name="log">日志内容</param>
+        /// <returns></returns>
+        public async Task LocalAndSqlLogAdd(SystemLog log)
 		{
-            //_logger.LogInformation("SystemLogService");
-
-            // Log.Information("LocalLogAdd");
-            //Log.Error("LocalLogAdd1");
-            // Log.CloseAndFlush();
-
             //写入本地
             //记录请求日志
             Log.Information(JsonConvert.SerializeObject(new

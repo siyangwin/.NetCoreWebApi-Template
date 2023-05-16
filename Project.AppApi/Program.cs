@@ -4,6 +4,8 @@ using IService;
 using Service;
 using MvcCore.Extension.Filter;
 using Serilog;
+using Azure.Core;
+using Serilog.Events;
 
 var ApiName = "Project.AppApi";
 
@@ -40,17 +42,19 @@ builder.Services.AddMvc(options =>
 });
 
 
+
 //SerilLog  再Service中引用次NuGet包
 //ThreadId需要引用专用的NuGet包
 //const string OUTPUT_TEMPLATE = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} <{ThreadId}> [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 const string OUTPUT_TEMPLATE = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
 
+//输出日志等级,可以禁止输出 ASP.NET Core 应用程序启动时记录的，并且是通过默认的日志记录器输出的（Information）
 Log.Logger = new LoggerConfiguration()
     //.MinimumLevel.Debug() //设置日志记录器的最小级别为 Debug，即只记录 Debug、Information、Warning、Error 和 Fatal 级别的日志事件。
-    //.MinimumLevel.Override("Microsoft", LogEventLevel.Information)//对 Microsoft 命名空间下的所有日志事件进行重写，将最小级别设置为 Information，即只记录 Information、Warning、Error 和 Fatal 级别的日志事件。
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//对 Microsoft 命名空间下的所有日志事件进行重写，将最小级别设置为 Information，即只记录 Information、Warning、Error 和 Fatal 级别的日志事件。
     //.Enrich.FromLogContext() //启用日志上下文功能，自动获取当前线程和方法的一些信息，并添加到每个日志事件中。
-    //.WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
+    .WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
     .WriteTo.File("logs/{Date}/app.txt"
         , rollingInterval: RollingInterval.Day,
          rollOnFileSizeLimit: true, // 当日志文件大小超过指定大小时自动滚动日志文件
@@ -58,6 +62,9 @@ Log.Logger = new LoggerConfiguration()
           retainedFileCountLimit: 7, // 最多保留 7 天的日志文件
           outputTemplate: OUTPUT_TEMPLATE)
     .CreateLogger();
+
+
+
 
 ///写入数据库需要引用专用的NuGet包
 //string connectionString = "Data Source=localhost;Initial Catalog=Logs;Integrated Security=True";
