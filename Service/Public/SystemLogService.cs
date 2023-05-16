@@ -23,9 +23,9 @@ namespace Service
 		/// <returns></returns>
 		public async Task LogAdd(SystemLog log)
 		{
-            var repository = new Repository();
+			var repository = new Repository();
 			log.CreateTime = DateTime.Now;
-			log.CreateUser = "System";
+			log.Request = "test";
 			repository.CommandSet<SystemLog>().Insert(log);
 		}
 
@@ -79,7 +79,7 @@ namespace Service
 			////写入数据库
 			var repository = new Repository();
 			log.CreateTime = DateTime.Now;
-			log.CreateUser = "System";
+			log.Request = "test";
 			repository.CommandSet<SystemLog>().Insert(log);
 		}
 

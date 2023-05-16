@@ -8,7 +8,7 @@ namespace Model.Table
     /// <summary>
     /// 系統日志
     /// </summary>
-    [Display(Rename = "Ecomm_SystemLog")]
+    [Display(Rename = "SystemLog")]
     public class SystemLog
     {
         #region Model
@@ -19,25 +19,10 @@ namespace Model.Table
         public  int Id { get; set; }
 
         /// <summary>
-        /// 创建人
-        /// </summary>
-        public  string CreateUser { get; set; }
-        /// <summary>
         /// 创建时间
         /// </summary>
         public  DateTime CreateTime { get; set; }
-        /// <summary>
-        /// 修改人
-        /// </summary>
-        public  string UpdateUser { get; set; }
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public  DateTime UpdateTime { get; set; }
-        /// <summary>
-        /// 删除标志（已经删除[True]=1    未删除[False]=0）
-        /// </summary>
-        public  bool IsDelete { get; set; }
+
         /// <summary>
         /// 唯一编号
         /// </summary>
@@ -52,6 +37,11 @@ namespace Model.Table
         /// 条款Url
         /// </summary>
         public string APIName { get; set; }
+
+        /// <summary>
+        /// 请求方式  Get Post
+        /// </summary>
+        public string Request { get; set; }
 
         /// <summary>
         /// 用户编号
