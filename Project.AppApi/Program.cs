@@ -70,20 +70,35 @@ const string OUTPUT_TEMPLATE = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}]
 
 
 //输出日志等级,可以禁止输出 ASP.NET Core 应用程序启动时记录的，并且是通过默认的日志记录器输出的（Information）
+//Log.Logger = new LoggerConfiguration()
+//    .MinimumLevel.Debug() //设置日志记录器的最小级别为 Debug，即只记录 Debug、Information、Warning、Error 和 Fatal 级别的日志事件。
+//    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//对 Microsoft 命名空间下的所有日志事件进行重写，将最小级别设置为 Information，即只记录 Information、Warning、Error 和 Fatal 级别的日志事件。
+//                                                              //.ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRODUCTION"}.json", optional: true).Build())
+//    .Enrich.FromLogContext() //启用日志上下文功能，自动获取当前线程和方法的一些信息，并添加到每个日志事件中。
+//    .WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
+//    //.WriteTo.File("logs/app.txt"
+//    //    , rollingInterval: RollingInterval.Day,
+//    //     rollOnFileSizeLimit: true, // 当日志文件大小超过指定大小时自动滚动日志文件
+//    //     fileSizeLimitBytes: 1048576, // 日志文件最大大小为 1MB
+//    //      retainedFileCountLimit: 7, // 最多保留 7 天的日志文件
+//    //      outputTemplate: OUTPUT_TEMPLATE)
+//    .WriteTo.MSSqlServer(GlobalConfig.ConnectionString, "dbo.[test]", columnOptions: columnOptions, autoCreateSqlTable: true) //restrictedToMinimumLevel: LogEventLevel.Information,
+//    .CreateLogger();
+
+string interval = "00:00:01"; //表示5秒
+TimeSpan ts;
+
+TimeSpan.TryParse(interval, out ts);
+
+
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug() //设置日志记录器的最小级别为 Debug，即只记录 Debug、Information、Warning、Error 和 Fatal 级别的日志事件。
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//对 Microsoft 命名空间下的所有日志事件进行重写，将最小级别设置为 Information，即只记录 Information、Warning、Error 和 Fatal 级别的日志事件。
-                                                              //.ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRODUCTION"}.json", optional: true).Build())
-    .Enrich.FromLogContext() //启用日志上下文功能，自动获取当前线程和方法的一些信息，并添加到每个日志事件中。
-    .WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
-    //.WriteTo.File("logs/app.txt"
-    //    , rollingInterval: RollingInterval.Day,
-    //     rollOnFileSizeLimit: true, // 当日志文件大小超过指定大小时自动滚动日志文件
-    //     fileSizeLimitBytes: 1048576, // 日志文件最大大小为 1MB
-    //      retainedFileCountLimit: 7, // 最多保留 7 天的日志文件
-    //      outputTemplate: OUTPUT_TEMPLATE)
-    .WriteTo.MSSqlServer("server=disk.risinguptech.com,36832;database=Project;user=risingup_admin;password=risingup2023;max pool size=300", "dbo.[test]", columnOptions: columnOptions, autoCreateSqlTable: true) //restrictedToMinimumLevel: LogEventLevel.Information,
+    .WriteTo
+    .MSSqlServer(
+        connectionString: GlobalConfig.ConnectionString,
+        sinkOptions: new MSSqlServerSinkOptions { TableName = "testnew" ,AutoCreateSqlTable=true,BatchPeriod=ts,BatchPostingLimit=1},
+        columnOptions:columnOptions)
     .CreateLogger();
+
 
 //测试日志输出
 Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmentVariable("USERNAME"), Environment.CurrentManagedThreadId);
