@@ -7,7 +7,7 @@ using ViewModel.App;
 namespace Project.AppApi.Controllers
 {
     /// <summary>
-    /// ²âÊÔ
+    /// æµ‹è¯•
     /// </summary>
     [ApiController]
     //[Route("[controller]")]
@@ -16,17 +16,17 @@ namespace Project.AppApi.Controllers
 
         private readonly ILogger<NetVersion> _logger;
 
-        //Êı¾İ¿âÁ´½Ó
+        //æ•°æ®åº“é“¾æ¥
         private IRepository connection;
 
         private ISystemLogService systemLogService { get; set; }
 
-       /// <summary>
-       /// 
-       /// </summary>
-       /// <param name="logger"></param>
-       /// <param name="connection"></param>
-       /// <param name="systemLogService"></param>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="connection"></param>
+        /// <param name="systemLogService"></param>
         public NetVersion(ILogger<NetVersion> logger, IRepository connection, ISystemLogService systemLogService)  //, IRepository connection
         {
             _logger = logger;
@@ -36,7 +36,7 @@ namespace Project.AppApi.Controllers
 
 
         /// <summary>
-        /// »ñÈ¡ÈÕÖ¾
+        /// è·å–æ—¥å¿—
         /// </summary>
         /// <returns></returns>
         [Route("/api/WeatherForecast/get-log")]
@@ -56,7 +56,7 @@ namespace Project.AppApi.Controllers
             systemLog.Token = Guid.NewGuid().ToString();
 
 
-            //¹ÊÒâÖÆÔì´íÎó
+            //æ•…æ„åˆ¶é€ é”™è¯¯
             //int a = 1;int b = 0;
             //int c = a / b;
 

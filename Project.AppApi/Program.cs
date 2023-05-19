@@ -16,14 +16,14 @@ var ApiName = "Project.AppApi";
 
 var builder = WebApplication.CreateBuilder(args);
 
-//»ñÈ¡Á¬½Ó×Ö·û´®
+//è·å–è¿æ¥å­—ç¬¦ä¸²
 GlobalConfig.ConnectionString = builder.Configuration.GetValue<string>("ConnectionStrings:SqlServer");
 
 // Add services to the container.
 
 builder.Services.AddControllers();
 
-//ÊÇ·ñ¿ªÆôSwagger
+//æ˜¯å¦å¼€å¯Swagger
 var getconfig = builder.Configuration.GetValue<bool>("ConfigSettings:SwaggerEnable");
 //Swagger
 if (getconfig)
@@ -32,17 +32,17 @@ if (getconfig)
 }
 
 
-//×¢ÈëDBÁ´½Ó
+//æ³¨å…¥DBé“¾æ¥
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<ISystemLogService, SystemLogService>();
 
 
-// ½«½Ó¿ÚÇëÇóÀ¹½ØÆ÷ºÍ´íÎóÀ¹½ØÆ÷ ×¢²áÎªÈ«¾Ö¹ıÂËÆ÷
+// å°†æ¥å£è¯·æ±‚æ‹¦æˆªå™¨å’Œé”™è¯¯æ‹¦æˆªå™¨ æ³¨å†Œä¸ºå…¨å±€è¿‡æ»¤å™¨
 builder.Services.AddMvc(options =>
 {
-    //½Ó¿ÚÇëÇóÀ¹½ØÆ÷
+    //æ¥å£è¯·æ±‚æ‹¦æˆªå™¨
     options.Filters.Add(typeof(ApiFilterAttribute));
-    //´íÎóÀ¹½ØÆ÷
+    //é”™è¯¯æ‹¦æˆªå™¨
     options.Filters.Add(typeof(ErrorFilterAttribute));
 });
 
@@ -63,32 +63,32 @@ var columnOptions = new ColumnOptions
 };
 
 
-//SerilLog  ÔÙServiceÖĞÒıÓÃ´ÎNuGet°ü
-//ThreadIdĞèÒªÒıÓÃ×¨ÓÃµÄNuGet°ü
+//SerilLog  å†Serviceä¸­å¼•ç”¨æ¬¡NuGetåŒ…
+//ThreadIdéœ€è¦å¼•ç”¨ä¸“ç”¨çš„NuGetåŒ…
 //const string OUTPUT_TEMPLATE = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} <{ThreadId}> [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 const string OUTPUT_TEMPLATE = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
 
-//Êä³öÈÕÖ¾µÈ¼¶,¿ÉÒÔ½ûÖ¹Êä³ö ASP.NET Core Ó¦ÓÃ³ÌĞòÆô¶¯Ê±¼ÇÂ¼µÄ£¬²¢ÇÒÊÇÍ¨¹ıÄ¬ÈÏµÄÈÕÖ¾¼ÇÂ¼Æ÷Êä³öµÄ£¨Information£©
+//è¾“å‡ºæ—¥å¿—ç­‰çº§,å¯ä»¥ç¦æ­¢è¾“å‡º ASP.NET Core åº”ç”¨ç¨‹åºå¯åŠ¨æ—¶è®°å½•çš„ï¼Œå¹¶ä¸”æ˜¯é€šè¿‡é»˜è®¤çš„æ—¥å¿—è®°å½•å™¨è¾“å‡ºçš„ï¼ˆInformationï¼‰
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug() //ÉèÖÃÈÕÖ¾¼ÇÂ¼Æ÷µÄ×îĞ¡¼¶±ğÎª Debug£¬¼´Ö»¼ÇÂ¼ Debug¡¢Information¡¢Warning¡¢Error ºÍ Fatal ¼¶±ğµÄÈÕÖ¾ÊÂ¼ş¡£
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//¶Ô Microsoft ÃüÃû¿Õ¼äÏÂµÄËùÓĞÈÕÖ¾ÊÂ¼ş½øĞĞÖØĞ´£¬½«×îĞ¡¼¶±ğÉèÖÃÎª Information£¬¼´Ö»¼ÇÂ¼ Information¡¢Warning¡¢Error ºÍ Fatal ¼¶±ğµÄÈÕÖ¾ÊÂ¼ş¡£
-    //.ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRODUCTION"}.json", optional: true).Build())
-    .Enrich.FromLogContext() //ÆôÓÃÈÕÖ¾ÉÏÏÂÎÄ¹¦ÄÜ£¬×Ô¶¯»ñÈ¡µ±Ç°Ïß³ÌºÍ·½·¨µÄÒ»Ğ©ĞÅÏ¢£¬²¢Ìí¼Óµ½Ã¿¸öÈÕÖ¾ÊÂ¼şÖĞ¡£
+    .MinimumLevel.Debug() //è®¾ç½®æ—¥å¿—è®°å½•å™¨çš„æœ€å°çº§åˆ«ä¸º Debugï¼Œå³åªè®°å½• Debugã€Informationã€Warningã€Error å’Œ Fatal çº§åˆ«çš„æ—¥å¿—äº‹ä»¶ã€‚
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//å¯¹ Microsoft å‘½åç©ºé—´ä¸‹çš„æ‰€æœ‰æ—¥å¿—äº‹ä»¶è¿›è¡Œé‡å†™ï¼Œå°†æœ€å°çº§åˆ«è®¾ç½®ä¸º Informationï¼Œå³åªè®°å½• Informationã€Warningã€Error å’Œ Fatal çº§åˆ«çš„æ—¥å¿—äº‹ä»¶ã€‚
+                                                              //.ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRODUCTION"}.json", optional: true).Build())
+    .Enrich.FromLogContext() //å¯ç”¨æ—¥å¿—ä¸Šä¸‹æ–‡åŠŸèƒ½ï¼Œè‡ªåŠ¨è·å–å½“å‰çº¿ç¨‹å’Œæ–¹æ³•çš„ä¸€äº›ä¿¡æ¯ï¼Œå¹¶æ·»åŠ åˆ°æ¯ä¸ªæ—¥å¿—äº‹ä»¶ä¸­ã€‚
     .WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
     //.WriteTo.File("logs/app.txt"
     //    , rollingInterval: RollingInterval.Day,
-    //     rollOnFileSizeLimit: true, // µ±ÈÕÖ¾ÎÄ¼ş´óĞ¡³¬¹ıÖ¸¶¨´óĞ¡Ê±×Ô¶¯¹ö¶¯ÈÕÖ¾ÎÄ¼ş
-    //     fileSizeLimitBytes: 1048576, // ÈÕÖ¾ÎÄ¼ş×î´ó´óĞ¡Îª 1MB
-    //      retainedFileCountLimit: 7, // ×î¶à±£Áô 7 ÌìµÄÈÕÖ¾ÎÄ¼ş
+    //     rollOnFileSizeLimit: true, // å½“æ—¥å¿—æ–‡ä»¶å¤§å°è¶…è¿‡æŒ‡å®šå¤§å°æ—¶è‡ªåŠ¨æ»šåŠ¨æ—¥å¿—æ–‡ä»¶
+    //     fileSizeLimitBytes: 1048576, // æ—¥å¿—æ–‡ä»¶æœ€å¤§å¤§å°ä¸º 1MB
+    //      retainedFileCountLimit: 7, // æœ€å¤šä¿ç•™ 7 å¤©çš„æ—¥å¿—æ–‡ä»¶
     //      outputTemplate: OUTPUT_TEMPLATE)
-    .WriteTo.MSSqlServer("server=disk.risinguptech.com,36832;database=Project;user=risingup_admin;password=risingup2023;max pool size=300", "dbo.[test]", columnOptions: columnOptions,  autoCreateSqlTable: true) //restrictedToMinimumLevel: LogEventLevel.Information,
+    .WriteTo.MSSqlServer("server=disk.risinguptech.com,36832;database=Project;user=risingup_admin;password=risingup2023;max pool size=300", "dbo.[test]", columnOptions: columnOptions, autoCreateSqlTable: true) //restrictedToMinimumLevel: LogEventLevel.Information,
     .CreateLogger();
 
-//²âÊÔÈÕÖ¾Êä³ö
+//æµ‹è¯•æ—¥å¿—è¾“å‡º
 Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmentVariable("USERNAME"), Environment.CurrentManagedThreadId);
 Log.Warning("No coins remain at position {@Position}", new { Lat = 25, Long = 134 });
-Log.Error("{EnvironmentUserName}{UserId}{RequestUri}",1,2,3);
+Log.Error("{EnvironmentUserName}{UserId}{RequestUri}", 1, 2, 3);
 Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmentVariable("USERNAME"), Environment.CurrentManagedThreadId);
 
 
@@ -107,7 +107,7 @@ Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmen
 
 
 
-///Ğ´ÈëÊı¾İ¿âĞèÒªÒıÓÃ×¨ÓÃµÄNuGet°ü
+///å†™å…¥æ•°æ®åº“éœ€è¦å¼•ç”¨ä¸“ç”¨çš„NuGetåŒ…
 //string connectionString = "Data Source=localhost;Initial Catalog=Logs;Integrated Security=True";
 
 //Log.Logger = new LoggerConfiguration()
@@ -123,22 +123,22 @@ Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmen
 //        })
 //    .CreateLogger();
 
-//Ğ´ÈëLog°¸Àı
+//å†™å…¥Logæ¡ˆä¾‹
 //Log.Information("Hello, Serilog!");
 //Log.Error("err");
 ///Log.CloseAndFlush();
 
-//×¢Èë Ìæ»»Ä¬ÈÏÈÕÖ¾
+//æ³¨å…¥ æ›¿æ¢é»˜è®¤æ—¥å¿—
 builder.Host.UseSerilog(Log.Logger, dispose: true);
 
 builder.Services.AddControllersWithViews();
 
 
-//GlobalConfig·½·¨×¢Èë
-//×¢ÈëÅäÖÃÈÕÖ¾
+//GlobalConfigæ–¹æ³•æ³¨å…¥
+//æ³¨å…¥é…ç½®æ—¥å¿—
 //GlobalConfig.SystemLogService()
 
-// ÅúÁ¿×¢²á·şÎñ
+// æ‰¹é‡æ³¨å†ŒæœåŠ¡
 //builder.Services.AddAutoFacs(new string[] { "Service.dll" });
 
 var app = builder.Build();
@@ -147,7 +147,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-//ÊÇ·ñ¿ªÆôSwagger
+//æ˜¯å¦å¼€å¯Swagger
 if (getconfig)
 {
     app.UseSwaggers(ApiName);
