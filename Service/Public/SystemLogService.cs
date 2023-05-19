@@ -16,166 +16,57 @@ namespace Service
         }
 
 
-		/// <summary>
-		/// 写入数据库日志
-		/// </summary>
-		/// <param name="log">日志内容</param>
-		/// <returns></returns>
-		public async Task LogAdd(SystemLog log)
-		{
-			var repository = new Repository();
-			log.CreateTime = DateTime.Now;
-			log.Request = "test";
-			repository.CommandSet<SystemLog>().Insert(log);
-		}
-
-		/// <summary>
-		/// 写入本地日志
-		/// </summary>
-		/// <param name="log">日志内容</param>
-		/// <returns></returns>
-		public async Task LocalLogAdd(SystemLog log)
-        {
-            //写入本地
-            //记录请求日志
-            Log.Information(JsonConvert.SerializeObject(new
-			{
-				log.Guid,
-				log.ClientType,
-				log.APIName,
-				log.Instructions,
-				log.ReqParameter,
-				log.ResParameter,
-				log.UserId,
-				log.DeviceId,
-				log.Time,
-				log.IP
-			}));
-        }
-
         /// <summary>
-        /// 写入本地和数据库日志
+        ///  写入日志
         /// </summary>
-        /// <param name="log">日志内容</param>
+        /// <param name="systemLogType">日志级别</param>
+        /// <param name="httpContext">请求内容</param>
+        /// <param name="instructions">操作说明</param>
+        /// <param name="reqParameter">请求参数内容</param>
+        /// <param name="resParameter">返回参数内容</param>
+        /// <param name="time">耗费时间</param>
+        /// <param name="ex">错误级别需要</param>
         /// <returns></returns>
-        public async Task LocalAndSqlLogAdd(SystemLog log)
+        public async Task LogAdd(SystemLogTypeEnum systemLogType, HttpContext httpContext, string instructions, string reqParameter, string resParameter, string? time, Exception? ex)
 		{
-            //写入本地
-            //记录请求日志
-            Log.Information(JsonConvert.SerializeObject(new
+			SystemLog systemLog = new SystemLog();
+			systemLog.Guid = httpContext.Request.Headers["GuidPwd"].ToString();
+			systemLog.ClientType = httpContext.Request.Headers["ClientType"].ToString();
+			systemLog.APIName = httpContext.Request.Path;
+			systemLog.Request = httpContext.Request.Method;
+            systemLog.UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]);
+			systemLog.DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString();
+            systemLog.Instructions = instructions;
+			systemLog.ReqParameter = reqParameter;
+			systemLog.ResParameter = resParameter;
+			systemLog.Time = string.IsNullOrEmpty(time)?"":time;
+			systemLog.IP = string.IsNullOrEmpty(httpContext.Connection.RemoteIpAddress.ToString()) ? "": httpContext.Connection.RemoteIpAddress.ToString();
+			systemLog.Server = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("USERNAME"))? "": Environment.GetEnvironmentVariable("USERNAME");
+
+            //判断传入参数
+            switch (systemLogType)
 			{
-				Guid = log.Guid,
-				ClientType = log.ClientType,
-				APIName = log.APIName,
-				Instructions = log.Instructions,
-				ReqParameter = log.ReqParameter,
-				ResParameter = log.ResParameter,
-				UserId = log.UserId,
-				DeviceId = log.DeviceId,
-				Time = log.Time,
-				log.IP
-			}));
-
-			////写入数据库
-			var repository = new Repository();
-			log.CreateTime = DateTime.Now;
-			log.Request = "test";
-			repository.CommandSet<SystemLog>().Insert(log);
-		}
-
-
-		/// <summary>
-		/// httpContext方式的时候一次写入日志
-		/// </summary>
-		/// <param name="httpContext">HTTP数据</param>
-		/// <param name="instructions">操作说明</param>
-		/// <param name="reqParameter">请求参数内容</param>
-		/// <param name="resParameter">返回参数内容</param>
-		/// <param name="type">类型 1：写数据库   2：写本地   3：同时写入数据库和本地</param>
-		/// <returns></returns>
-		public async Task AddLogByHttpContext(HttpContext httpContext, string instructions, string reqParameter, string resParameter, SystemLogType type)
-		{
-			string ip = httpContext.Connection.RemoteIpAddress.ToString();
-			switch (type)
-			{
-				case SystemLogType.Sql:
-					//写入数据库
-					await LogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = httpContext.Request.Path, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = "", IP = ip });
-					break;
-				case SystemLogType.Local:
-                    //写入本地日志
-                    await LocalLogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = httpContext.Request.Path, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = "", IP = ip });
-					break;
-				case SystemLogType.SqlAndLocal:
-                    //写入数据库和本地日志
-                    await LocalAndSqlLogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = httpContext.Request.Path, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = "", IP = ip });
+				case SystemLogTypeEnum.Verbose:
+                    Log.Verbose("An Verbose{@Exception}{UserName}{UserId}{RequestUri}",);
+                    break;
+                case SystemLogTypeEnum.Debug:
+                    Log.Debug("An Debug{@Exception}{UserName}{UserId}{RequestUri}", 1, 2, 3);
+                    break;
+                case SystemLogTypeEnum.Information:
+                    Log.Information("An Information{@Exception}{UserName}{UserId}{RequestUri}", 1, 2, 3);
+                    break;
+                case SystemLogTypeEnum.Warning:
+                    Log.Warning("An Warning{@Exception}{UserName}{UserId}{RequestUri}", 1, 2, 3);
+                    break;
+                case SystemLogTypeEnum.Error:
+                    Log.Error(ex, "An error occurred: {@Exception}{UserName}{UserId}{RequestUri}", ex, 1, 2, 3);
+                    break;
+                case SystemLogTypeEnum.Fatal:
+                    Log.Fatal("An Fatal{@Exception}{UserName}{UserId}{RequestUri}", ex, 1, 2, 3);
+                    break;
+                default:
 					break;
 			}
-		}
-
-
-		/// <summary>
-		/// httpContext方式的时候一次写入日志
-		/// </summary>
-		/// <param name="httpContext">HTTP数据</param>
-		/// <param name="instructions">操作说明</param>
-		/// <param name="reqParameter">请求参数内容</param>
-		/// <param name="resParameter">返回参数内容</param>
-		/// <param name="type">类型 1：写数据库   2：写本地   3：同时写入数据库和本地</param>
-		/// <param name="time"></param>
-		/// <returns></returns>
-		public async Task AddLogByHttpContext(HttpContext httpContext, string instructions, string reqParameter, string resParameter, SystemLogType type, string time)
-		{
-			string ip = httpContext.Connection.RemoteIpAddress.ToString();
-			switch (type)
-			{
-				case SystemLogType.Sql:
-                    //写入数据库
-                    await LogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = httpContext.Request.Path, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = time, IP = ip });
-					break;
-				case SystemLogType.Local:
-                    //写入本地日志
-                    await LocalLogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = httpContext.Request.Path, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = time, IP = ip });
-					break;
-				case SystemLogType.SqlAndLocal:
-                    //写入数据库和本地日志
-                    await LocalAndSqlLogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = httpContext.Request.Path, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = time, IP = ip });
-					break;
-			}
-		}
-
-
-		/// <summary>
-		/// httpContext方式的时候一次写入日志  apiName不同
-		/// </summary>
-		/// <param name="httpContext">HTTP数据</param>
-		/// <param name="aPIName">调用路径</param>
-		/// <param name="instructions">操作说明</param>
-		/// <param name="reqParameter">请求参数内容</param>
-		/// <param name="resParameter">返回参数内容</param>
-		/// <param name="type">类型 1：写数据库   2：写本地   3：同时写入数据库和本地</param>
-		/// <param name="time"></param>
-		/// <returns></returns>
-
-		public async Task AddLogByHttpContext(HttpContext httpContext, string aPIName, string instructions, string reqParameter, string resParameter, SystemLogType type, string time)
-		{
-			string ip = httpContext.Connection.RemoteIpAddress.ToString();
-			switch (type)
-			{
-				case SystemLogType.Sql:
-                    //写入数据库
-                    await LogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = aPIName, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = time, IP = ip });
-					break;
-				case SystemLogType.Local:
-                    //写入本地日志
-                    await LocalLogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = aPIName, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = time, IP = ip });
-					break;
-				case SystemLogType.SqlAndLocal:
-                    //写入数据库和本地日志
-                    await LocalAndSqlLogAdd(new SystemLog { Guid = httpContext.Request.Headers["GuidPwd"].ToString(), ClientType = httpContext.Request.Headers["ClientType"].ToString(), APIName = aPIName, UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]), DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString(), Instructions = instructions, ReqParameter = reqParameter, ResParameter = resParameter, Time = time, IP = ip });
-					break;
-			}
-		}
-
+        }
 	}
 }

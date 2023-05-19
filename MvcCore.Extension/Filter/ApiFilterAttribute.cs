@@ -7,6 +7,7 @@ using Model.Table;
 using Core;
 using Microsoft.Extensions.Logging;
 using IService;
+using Model.EnumModel;
 
 namespace MvcCore.Extension.Filter
 {
@@ -97,47 +98,35 @@ namespace MvcCore.Extension.Filter
             // 執行前
             try
             {
-                apiRequest.Add(new
-                {
-                    Title = "请求信息",
-                    Data = logData
-                });
+                apiRequest.Add(new{Title = "请求信息",Data = logData});
 
                 object responseValue = null;
-                
 
                 var executedContext = await next.Invoke();
                 //await Console.Out.WriteLineAsync("OnResourceExecutionAsync - After");
 
                 responseValue = executedContext.Result;
                 responseJson = JsonConvert.SerializeObject((responseValue as ObjectResult) is null ? responseValue : (responseValue as ObjectResult).Value);
-                apiRequest.Add(new
-                {
-                    Title = "返回信息",
-                    Data = responseJson
-                });
+
+                apiRequest.Add(new{Title = "返回信息",Data = responseJson});
             }
             catch (Exception ex)
             {
-                apiRequest.Add(new
-                {
-                    Title = "返回信息",
-                    Data = "异常"
-                });
-                //LogExtension.Error(ex);
+                //获取这个API执行到这里的时间
+                string Time = (DateTime.Now - ReqTime).ToString();
+
+                apiRequest.Add(new{Title = "返回信息",Data = "异常"});
+
+                //写入日志
+                await systemLogService.LogAdd(SystemLogTypeEnum.Information, context.HttpContext, "异常", JsonConvert.SerializeObject(logData), responseJson, Time, ex);
             }
             finally
             {
                 //获取这个API执行的时间
                 string Time = (DateTime.Now - ReqTime).ToString();
 
-                //LogExtension.Debug(JsonConvert.SerializeObject(apiRequest));
-
-                //获取IP
-                string ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
-
                 //写入日志
-                await systemLogService.LocalAndSqlLogAdd(new SystemLog { Guid = context.HttpContext.Request.Headers["Guid"].ToString(), ClientType = context.HttpContext.Request.Headers["ClientType"].ToString(), APIName = context.HttpContext.Request.Path, UserId = context.HttpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(context.HttpContext.Request.Headers["UserId"]), DeviceId = context.HttpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : context.HttpContext.Request.Headers["DeviceId"].ToString(), Instructions = "请求-返回", ReqParameter = JsonConvert.SerializeObject(logData), ResParameter = responseJson, Time = Time, IP = ip });
+                await systemLogService.LogAdd(SystemLogTypeEnum.Information, context.HttpContext, "请求-返回", JsonConvert.SerializeObject(logData), responseJson, Time,null);
             }
         }
 

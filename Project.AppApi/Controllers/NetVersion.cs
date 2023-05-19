@@ -1,6 +1,7 @@
 using IService;
 using Microsoft.AspNetCore.Mvc;
 using Model.Table;
+using Serilog;
 using ViewModel;
 using ViewModel.App;
 
@@ -44,21 +45,21 @@ namespace Project.AppApi.Controllers
         public async Task<ResultModel<AuthorizationTokenResDto>> Log()
         {
             ResultModel<AuthorizationTokenResDto> resultModel = new ResultModel<AuthorizationTokenResDto>();
-            //var connection = new Repository();
-            //var SystemLog = connection.QuerySet<SystemLog>().Get();
-            //_logger.LogInformation("INFO");
-            //_logger.LogError("ERROR");
-            //_logger.LogWarning("WARNING");
-            //_logger.LogDebug("DEBUG");
-
             AuthorizationTokenResDto systemLog = new AuthorizationTokenResDto();
             systemLog.UserId = 1;
             systemLog.Token = Guid.NewGuid().ToString();
 
-
             //故意制造错误
-            //int a = 1;int b = 0;
-            //int c = a / b;
+            try
+            {
+                int a = 1; int b = 0;
+                int c = a / b;
+            }
+            catch (Exception ex)
+            {
+                //写入错误日志
+                await systemLogService.ErrorLogAdd(ex);
+            }
 
             resultModel.data = systemLog;
             return resultModel;

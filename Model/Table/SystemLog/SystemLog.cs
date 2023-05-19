@@ -19,11 +19,6 @@ namespace Model.Table
         public  int Id { get; set; }
 
         /// <summary>
-        /// 创建时间
-        /// </summary>
-        public  DateTime CreateTime { get; set; }
-
-        /// <summary>
         /// 唯一编号
         /// </summary>
         public string Guid { get; set; }
@@ -39,7 +34,7 @@ namespace Model.Table
         public string APIName { get; set; }
 
         /// <summary>
-        /// 请求方式  Get Post
+        /// 请求方式  Get Post   context.Request.Method;
         /// </summary>
         public string Request { get; set; }
 
@@ -74,9 +69,19 @@ namespace Model.Table
         public string Time { get; set; }
 
         /// <summary>
-        /// 
+        /// 请求用户的IP
         /// </summary>
         public string IP { get; set; }
+
+        /// <summary>
+        /// Web服务器的主机名或IP地址  context.Request.Host.Value;
+        /// </summary>
+        //public string Host { get; set; }
+
+        /// <summary>
+        /// 服务器名称(负载均衡记录) Environment.GetEnvironmentVariable("USERNAME")
+        /// </summary>
+        public string Server { get; set; }
         #endregion
     }
 }

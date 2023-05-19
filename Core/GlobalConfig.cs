@@ -54,67 +54,19 @@ namespace Core
 	/// </summary>
 	public interface ILogService
 	{
-		/// <summary>
-		/// 写入数据库日志
-		/// </summary>
-		/// <param name="log">日志内容</param>
-		/// <returns></returns>
-		Task LogAdd(SystemLog log);
-
-		/// <summary>
-		/// 写入本地日志
-		/// </summary>
-		/// <param name="log">日志内容</param>
-		/// <returns></returns>
-		Task LocalLogAdd(SystemLog log);
-
-
-		/// <summary>
-		/// 写入本地和数据库日志
-		/// </summary>
-		/// <param name="log">日志内容</param>
-		/// <returns></returns>
-		Task LocalAndSqlLogAdd(SystemLog log);
-
-		/// <summary>
-		/// httpContext方式的时候一次写入日志
-		/// </summary>
-		/// <param name="httpContext">HTTP数据</param>
-		/// <param name="instructions">操作说明</param>
-		/// <param name="reqParameter">请求参数内容</param>
-		/// <param name="resParameter">返回参数内容</param>
-		/// <param name="type">类型 1：写数据库   2：写本地   3：同时写入数据库和本地</param>
-		/// <returns></returns>
-		Task AddLogByHttpContext(HttpContext httpContext, string instructions, string reqParameter, string resParameter, SystemLogType type);
-
-
-		/// <summary>
-		/// httpContext方式的时候一次写入日志
-		/// </summary>
-		/// <param name="httpContext">HTTP数据</param>
-		/// <param name="instructions">操作说明</param>
-		/// <param name="reqParameter">请求参数内容</param>
-		/// <param name="resParameter">返回参数内容</param>
-		/// <param name="type">类型 1：写数据库   2：写本地   3：同时写入数据库和本地</param>
-		/// <param name="time"></param>
-		/// <returns></returns>
-		Task AddLogByHttpContext(HttpContext httpContext, string instructions, string reqParameter, string resParameter, SystemLogType type, string time);
-
-
-		/// <summary>
-		/// httpContext方式的时候一次写入日志  apiName不同
-		/// </summary>
-		/// <param name="httpContext">HTTP数据</param>
-		/// <param name="aPIName">调用路径</param>
-		/// <param name="instructions">操作说明</param>
-		/// <param name="reqParameter">请求参数内容</param>
-		/// <param name="resParameter">返回参数内容</param>
-		/// <param name="type">类型 1：写数据库   2：写本地   3：同时写入数据库和本地</param>
-		/// <param name="time"></param>
-		/// <returns></returns>
-
-		Task AddLogByHttpContext(HttpContext httpContext, string aPIName, string instructions, string reqParameter, string resParameter, SystemLogType type, string time);
-	}
+        /// <summary>
+        ///  写入日志
+        /// </summary>
+        /// <param name="systemLogType">日志级别</param>
+        /// <param name="httpContext">请求内容</param>
+        /// <param name="instructions">操作说明</param>
+        /// <param name="reqParameter">请求参数内容</param>
+        /// <param name="resParameter">返回参数内容</param>
+        /// <param name="time">耗费时间</param>
+        /// <param name="ex">错误级别需要</param>
+        /// <returns></returns>
+        Task LogAdd(SystemLogTypeEnum systemLogType, HttpContext httpContext, string instructions, string reqParameter, string resParameter, string? time, Exception? ex)
+    }
 
 
 	/// <summary>
