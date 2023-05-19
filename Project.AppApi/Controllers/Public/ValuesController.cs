@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Project.AppApi.Controllers;
 
-namespace MetaMarket.AppApi.Controllers
+namespace Project.AppApi.Controllers
 {
-	[ApiExplorerSettings(IgnoreApi = true)]
+	[ApiExplorerSettings(IgnoreApi = false)]
 	[Route("api/[controller]")]
 	[ApiController]
 	public class ValuesController : BaseController

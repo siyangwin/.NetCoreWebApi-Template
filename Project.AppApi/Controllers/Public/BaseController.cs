@@ -1,7 +1,7 @@
-﻿using MvcCore.Extension.Filter;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using Model.EnumModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project.AppApi.Controllers
 {

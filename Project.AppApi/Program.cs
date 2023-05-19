@@ -10,17 +10,21 @@ using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
 using System.Data;
 using Model.EnumModel;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using MvcCore.Extension.Auth;
 using System.Configuration;
 
 var ApiName = "Project.AppApi";
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 //获取连接字符串
 GlobalConfig.ConnectionString = builder.Configuration.GetValue<string>("ConnectionStrings:SqlServer");
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 
 //是否开启Swagger
@@ -32,11 +36,6 @@ if (getconfig)
 }
 
 
-//注入DB链接
-builder.Services.AddScoped<IRepository, Repository>();
-builder.Services.AddScoped<ISystemLogService, SystemLogService>();
-
-
 // 将接口请求拦截器和错误拦截器 注册为全局过滤器
 builder.Services.AddMvc(options =>
 {
@@ -46,6 +45,7 @@ builder.Services.AddMvc(options =>
     options.Filters.Add(typeof(ErrorFilterAttribute));
 });
 
+#region SerilLog配置
 
 //SerilLog再Service中引用次NuGet包
 //ThreadId需要引用专用的NuGet包
@@ -116,7 +116,7 @@ Log.Logger = new LoggerConfiguration()
         columnOptions: columnOpts)
     .CreateLogger();
 
-#region SerilLog写入数据库
+#region SerilLog写入数据库Demo
 //WriteTo生效 AuditTo不生效
 //BatchPostingLimit: 用于设置批处理日志事件的数量限制。默认值为 50，即当累积了 50 条日志事件时就会将它们作为一个批次进行写入数据库。这个选项可以帮助优化性能，因为一次提交大量的日志事件比一次提交少量的日志事件效率更高。
 //BatchPeriod: 用于设置批处理的时间间隔。默认值为 2 秒，即每隔 2 秒就会将所有已缓存的日志事件作为一个批次进行写入数据库。这个选项可以保证在一定的时间间隔内一定会向数据库提交日志事件，以保证数据的实时性和完整性。
@@ -139,8 +139,10 @@ Log.Logger = new LoggerConfiguration()
 
 //注入 替换默认日志
 builder.Host.UseSerilog(Log.Logger, dispose: true);
+#endregion
 
 builder.Services.AddControllersWithViews();
+
 
 
 //GlobalConfig方法注入
@@ -149,6 +151,48 @@ builder.Services.AddControllersWithViews();
 
 // 批量注册服务
 //builder.Services.AddAutoFacs(new string[] { "Service.dll" });
+
+//注入DB链接
+builder.Services.AddScoped<IRepository, Repository>();
+//注入Log
+builder.Services.AddScoped<ISystemLogService, SystemLogService>();
+
+
+#region jwt验证
+
+//注入jwt
+builder.Services.AddScoped<GenerateJwt>();
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+
+//实例化对象
+var jwtConfig = new JwtConfig();
+//从Appsetting.config中读取出来赋值给对象
+builder.Configuration.Bind("JwtConfig", jwtConfig);
+
+builder.Services.AddAuthentication(option =>
+    {
+        //认证middleware配置
+        option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            //Token颁发机构
+            ValidIssuer = jwtConfig.Issuer,
+            //颁发给谁
+            ValidAudience = jwtConfig.Audience,
+            //这里的key要进行加密
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey)),
+            //是否验证Token有效期，使用当前时间与Token的Claims中的NotBefore和Expires对比
+            ValidateLifetime = true,
+        };
+    });
+#endregion
+
+
+
 
 var app = builder.Build();
 
@@ -195,7 +239,10 @@ app.Use(async (context, next) =>
 
 app.UseRouting();
 
-app.UseAuthorization();
+//注意顺序，先认证后授权，不然接口加入Token认证也不会通过
+app.UseAuthentication();//启动认证   
+
+app.UseAuthorization();//启动授权
 
 app.MapControllers();
 
