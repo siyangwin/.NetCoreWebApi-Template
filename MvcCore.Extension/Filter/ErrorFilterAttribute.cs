@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Core;
 using IService;
 using Microsoft.Extensions.Logging;
+using Model.EnumModel;
 
 namespace MvcCore.Extension.Filter
 {
@@ -41,7 +42,7 @@ namespace MvcCore.Extension.Filter
 		{
 
             //写入日志
-            systemLogService.LogAdd(new SystemLog { Guid = context.HttpContext.Request.Headers["GuidPwd"].ToString(), ClientType=context.HttpContext.Request.Headers["ClientType"].ToString(), APIName = context.HttpContext.Request.Path, UserId = context.HttpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(context.HttpContext.Request.Headers["UserId"]), DeviceId = context.HttpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : context.HttpContext.Request.Headers["DeviceId"].ToString(), Instructions = "错误", ReqParameter = JsonConvert.SerializeObject(context.Exception), ResParameter = "" });
+             systemLogService.LogAdd(SystemLogTypeEnum.Error, context.HttpContext, "异常", JsonConvert.SerializeObject(context.Exception), "", null, context.Exception);
 
 			return base.OnExceptionAsync(context);
 		}

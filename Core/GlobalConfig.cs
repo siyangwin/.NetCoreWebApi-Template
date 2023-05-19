@@ -54,18 +54,18 @@ namespace Core
 	/// </summary>
 	public interface ILogService
 	{
-        /// <summary>
-        ///  写入日志
-        /// </summary>
-        /// <param name="systemLogType">日志级别</param>
-        /// <param name="httpContext">请求内容</param>
-        /// <param name="instructions">操作说明</param>
-        /// <param name="reqParameter">请求参数内容</param>
-        /// <param name="resParameter">返回参数内容</param>
-        /// <param name="time">耗费时间</param>
-        /// <param name="ex">错误级别需要</param>
-        /// <returns></returns>
-        Task LogAdd(SystemLogTypeEnum systemLogType, HttpContext httpContext, string instructions, string reqParameter, string resParameter, string? time, Exception? ex)
+		/// <summary>
+		///  写入日志
+		/// </summary>
+		/// <param name="systemLogType">日志级别</param>
+		/// <param name="httpContext">请求内容</param>
+		/// <param name="instructions">操作说明</param>
+		/// <param name="reqParameter">请求参数内容</param>
+		/// <param name="resParameter">返回参数内容</param>
+		/// <param name="time">耗费时间</param>
+		/// <param name="ex">错误级别需要</param>
+		/// <returns></returns>
+		Task LogAdd(SystemLogTypeEnum systemLogType, HttpContext httpContext, string instructions, string reqParameter, string resParameter, string? time, Exception? ex);
     }
 
 

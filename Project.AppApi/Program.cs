@@ -1,17 +1,16 @@
 using Core;
 using MvcCore.Extension.Swagger;
+using MvcCore.Extension;
 using IService;
 using Service;
 using MvcCore.Extension.Filter;
 using Serilog;
-using Azure.Core;
 using Serilog.Events;
-using Model.Table;
 using Serilog.Sinks.MSSqlServer;
-using static Serilog.Sinks.MSSqlServer.ColumnOptions;
 using System.Collections.ObjectModel;
 using System.Data;
-using System;
+using Model.EnumModel;
+using System.Configuration;
 
 var ApiName = "Project.AppApi";
 
@@ -85,6 +84,7 @@ var columnOpts = new ColumnOptions
     }
 };
 
+columnOpts.Store.Remove(StandardColumn.Message);
 columnOpts.Store.Remove(StandardColumn.Properties);
 columnOpts.Store.Remove(StandardColumn.MessageTemplate);
 //columnOpts.Store.Add(StandardColumn.LogEvent);
@@ -161,6 +161,39 @@ if (getconfig)
 {
     app.UseSwaggers(ApiName);
 }
+
+app.Use(async (context, next) =>
+{
+    //表示此API是什么端
+    context.Request.Headers.Add("ClientType", "APP");
+
+    //注入Guid每次请求唯一编码
+    context.Request.Headers.Add("Guid", Guid.NewGuid().ToString("N"));
+
+    //获取默认语言
+    string language = context.QueryOrHeaders("language");
+    if (string.IsNullOrEmpty(language))
+    { 
+        language = ((int)LanguageEnum.CN).ToString(); 
+    }
+    context.SetHeaders("Language", language);
+
+    //token
+    context.SetHeaders("Token", context.QueryOrHeaders("Token"));
+
+    //街市id
+    string marketId = context.QueryOrHeaders("marketId");
+    if (string.IsNullOrEmpty(marketId))
+    {
+        //默认MarkertId
+        marketId = "1";
+    }
+    context.SetHeaders("MarketId", marketId);
+
+    await next();
+});
+
+app.UseRouting();
 
 app.UseAuthorization();
 

@@ -49,17 +49,17 @@ namespace Project.AppApi.Controllers
             systemLog.UserId = 1;
             systemLog.Token = Guid.NewGuid().ToString();
 
-            //故意制造错误
-            try
-            {
-                int a = 1; int b = 0;
-                int c = a / b;
-            }
-            catch (Exception ex)
-            {
-                //写入错误日志
-                await systemLogService.ErrorLogAdd(ex);
-            }
+            ////故意制造错误
+            //try
+            //{
+                //int a = 1; int b = 0;
+                //int c = a / b;
+            //}
+            //catch (Exception ex)
+            //{
+            //    //写入错误日志
+            //    await systemLogService.LogAdd(ex);
+            //}
 
             resultModel.data = systemLog;
             return resultModel;

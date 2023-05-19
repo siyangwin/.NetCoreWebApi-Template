@@ -15,7 +15,6 @@ namespace Service
         {
         }
 
-
         /// <summary>
         ///  写入日志
         /// </summary>
@@ -30,7 +29,7 @@ namespace Service
         public async Task LogAdd(SystemLogTypeEnum systemLogType, HttpContext httpContext, string instructions, string reqParameter, string resParameter, string? time, Exception? ex)
 		{
 			SystemLog systemLog = new SystemLog();
-			systemLog.Guid = httpContext.Request.Headers["GuidPwd"].ToString();
+			systemLog.Guid = httpContext.Request.Headers["Guid"].ToString();
 			systemLog.ClientType = httpContext.Request.Headers["ClientType"].ToString();
 			systemLog.APIName = httpContext.Request.Path;
 			systemLog.Request = httpContext.Request.Method;
@@ -43,26 +42,30 @@ namespace Service
 			systemLog.IP = string.IsNullOrEmpty(httpContext.Connection.RemoteIpAddress.ToString()) ? "": httpContext.Connection.RemoteIpAddress.ToString();
 			systemLog.Server = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("USERNAME"))? "": Environment.GetEnvironmentVariable("USERNAME");
 
+
+            //string MessageTemplate = "{Guid}{ClientType}{APIName}{Request}{UserId}{DeviceId}{Instructions}{ReqParameter}{ResParameter}{Time}{IP}{Server}";
+            string MessageTemplate = "\"Guid\":\"{Guid}\",\"ClientType\":\"{ClientType}\",\"APIName\":\"{APIName}\",\"Request\":\"{Request}\",\"UserId\":\"{UserId}\",\"DeviceId\":\"{DeviceId}\",\"Instructions\":\"{Instructions}\",\"ReqParameter\":\"{ReqParameter}\",\"ResParameter\":\"{ResParameter}\",\"Time\":\"{Time}\",\"IP\":\"{IP}\",\"Server\":\"{Server}\"";
+
             //判断传入参数
             switch (systemLogType)
 			{
 				case SystemLogTypeEnum.Verbose:
-                    Log.Verbose("An Verbose{@Exception}{UserName}{UserId}{RequestUri}",);
+                    Log.Verbose(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
                     break;
                 case SystemLogTypeEnum.Debug:
-                    Log.Debug("An Debug{@Exception}{UserName}{UserId}{RequestUri}", 1, 2, 3);
+                    Log.Debug(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
                     break;
                 case SystemLogTypeEnum.Information:
-                    Log.Information("An Information{@Exception}{UserName}{UserId}{RequestUri}", 1, 2, 3);
+                    Log.Information(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
                     break;
                 case SystemLogTypeEnum.Warning:
-                    Log.Warning("An Warning{@Exception}{UserName}{UserId}{RequestUri}", 1, 2, 3);
+                    Log.Warning(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
                     break;
                 case SystemLogTypeEnum.Error:
-                    Log.Error(ex, "An error occurred: {@Exception}{UserName}{UserId}{RequestUri}", ex, 1, 2, 3);
+                    Log.Error(ex, MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
                     break;
                 case SystemLogTypeEnum.Fatal:
-                    Log.Fatal("An Fatal{@Exception}{UserName}{UserId}{RequestUri}", ex, 1, 2, 3);
+                    Log.Fatal(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
                     break;
                 default:
 					break;
