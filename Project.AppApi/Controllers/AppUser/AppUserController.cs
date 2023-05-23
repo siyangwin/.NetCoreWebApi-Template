@@ -85,7 +85,7 @@ namespace Project.AppApi.Controllers
             ResultModel<AuthorizationTokenResDto> resultModel = new ResultModel<AuthorizationTokenResDto>();
             AuthorizationTokenResDto authorizationTokenResDto = new AuthorizationTokenResDto();
 
-            var auth = Token.Split("")[1];
+            var auth = Token.Split(" ")[1];
             var jwtArr = auth.Split(".");
             var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(Base64UrlEncoder.Decode(jwtArr[1]));
 

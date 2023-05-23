@@ -43,6 +43,8 @@ builder.Services.AddMvc(options =>
     options.Filters.Add(typeof(ApiFilterAttribute));
     //错误拦截器
     options.Filters.Add(typeof(ErrorFilterAttribute));
+    //授权验证拦截器
+    options.Filters.Add(typeof(AuthValidator));
 });
 
 #region SerilLog配置

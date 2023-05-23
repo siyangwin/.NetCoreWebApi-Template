@@ -12,7 +12,8 @@ namespace Project.AppApi.Controllers
 	//[ErrorFilter]
 	//[AuthValidator]
 	[ApiController]
-	public class BaseController : ControllerBase
+    //[Authorize]  //加了这个，所有的API都会需要鉴权
+    public class BaseController : ControllerBase
 	{
 		private string _userid { get => base.HttpContext.Request.Headers["UserId"].ToString(); }
 		//private string _username { get => base.HttpContext.Request.Headers["UserName"].ToString(); }
