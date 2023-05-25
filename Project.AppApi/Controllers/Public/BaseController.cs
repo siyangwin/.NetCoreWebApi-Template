@@ -23,10 +23,6 @@ namespace Project.AppApi.Controllers
 		/// </summary>
 		public int UserId { get => !string.IsNullOrEmpty(_userid) ? Convert.ToInt32(_userid) : 0; }
 
-		///// <summary>
-		///// 用戶名稱
-		///// </summary>
-		//public string UserName { get => _username; }
 
 		/// <summary>
 		/// token
