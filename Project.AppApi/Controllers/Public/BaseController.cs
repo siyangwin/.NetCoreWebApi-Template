@@ -8,16 +8,12 @@ namespace Project.AppApi.Controllers
 	/// <summary>
 	/// 控制器基類
 	/// </summary>
-	//[ApiFilter]
-	//[ErrorFilter]
-	//[AuthValidator]
 	[ApiController]
     [Authorize]  //加了这个，所有的API都会需要鉴权
 
     public class BaseController : ControllerBase
 	{
 		private string _userid { get => base.HttpContext.Request.Headers["UserId"].ToString(); }
-		//private string _username { get => base.HttpContext.Request.Headers["UserName"].ToString(); }
 		private string _token { get => base.HttpContext.Request.Headers["Token"].ToString(); }
 		private string _language { get => base.HttpContext.Request.Headers["Language"].ToString(); }
 		private string _marketId { get => base.HttpContext.Request.Headers["marketId"].ToString(); }
