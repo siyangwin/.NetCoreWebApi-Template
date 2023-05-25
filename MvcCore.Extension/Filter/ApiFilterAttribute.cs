@@ -159,7 +159,7 @@ namespace MvcCore.Extension.Filter
                  //记录head
                 string header = JsonConvert.SerializeObject(context.Request.Headers);
                 //记录参数内容
-                var content = new StreamReader(context.Request.Body, UTF8Encoding.UTF8).ReadToEndAsync();
+                var content = new StreamReader(context.Request.Body, UTF8Encoding.UTF8).ReadToEndAsync().Result;
                 context.Request.Body.Dispose();
                 builder.Append(JsonConvert.SerializeObject(new { header, content }));
                 builder.Append(Environment.NewLine);

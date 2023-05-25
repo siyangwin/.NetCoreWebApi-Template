@@ -88,7 +88,7 @@ namespace Core
 		/// </summary>
 		/// <param name="Token">传入Token</param>
 		/// <returns></returns>
-		ResultModel<AuthorizationTokenResDto> CheckAuthorizationToken(string Token);
+		ResultModel<AuthorizationResDto> CheckAuthorizationToken(string Token);
 
 
 		bool DeleteAuthorizationToken(int UserId);

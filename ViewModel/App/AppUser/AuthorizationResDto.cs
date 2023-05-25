@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace ViewModel.App
 {
     /// <summary>
-    /// 用户令牌
+    /// 授权返回类
     /// </summary>
-    public class AuthorizationTokenResDto
+    public class AuthorizationResDto
     {
         /// <summary>
-        /// 当前用户令牌
+        /// 授权令牌
         /// </summary>
-        public string Token { get; set; }
+        public string Authorization { get; set; }
     }
 }

@@ -24,21 +24,20 @@ namespace MvcCore.Extension.Auth
         /// <summary>
         /// 生成token
         /// </summary>
-        /// <param name="sub"></param>
-        /// <param name="customClaims">携带的用户信息</param>
+        /// <param name="UserId">携带的用户信息</param>
         /// <returns></returns>
-        public string GenerateEncodedTokenAsync(string sub, int userid)
+        public string GenerateEncodedTokenAsync(int UserId)
         {
             //创建用户身份标识，可按需要添加更多信息
             var claims = new List<Claim>
             {
-                new Claim("userid", userid.ToString()),
+                new Claim("UserId", UserId.ToString()),
                 //new Claim("username", customClaims.username),
                 //new Claim("realname",customClaims.realname),
                 //new Claim("roles", string.Join(";",customClaims.roles)),
                 //new Claim("permissions", string.Join(";",customClaims.permissions)),
                 //new Claim("normalPermissions", string.Join(";",customClaims.normalPermissions)),
-                new Claim(JwtRegisteredClaimNames.Sub, sub),
+                //new Claim(JwtRegisteredClaimNames.Sub, sub),
             };
             //创建令牌
             var jwt = new JwtSecurityToken(
@@ -52,13 +51,6 @@ namespace MvcCore.Extension.Auth
             string access_token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
             return access_token;
-            //return new JwtTokenResult()
-            //{
-            //    access_token = access_token,
-            //    expires_in = _jwtConfig.Expired * 60,
-            //    token_type = JwtBearerDefaults.AuthenticationScheme,
-            //    user = customClaims
-            //};
         }
     }
 }

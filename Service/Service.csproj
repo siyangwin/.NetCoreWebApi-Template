@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.Mssql.csproj" />
     <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj" />
     <ProjectReference Include="..\Kogel.Repository\Kogel.Repository.csproj" />
+    <ProjectReference Include="..\MvcCore.Extension\MvcCore.Extension.csproj" />
   </ItemGroup>
 
 </Project>

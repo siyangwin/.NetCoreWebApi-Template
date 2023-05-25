@@ -18,6 +18,8 @@ using System.Configuration;
 using Autofac.Core;
 using System.Net;
 using Newtonsoft.Json;
+using IService.App;
+using Service.App;
 
 var ApiName = "Project.AppApi";
 
@@ -161,6 +163,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IRepository, Repository>();
 //注入Log
 builder.Services.AddScoped<ISystemLogService, SystemLogService>();
+//注入用户类
+builder.Services.AddScoped<IAppUserService,AppUserService>();
 
 
 #region jwt验证
