@@ -15,6 +15,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MvcCore.Extension.Auth;
 using System.Configuration;
+using Autofac.Core;
+using System.Net;
+using Newtonsoft.Json;
 
 var ApiName = "Project.AppApi";
 
@@ -43,8 +46,8 @@ builder.Services.AddMvc(options =>
     options.Filters.Add(typeof(ApiFilterAttribute));
     //错误拦截器
     options.Filters.Add(typeof(ErrorFilterAttribute));
-    //授权验证拦截器
-    options.Filters.Add(typeof(AuthValidator));
+    ////授权验证拦截器
+    //options.Filters.Add(typeof(AuthValidator));
 });
 
 #region SerilLog配置
@@ -179,18 +182,52 @@ builder.Services.AddAuthentication(option =>
     })
     .AddJwtBearer(options =>
     {
+        //指定Jwt的验证
         options.TokenValidationParameters = new TokenValidationParameters
         {
             //Token颁发机构
+            //指定 JWT 的颁发者（issuer），即表示 JWT 令牌的来源。
             ValidIssuer = jwtConfig.Issuer,
             //颁发给谁
+            //指定 JWT 的受众（audience），即表示 JWT 令牌应该被哪些客户端使用。
             ValidAudience = jwtConfig.Audience,
             //这里的key要进行加密
+            //指定用于对 JWT 签名进行验证的密钥。在这里使用 SymmetricSecurityKey 类型来指定密钥，其可以是任何字节数组，例如使用 Encoding.UTF8.GetBytes() 方法将字符串转换为字节数组。
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey)),
             //是否验证Token有效期，使用当前时间与Token的Claims中的NotBefore和Expires对比
+            //指示是否验证 JWT 令牌的有效期。当服务器收到一个 JWT 令牌时，会检查其 Claims 中的 NotBefore 和 Expires 是否在当前时间范围内。如果 ValidateLifetime 设置为 true，则服务器将拒绝过期的 JWT 令牌，并认为它是无效的。
             ValidateLifetime = true,
+            //指示是否验证 JWT 的签名密钥。
+            ValidateIssuerSigningKey = true,
+            //指示是否验证 JWT 的颁发者。
+            ValidateIssuer =true,
+            //指示是否验证 JWT 的受众。
+            ValidateAudience =true,
+        };
+
+        //指定Jwt的返回内容
+        options.Events = new JwtBearerEvents
+        {
+            //此处为权限验证失败后触发的事件
+            OnChallenge = context =>
+            {
+                //此处代码为终止.Net Core默认的返回类型和数据结果，这个很重要哦，必须
+                context.HandleResponse();
+
+                //自定义自己想要返回的数据结果，我这里要返回的是Json对象，通过引用Newtonsoft.Json库进行转换
+                var payload = JsonConvert.SerializeObject(new { Code = "401", Message = "很抱歉，您无权访问该接口；这是一个JWT权限验证失败后自定义返回Json数据对象" });
+                //自定义返回的数据类型
+                context.Response.ContentType = "application/json";
+                //自定义返回状态码，默认为401 我这里改成 200
+                context.Response.StatusCode = StatusCodes.Status200OK;
+                //context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                //输出Json数据结果
+                context.Response.WriteAsync(payload);
+                return Task.FromResult(0);
+            }
         };
     });
+
 #endregion
 
 
@@ -225,8 +262,9 @@ app.Use(async (context, next) =>
     context.SetHeaders("Language", language);
 
     //token
-    context.SetHeaders("Token", context.QueryOrHeaders("Token"));
-
+    //context.SetHeaders("Token", context.QueryOrHeaders("Token"));
+    context.SetHeaders("Token", context.QueryOrHeaders("Authorization"));
+    
     //街市id
     string marketId = context.QueryOrHeaders("marketId");
     if (string.IsNullOrEmpty(marketId))
@@ -241,10 +279,14 @@ app.Use(async (context, next) =>
 
 app.UseRouting();
 
+
 //注意顺序，先认证后授权，不然接口加入Token认证也不会通过
 app.UseAuthentication();//启动认证   
 
 app.UseAuthorization();//启动授权
+
+//添加 JWT 异常处理中间件
+app.UseMiddleware<AuthValidator>();
 
 app.MapControllers();
 
