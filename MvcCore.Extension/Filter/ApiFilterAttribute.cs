@@ -8,6 +8,7 @@ using Core;
 using Microsoft.Extensions.Logging;
 using IService;
 using Model.EnumModel;
+using Azure.Core;
 
 namespace MvcCore.Extension.Filter
 {
@@ -93,6 +94,12 @@ namespace MvcCore.Extension.Filter
                 RequestParam = GetParamString(context.HttpContext)
             };
 
+
+            //var logData = new
+            //{
+            //    kjjj = 1
+            //};
+
             string responseJson = string.Empty;
 
             // 執行前
@@ -153,17 +160,70 @@ namespace MvcCore.Extension.Filter
                 }
             }
 
-            //检查 HTTP 请求体是否可读
+            ////验证是否存在Raw参数
+            //if (context.Request.Body.CanRead)
+            //{
+            //    var memery = new System.IO.MemoryStream();
+            //    context.Request.Body.CopyTo(memery);
+            //    memery.Position = 0;
+            //    //记录head
+            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
+            //    //记录参数内容
+            //    string content = new StreamReader(memery, UTF8Encoding.UTF8).ReadToEnd();
+            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
+            //    builder.Append(Environment.NewLine);
+            //    memery.Position = 0;
+            //    context.Request.Body = memery;
+            //}
+
+         
+            ////检查 HTTP 请求体是否可读
+            //if (context.Request.Body.CanRead)
+            //{
+            //    //记录head
+            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
+
+            //    //记录参数内容
+            //    var content = new StreamReader(context.Request.Body, UTF8Encoding.UTF8).ReadToEndAsync().Result;
+            //    //context.Request.Body.Dispose();
+            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
+            //    //builder.Append(Environment.NewLine);
+            //    context.Request.Body.Seek(0, SeekOrigin.Begin);
+            //}
+
+
+            var requestBody = string.Empty;
             if (context.Request.Body.CanRead)
             {
-                 //记录head
-                string header = JsonConvert.SerializeObject(context.Request.Headers);
-                //记录参数内容
-                var content = new StreamReader(context.Request.Body, UTF8Encoding.UTF8).ReadToEndAsync().Result;
-                context.Request.Body.Dispose();
-                builder.Append(JsonConvert.SerializeObject(new { header, content }));
-                builder.Append(Environment.NewLine);
+                // 记录请求头部信息
+                var headers = JsonConvert.SerializeObject(context.Request.Headers);
+
+                // 读取请求体参数内容
+                var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
+                requestBody = reader.ReadToEndAsync().Result;
+
+                // 重置请求流位置
+                if (context.Request.Body.CanSeek)
+                {
+                    context.Request.Body.Seek(0, SeekOrigin.Begin);
+                }
+
+                // 记录请求内容
+                var requestJson = JsonConvert.SerializeObject(new { Headers = headers, Body = requestBody });
+                builder.Append(requestJson);
             }
+
+            ////检查 HTTP 请求体是否可读
+            //if (context.Request.Body.CanRead)
+            //{
+            //     //记录head
+            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
+            //    //记录参数内容
+            //    var content = new StreamReader(context.Request.Body, UTF8Encoding.UTF8).ReadToEndAsync().Result;
+            //    //context.Request.Body.Dispose();
+            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
+            //    builder.Append(Environment.NewLine);
+            //}
             return builder.ToString();
         }
     }

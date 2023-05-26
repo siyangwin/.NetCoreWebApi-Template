@@ -52,7 +52,7 @@ namespace Project.AppApi.Controllers
         [Route("/api/appuser/authorizationnew")]
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ResultModel<AuthorizationResDto>> AuthorizationNew(AuthorizationReqDto req)
+        public async Task<ResultModel<AuthorizationResDto>> AuthorizationNew([FromBody] AuthorizationReqDto req)
         {
             return appUserService.Authorization(Language, req);
         }
