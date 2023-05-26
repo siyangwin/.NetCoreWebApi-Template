@@ -33,12 +33,21 @@ namespace MvcCore.Extension.Auth
         {
             try
             {
+                // 获取用户 ID (sub) 声明值
+                var UserId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (UserId != null && !string.IsNullOrEmpty(UserId))
+                {
+                    //身份写入Header
+                    context.Request.Headers.Add("UserId", UserId);
+                }
+
                 //检查当前的接口是否需要验证
                 // 检查当前 Action 是否带有 [AllowAnonymous] 特性
                 var actionDescriptor = context.GetEndpoint()?.Metadata?.GetMetadata<ControllerActionDescriptor>();
                 var allowAnonymous = actionDescriptor != null && actionDescriptor.ControllerTypeInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any() || actionDescriptor.MethodInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any();
 
-                // 如果当前 Action 不需要身份验证，则直接调用下一个中间件或控制器
+                // 如果当前Action 不需要身份验证，则直接调用下一个中间件或控制器
                 if (allowAnonymous || !context.User.Identity.IsAuthenticated)
                 {
                     await _next(context);
@@ -90,18 +99,8 @@ namespace MvcCore.Extension.Auth
                 else
                 {
                     // 其他错误，交给 ASP.NET Core 处理
-                    throw ex;
+                    //throw ex;
                 }
-
-
-                //// JWT 校验失败，构造自定义错误信息
-                //var error = new { message = "Invalid token." };
-                //var json = JsonConvert.SerializeObject(error);
-
-                //// 设置响应状态码和内容
-                //context.Response.StatusCode = 401;
-                //context.Response.ContentType = "application/json";
-                //await context.Response.WriteAsync(json);
             }
         }
 
@@ -118,28 +117,11 @@ namespace MvcCore.Extension.Auth
             //从Header中获取token
             string token = context.HttpContext.Request.Headers["Token"];
 
-            //如果为空,变从Query中获取
-            if (string.IsNullOrEmpty(token))
-                token = context.HttpContext.Request.Query["Token"];
-
             if (!string.IsNullOrEmpty(token))
             {
                 try
                 {
-                    ////获取Token缓存数据
-                    //var claims = MemoryCacheHelper.Get<ClaimsIdentity>(token);
-
-                    #region 新添加逻辑：cms用token登录，并且不用保存到db中的判断
-                    //新添加逻辑：cms用token登录，并且不用保存到db中的判断
-                    if (context.HttpContext.Request.Headers["ClientType"] == "CMS")
-                    {
-                      
-                    }
-                    #endregion
-                    else
-                    {
-                       
-                    }
+                   //此处可以分别为APP和CMS做不同的操作
                 }
                 catch (Exception ex)
                 {

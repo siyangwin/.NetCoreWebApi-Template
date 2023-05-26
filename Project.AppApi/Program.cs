@@ -219,7 +219,7 @@ builder.Services.AddAuthentication(option =>
                 context.HandleResponse();
 
                 //自定义自己想要返回的数据结果，我这里要返回的是Json对象，通过引用Newtonsoft.Json库进行转换
-                var payload = JsonConvert.SerializeObject(new { Code = "401", Message = "很抱歉，您无权访问该接口；这是一个JWT权限验证失败后自定义返回Json数据对象" });
+                var payload = JsonConvert.SerializeObject(new { api_version = "v1", success = false, code = "401", message = "很抱歉，您无权访问,请授权!" });
                 //自定义返回的数据类型
                 context.Response.ContentType = "application/json";
                 //自定义返回状态码，默认为401 我这里改成 200
@@ -265,18 +265,19 @@ app.Use(async (context, next) =>
     }
     context.SetHeaders("Language", language);
 
-    //token
+    //Token
     //context.SetHeaders("Token", context.QueryOrHeaders("Token"));
-    context.SetHeaders("Token", context.QueryOrHeaders("Authorization"));
+    string Token = context.QueryOrHeaders("Authorization");
+    context.SetHeaders("Token", Token);
     
-    //街市id
-    string marketId = context.QueryOrHeaders("marketId");
-    if (string.IsNullOrEmpty(marketId))
-    {
-        //默认MarkertId
-        marketId = "1";
-    }
-    context.SetHeaders("MarketId", marketId);
+    ////街市id
+    //string marketId = context.QueryOrHeaders("marketId");
+    //if (string.IsNullOrEmpty(marketId))
+    //{
+    //    //默认MarkertId
+    //    marketId = "1";
+    //}
+    //context.SetHeaders("MarketId", marketId);
 
     await next();
 });

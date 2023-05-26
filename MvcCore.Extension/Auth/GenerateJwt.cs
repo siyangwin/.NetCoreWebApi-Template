@@ -37,7 +37,7 @@ namespace MvcCore.Extension.Auth
                 //new Claim("roles", string.Join(";",customClaims.roles)),
                 //new Claim("permissions", string.Join(";",customClaims.permissions)),
                 //new Claim("normalPermissions", string.Join(";",customClaims.normalPermissions)),
-                //new Claim(JwtRegisteredClaimNames.Sub, sub),
+                new Claim(JwtRegisteredClaimNames.Sub, UserId.ToString())
             };
             //创建令牌
             var jwt = new JwtSecurityToken(

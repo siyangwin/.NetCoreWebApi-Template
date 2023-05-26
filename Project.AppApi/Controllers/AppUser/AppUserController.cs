@@ -23,47 +23,26 @@ namespace Project.AppApi.Controllers
             this.appUserService = appUserService;
         }
 
-
         /// <summary>
         /// 授权
         /// </summary>
         /// <param name="AuthorizationInfo">授权信息</param>
         /// <returns></returns>
         [Route("/api/appuser/authorization")]
-        [HttpGet]
+        [HttpPost]
         [AllowAnonymous]
-        public async Task<ResultModel<AuthorizationResDto>> Authorization(string account,string password)
+        public async Task<ResultModel<AuthorizationResDto>> Authorization(AuthorizationReqDto AuthorizationInfo)
         {
-            //return null;
-            AuthorizationReqDto AuthorizationInfo = new AuthorizationReqDto();
-            AuthorizationInfo.account = account;
-            AuthorizationInfo.password = password;
-
             return appUserService.Authorization(Language, AuthorizationInfo);
         }
 
-
-
         /// <summary>
-        /// 授权
-        /// </summary>
-        /// <param name="AuthorizationInfo">授权信息</param>
-        /// <returns></returns>
-        [Route("/api/appuser/authorizationnew")]
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ResultModel<AuthorizationResDto>> AuthorizationNew([FromBody] AuthorizationReqDto req)
-        {
-            return appUserService.Authorization(Language, req);
-        }
-
-        /// <summary>
-        /// 查看数据
+        /// 查看授权信息--授权
         /// </summary>
         /// <returns></returns>
-        [Route("/api/appuser/checkuserinfo")]
+        [Route("/api/appuser/checkauthorizationinfo")]
         [HttpGet]
-        public async Task<ResultModel<string>> check()
+        public async Task<ResultModel<string>> CheckAuthorizationInfo()
         {
             ResultModel<string> resultModel = new ResultModel<string>();
 
@@ -74,13 +53,13 @@ namespace Project.AppApi.Controllers
 
 
         /// <summary>
-        /// 查看数据
+        /// 查看数据-无需授权
         /// </summary>
         /// <returns></returns>
-        [Route("/api/appuser/checkuserinfonew")]
+        [Route("/api/appuser/checknoAuthorizationinfo")]
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ResultModel<string>> checknew()
+        public async Task<ResultModel<string>> CheckNoAuthorizationInfo()
         {
             ResultModel<string> resultModel = new ResultModel<string>();
             resultModel.data = "当前用户为：" + UserId;

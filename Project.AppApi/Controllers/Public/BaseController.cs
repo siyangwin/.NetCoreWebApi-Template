@@ -9,7 +9,7 @@ namespace Project.AppApi.Controllers
 	/// 控制器基類
 	/// </summary>
 	[ApiController]
-    //[Authorize]  //加了这个，所有的API都会需要鉴权
+    [Authorize]  //加了这个，所有的API都会需要鉴权
 
     public class BaseController : ControllerBase
 	{
