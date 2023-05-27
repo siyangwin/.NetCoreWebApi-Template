@@ -21,5 +21,11 @@ namespace IService.App
         /// <param name="AuthorizationInfo">授权信息</param>
         /// <returns></returns>
         ResultModel<AuthorizationResDto> Authorization(LanguageEnum language, AuthorizationReqDto AuthorizationInfo);
+
+        /// <summary>
+        /// 写入数据
+        /// </summary>
+        /// <returns></returns>
+        ResultModel ProductInsert(LanguageEnum language, List<ProductInfoReqDto> Req);
     }
 }

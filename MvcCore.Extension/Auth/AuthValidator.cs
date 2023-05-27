@@ -99,7 +99,7 @@ namespace MvcCore.Extension.Auth
                 else
                 {
                     // 其他错误，交给 ASP.NET Core 处理
-                    //throw ex;
+                    throw ex;
                 }
             }
         }

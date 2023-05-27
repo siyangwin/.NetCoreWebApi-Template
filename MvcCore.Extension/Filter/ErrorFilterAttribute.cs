@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Model.Table;
 using Newtonsoft.Json;
-using Core;
 using IService;
-using Microsoft.Extensions.Logging;
 using Model.EnumModel;
 
 namespace MvcCore.Extension.Filter
@@ -53,13 +49,14 @@ namespace MvcCore.Extension.Filter
 		/// <param name="context"></param>
 		public override void OnException(ExceptionContext context)
 		{
-			context.ExceptionHandled = true;
+            context.ExceptionHandled = true;
 			context.Result = new JsonResult(new
 			{
-				code = "402",
+                api_version="v1",
+                code = "402",
 				success = false,
 				message = "Server internal error"
 			});
-		}
+        }
 	}
 }

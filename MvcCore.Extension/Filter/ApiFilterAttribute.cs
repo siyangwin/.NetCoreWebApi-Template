@@ -91,7 +91,7 @@ namespace MvcCore.Extension.Filter
                 RequestPath = context.HttpContext.Request.Path,
                 RequestLocalIp = (context.HttpContext.Request.HttpContext.Connection.LocalIpAddress.MapToIPv4().ToString() + ":" + context.HttpContext.Request.HttpContext.Connection.LocalPort),
                 RequestRemoteIp = (context.HttpContext.Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString() + ":" + context.HttpContext.Request.HttpContext.Connection.RemotePort),
-                RequestParam = GetParamString(context.HttpContext)
+                //RequestParam = GetParamString(context.HttpContext)
             };
 
 
@@ -142,7 +142,7 @@ namespace MvcCore.Extension.Filter
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string GetParamString(HttpContext context)
+        public async Task<string> GetParamString(HttpContext context)
         {
             StringBuilder builder = new StringBuilder();
             if (context.Request.HasFormContentType && context.Request.Form != null)
@@ -152,6 +152,7 @@ namespace MvcCore.Extension.Filter
                     builder.Append(key + ":" + context.Request.Form[key].ToString() + "|");
                 }
             }
+
             if (context.Request.Query != null)
             {
                 foreach (var key in context.Request.Query.Keys)
@@ -160,22 +161,81 @@ namespace MvcCore.Extension.Filter
                 }
             }
 
-
             // 验证是否存在 Raw 参数
+            SemaphoreSlim semaphore = new SemaphoreSlim(1);
             if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)
             {
-                var memory = new MemoryStream();
-                context.Request.Body.CopyToAsync(memory);
-                memory.Position = 0;
+                MemoryStream memory;
+                await semaphore.WaitAsync();
+                try
+                {
+                    memory = new MemoryStream();
+                    await context.Request.Body.CopyToAsync(memory);
+                    memory.Position = 0;
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+
                 // 记录 header
                 string header = JsonConvert.SerializeObject(context.Request.Headers);
                 // 记录参数内容
                 string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
                 builder.Append(JsonConvert.SerializeObject(new { header, content }));
                 builder.Append(Environment.NewLine);
+
+                // 恢复流位置
                 memory.Position = 0;
-                context.Request.Body = memory;
+                context.Request.Body.Position = 0;
+
+                // 创建新的内存流对象并拷贝内容
+                var newMemory = new MemoryStream();
+                await memory.CopyToAsync(newMemory);
+                newMemory.Position = 0;
+                context.Request.Body = newMemory;
             }
+
+
+            // 验证是否存在 Raw 参数
+            //if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)
+            //{
+            //    var memory = new MemoryStream();
+            //    context.Request.Body.CopyToAsync(memory);
+            //    memory.Position = 0;
+            //    // 记录 header
+            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
+            //    // 记录参数内容
+            //    string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
+            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
+            //    builder.Append(Environment.NewLine);
+            //    memory.Position = 0;
+            //    context.Request.Body = memory;
+            //}
+
+
+            //if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)
+            //{
+            //    var memory = new MemoryStream();
+            //    await context.Request.Body.CopyToAsync(memory);
+            //    memory.Position = 0;
+            //    // 记录 header
+            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
+            //    // 记录参数内容
+            //    string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
+            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
+            //    builder.Append(Environment.NewLine);
+
+            //    // 恢复流位置
+            //    memory.Position = 0;
+            //    context.Request.Body.Position = 0;
+
+            //    // 创建新的内存流对象并拷贝内容
+            //    var newMemory = new MemoryStream();
+            //    await memory.CopyToAsync(newMemory);
+            //    newMemory.Position = 0;
+            //    context.Request.Body = newMemory;
+            //}
             return builder.ToString();
         }
     }

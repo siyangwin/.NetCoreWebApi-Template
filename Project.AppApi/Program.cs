@@ -20,6 +20,8 @@ using System.Net;
 using Newtonsoft.Json;
 using IService.App;
 using Service.App;
+using Microsoft.Extensions.FileProviders;
+using System.Security.Policy;
 
 var ApiName = "Project.AppApi";
 
@@ -44,10 +46,10 @@ if (getconfig)
 // 将接口请求拦截器和错误拦截器 注册为全局过滤器
 builder.Services.AddMvc(options =>
 {
-    //接口请求拦截器
-    options.Filters.Add(typeof(ApiFilterAttribute));
     //错误拦截器
     options.Filters.Add(typeof(ErrorFilterAttribute));
+    //接口请求拦截器
+    options.Filters.Add(typeof(ApiFilterAttribute));
     ////授权验证拦截器
     //options.Filters.Add(typeof(AuthValidator));
 });
@@ -248,6 +250,44 @@ if (getconfig)
 {
     app.UseSwaggers(ApiName);
 }
+
+
+//判断文件夹是否存在,不存在则创建
+string folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"other");
+if (!Directory.Exists(folderPath))
+{
+    Directory.CreateDirectory(folderPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions()
+{
+    //指定要公开的静态文件所在的目录路径。在此示例中，它将当前工作目录下的“Files”子目录指定为静态文件的根目录。
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"other")),
+
+    //指定可用于访问静态文件的 URL 路径。在此示例中，它将 "/Files" 路径映射到 "Files" 目录。
+    RequestPath = new PathString("/other"),
+
+    //一个布尔值，指定是否应该在请求的文件类型未知时允许服务静态文件。默认情况下，这个属性设置为 false，表示只有已知 MIME 类型的文件才会被服务。如果设置为 true，则未知文件类型也可以被服务。
+    ServeUnknownFileTypes = true,
+
+    //用于指定特定文件扩展名的 MIME 类型的字典。如果请求的文件扩展名与此列表不匹配，则服务器返回一个 404 响应。在此示例中，注释掉了这个属性，因此所有响应的文件类型将根据其文件扩展名自动识别。
+    //ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
+    //{
+    //     { ".apk","application/vnd.android.package-archive"}
+    //})
+
+    //OnPrepareResponse = ctx =>
+    //{
+    //    // 检查文件夹是否存在，如果不存在则创建
+    //    string filePath = Path.Combine(ctx.Context.Request.Path.Value, ctx.File.Name);
+    //    string folderPath = Path.GetDirectoryName(filePath);
+    //    if (!Directory.Exists(folderPath))
+    //    {
+    //        Directory.CreateDirectory(folderPath);
+    //    }
+    //}
+});
+
 
 app.Use(async (context, next) =>
 {
