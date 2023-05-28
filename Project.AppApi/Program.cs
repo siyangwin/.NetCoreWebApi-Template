@@ -17,7 +17,6 @@ using MvcCore.Extension.Auth;
 using System.Configuration;
 using Autofac.Core;
 using System.Net;
-using Newtonsoft.Json;
 using IService.App;
 using Service.App;
 using Microsoft.Extensions.FileProviders;
@@ -26,6 +25,38 @@ using System.Security.Policy;
 var ApiName = "Project.AppApi";
 
 var builder = WebApplication.CreateBuilder(args);
+
+//设置跨域
+//設置Cors共享不攔截
+builder.Services.AddCors(options =>
+{
+    //options.AddDefaultPolicy(builders =>
+    //{
+    //    builders
+    //        .AllowAnyOrigin()  //所有来源
+    //        .AllowAnyHeader()  //所有标头
+    //        .AllowAnyMethod();  //所有 HTTP 方法
+    //});
+
+    options.AddPolicy("cors", builders =>
+    {
+        builders
+            .AllowAnyOrigin()  //所有来源
+            .AllowAnyHeader()  //所有标头
+            .AllowAnyMethod();  //所有 HTTP 方法
+            //.AllowCredentials();   //是一个跨域请求（CORS）选项，用于指示服务端是否允许客户端在跨域请求中包含凭据信息，如 Cookies、Authorization 标头等。
+    });
+
+
+    //options.AddPolicy("cors", builders =>
+    //{
+    //    builders
+    //        //.WithOrigins(builder.Configuration.GetValue<string>("ConfigSettings:Orgins").Split(','))  //部分来源，如果需要按域名的跨域，设置这个
+    //        .AllowAnyHeader()  //所有标头
+    //        .AllowAnyMethod()  //所有 HTTP 方法
+    //        .AllowCredentials();   //是一个跨域请求（CORS）选项，用于指示服务端是否允许客户端在跨域请求中包含凭据信息，如 Cookies、Authorization 标头等。
+    //});
+});
 
 
 //获取连接字符串
@@ -221,7 +252,8 @@ builder.Services.AddAuthentication(option =>
                 context.HandleResponse();
 
                 //自定义自己想要返回的数据结果，我这里要返回的是Json对象，通过引用Newtonsoft.Json库进行转换
-                var payload = JsonConvert.SerializeObject(new { api_version = "v1", success = false, code = "401", message = "很抱歉，您无权访问,请授权!" });
+                //var payload = JsonConvert.SerializeObject(new { api_version = "v1", success = false, code = "401", message = "很抱歉，您无权访问,请授权!" });
+                var payload = "no";
                 //自定义返回的数据类型
                 context.Response.ContentType = "application/json";
                 //自定义返回状态码，默认为401 我这里改成 200
@@ -245,12 +277,15 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+//跨域第一種版本，請要ConfigureService中配置服務 services.AddCors();
+//app.UseCors();
+app.UseCors("cors");
+
 //是否开启Swagger
 if (getconfig)
 {
     app.UseSwaggers(ApiName);
 }
-
 
 //判断文件夹是否存在,不存在则创建
 string folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"other");
