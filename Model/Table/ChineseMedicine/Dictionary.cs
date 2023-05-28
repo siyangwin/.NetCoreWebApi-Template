@@ -30,6 +30,11 @@ namespace Model.Table
         public string NamePY { get; set; }
 
         /// <summary>
+        /// 英文名
+        /// </summary>
+        public string NameEN { get; set; }
+
+        /// <summary>
         /// 出处
         /// </summary>
         public string Provenance { get; set; }
@@ -50,6 +55,16 @@ namespace Model.Table
         public string OriginalForm { get; set; }
 
         /// <summary>
+        /// 生境分布
+        /// </summary>
+        public string HabitatDistribution { get; set; }
+
+        /// <summary>
+        /// 栽培
+        /// </summary>
+        public string Cultivation { get; set; }
+
+        /// <summary>
         /// 性状
         /// </summary>
         public string Character { get; set; }
@@ -65,9 +80,19 @@ namespace Model.Table
         public string Role { get; set; }
 
         /// <summary>
+        /// 毒性
+        /// </summary>
+        public string Toxicity { get; set; }
+
+        /// <summary>
         /// 炮制
         /// </summary>
         public string Preparation { get; set; }
+
+        /// <summary>
+        /// 制法
+        /// </summary>
+        public string PreparationMethod { get; set; }
 
         /// <summary>
         /// 性味

@@ -197,21 +197,21 @@ namespace MvcCore.Extension.Filter
             //}
 
 
-            //验证是否存在 Raw 参数
-            if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)
-            {
-                var memory = new MemoryStream();
-                await context.Request.Body.CopyToAsync(memory);
-                memory.Position = 0;
-                // 记录 header
-                string header = JsonConvert.SerializeObject(context.Request.Headers);
-                // 记录参数内容
-                string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
-                builder.Append(JsonConvert.SerializeObject(new { header, content }));
-                builder.Append(Environment.NewLine);
-                memory.Position = 0;
-                context.Request.Body = memory;
-            }
+            ////验证是否存在 Raw 参数 this
+            //if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)
+            //{
+            //    var memory = new MemoryStream();
+            //    await context.Request.Body.CopyToAsync(memory);
+            //    memory.Position = 0;
+            //    // 记录 header
+            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
+            //    // 记录参数内容
+            //    string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
+            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
+            //    builder.Append(Environment.NewLine);
+            //    memory.Position = 0;
+            //    context.Request.Body = memory;
+            //}
 
 
             //if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)

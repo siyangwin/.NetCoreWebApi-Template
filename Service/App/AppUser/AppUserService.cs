@@ -76,7 +76,7 @@ namespace Service.App
             string message = "";
             foreach (var item in Req)
             {
-                Console.WriteLine(item.productId + ":" + item.bookName);
+                //Console.WriteLine(item.productId + ":" + item.bookName);
                 switch (item.bookName) {
                     case "中国药典":
                         //创建数据库类,写入数据
@@ -112,6 +112,9 @@ namespace Service.App
                                 case "炮制":
                                     chinesePharmacopoeia.Preparation = items[1];
                                     break;
+                                case "制法":
+                                    chinesePharmacopoeia.PreparationMethod= items[1];
+                                    break;
                                 case "性味":
                                     chinesePharmacopoeia.Taste = items[1];
                                     break;
@@ -135,7 +138,7 @@ namespace Service.App
                                     break;
                                 default:
                                     //可以记录缺少的字段
-                                    message += "中国药典,缺少:" + items[0];
+                                    message += "《中国药典》,缺少:" + items[0] + ";";
                                     break;
                             }
                             //按items[0]的名称分配数据库字段
@@ -143,7 +146,7 @@ namespace Service.App
                         }
                         chinesePharmacopoeia.CreateUser = "SiYang";
                         //写入数据库
-                        bool chinesePharmacopoeiares = connection.CommandSet<ChinesePharmacopoeia>().InsertIdentity(chinesePharmacopoeia)>1;
+                        bool chinesePharmacopoeiares = connection.CommandSet<ChinesePharmacopoeia>().InsertIdentity(chinesePharmacopoeia)>0;
                         if (chinesePharmacopoeiares)
                         {
                             success++;
@@ -163,6 +166,9 @@ namespace Service.App
                                 case "拼音名":
                                     dictionary.NamePY = items[1];
                                     break;
+                                case "英文名":
+                                    dictionary.NameEN = items[1];
+                                    break;
                                 case "出处":
                                     dictionary.Provenance = items[1];
                                     break;
@@ -175,6 +181,12 @@ namespace Service.App
                                 case "原形态":
                                     dictionary.OriginalForm = items[1];
                                     break;
+                                case "生境分布":
+                                    dictionary.HabitatDistribution = items[1];
+                                    break;
+                                case "栽培":
+                                    dictionary.Cultivation = items[1];
+                                    break;
                                 case "性状":
                                     dictionary.Character = items[1];
                                     break;
@@ -184,8 +196,14 @@ namespace Service.App
                                 case "作用":
                                     dictionary.Role = items[1];
                                     break;
+                                case "毒性":
+                                    dictionary.Toxicity = items[1];
+                                    break;
                                 case "炮制":
                                     dictionary.Preparation = items[1];
+                                    break;
+                                case "制法":
+                                    dictionary.PreparationMethod = items[1];
                                     break;
                                 case "性味":
                                     dictionary.Taste = items[1];
@@ -219,15 +237,16 @@ namespace Service.App
                                     break;
                                 default:
                                     //可以记录缺少的字段
-                                    message += "辞典,缺少:" + items[0];
+                                    message += "《辞典》,缺少:" + items[0] + ";";
                                     break;
                              }
                             //按items[0]的名称分配数据库字段
                              //Console.WriteLine(items[0] + ":" + items[1]);
                          }
+                
                         dictionary.CreateUser = "SiYang";
                         //写入数据库
-                        bool dictionaryres = connection.CommandSet<Dictionary>().InsertIdentity(dictionary) > 1;
+                        bool dictionaryres = connection.CommandSet<Dictionary>().InsertIdentity(dictionary) > 0;
                         if (dictionaryres)
                         {
                             success++;
@@ -286,6 +305,9 @@ namespace Service.App
                                 case "炮制":
                                     chineseMateriaMedica.Preparation = items[1];
                                     break;
+                                case "制法":
+                                    chineseMateriaMedica.PreparationMethod = items[1];
+                                    break;
                                 case "性味":
                                     chineseMateriaMedica.Taste = items[1];
                                     break;
@@ -318,7 +340,7 @@ namespace Service.App
                                     break;
                                 default:
                                     //可以记录缺少的字段
-                                    message += "中华本草,缺少:" + items[0];
+                                    message += "《中华本草》,缺少:" + items[0]+";";
                                     break;
                             }
                             //按items[0]的名称分配数据库字段
@@ -326,7 +348,7 @@ namespace Service.App
                         }
                         chineseMateriaMedica.CreateUser = "SiYang";
                         //写入数据库
-                        bool chineseMateriaMedicares = connection.CommandSet<ChineseMateriaMedica>().InsertIdentity(chineseMateriaMedica) > 1;
+                        bool chineseMateriaMedicares = connection.CommandSet<ChineseMateriaMedica>().InsertIdentity(chineseMateriaMedica) > 0;
                         if (chineseMateriaMedicares)
                         {
                             success++;
@@ -340,7 +362,15 @@ namespace Service.App
                 //Console.WriteLine("-----------------------------------------换下一个------------------------------------------");
             }
 
-            resultModel.success = success > 0;
+            if (Req.Count()==0)
+            {
+                resultModel.success = true;
+            }
+            else
+            {
+                resultModel.success = success > 0;
+            }
+
             resultModel.message = "传入数量：" + Req.Count() + ",写入成功数据：" + success+",备注:"+message;
             return resultModel;
         }

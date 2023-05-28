@@ -65,6 +65,11 @@ namespace Model.Table
         public string Preparation { get; set; }
 
         /// <summary>
+        /// 制法
+        /// </summary>
+        public string PreparationMethod { get; set; }
+
+        /// <summary>
         /// 性味
         /// </summary>
         public string Taste { get; set; }
