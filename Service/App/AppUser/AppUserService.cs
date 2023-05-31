@@ -374,5 +374,43 @@ namespace Service.App
             resultModel.message = "传入数量：" + Req.Count() + ",写入成功数据：" + success+",备注:"+message;
             return resultModel;
         }
+
+
+        /// <summary>
+        /// 写入产品名称数据
+        /// </summary>
+        /// <returns></returns>
+        public ResultModel ProductNameInsert(LanguageEnum language, List<ProductReqDto> Req)
+        {
+            ResultModel resultModel = new ResultModel();
+            int success = 0;
+            string message = "";
+            foreach (var item in Req)
+            {
+                Product product = new Product();
+                product.ProductId = item.Id;
+                product.ProductName = item.Name;
+                product.CreateUser = "SiYang";
+
+                //写入数据库
+                bool productNum = connection.CommandSet<Product>().InsertIdentity(product) > 0;
+                if (productNum)
+                {
+                    success++;
+                }
+            }
+
+            if (Req.Count() == 0)
+            {
+                resultModel.success = true;
+            }
+            else
+            {
+                resultModel.success = success > 0;
+            }
+
+            resultModel.message = "传入数量：" + Req.Count() + ",写入成功数据：" + success;
+            return resultModel;
+        }
     }
 }

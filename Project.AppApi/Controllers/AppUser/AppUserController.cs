@@ -79,5 +79,21 @@ namespace Project.AppApi.Controllers
             return appUserService.ProductInsert(Language, Req); ;
         }
 
+
+        /// <summary>
+        /// 写入产品名称数据-无需授权
+        /// </summary>
+        /// <param name="Req">请求参数</param>
+        /// <returns></returns>
+        [Route("/api/appuser/productnameinsert")]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ResultModel> ProductNameInsert(List<ProductReqDto> Req)
+        {
+            return appUserService.ProductNameInsert(Language, Req); ;
+        }
+
+
+
     }
 }

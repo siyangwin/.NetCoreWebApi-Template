@@ -366,7 +366,7 @@ app.UseAuthentication();//启动认证
 app.UseAuthorization();//启动授权
 
 //添加 JWT 异常处理中间件
-app.UseMiddleware<AuthValidator>();
+//app.UseMiddleware<AuthValidator>();
 
 app.MapControllers();
 
