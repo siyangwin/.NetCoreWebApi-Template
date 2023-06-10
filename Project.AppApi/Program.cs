@@ -198,7 +198,8 @@ builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<ISystemLogService, SystemLogService>();
 //注入用户类
 builder.Services.AddScoped<IAppUserService,AppUserService>();
-
+//注入植物类
+builder.Services.AddScoped<IPlantService, PlantService>();
 
 #region jwt验证
 
