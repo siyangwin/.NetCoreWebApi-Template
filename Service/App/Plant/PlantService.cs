@@ -120,5 +120,31 @@ namespace Service.App
 
             return resultModel;
         }
+
+
+
+        /// <summary>
+        /// 植物搜索
+        /// </summary>
+        /// <param name="plantListSearchReqDto">植物搜索请求类</param>
+        /// <returns></returns>
+        public ResultModel<PageList<PlantListResDto>> GetSearch(PlantListSearchReqDto plantListSearchReqDto)
+        {
+            ResultModel<PageList<PlantListResDto>> resultModel = new ResultModel<PageList<PlantListResDto>>();
+
+            var PlantListResDto = connection.QuerySet<vm_app_PlantList>()
+            .Where(s => s.PlantName.Contains(plantListSearchReqDto.Content))
+            .OrderBy(s => s.PlantName)
+            .PageList(plantListSearchReqDto.PageIndex, plantListSearchReqDto.PageSize, x => new PlantListResDto()
+            {
+                Id = x.Id,
+                PlantName = x.PlantName,
+                PlantPictures = x.PlantPictures
+            });
+
+            resultModel.data = PlantListResDto;
+
+            return resultModel;
+        }
     }
 }

@@ -65,5 +65,19 @@ namespace Project.AppApi.Controllers.Plant
         {
             return plantService.GetPlantInfo(Id);
         }
+
+
+        /// <summary>
+        /// 植物搜索
+        /// </summary>
+        /// <param name="plantListSearchReqDto">植物搜索请求类</param>
+        /// <returns></returns>
+        [Route("/api/plant/search")]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ResultModel<PageList<PlantListResDto>>> GetSearch(PlantListSearchReqDto plantListSearchReqDto)
+        {
+            return plantService.GetSearch(plantListSearchReqDto);
+        }
     }
 }

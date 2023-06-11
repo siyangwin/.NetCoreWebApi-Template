@@ -34,6 +34,13 @@ namespace IService.App
         /// </summary>
         /// <param name="Id">植物编号</param>
         /// <returns></returns>
-        public ResultModel<PlantInfoResDto> GetPlantInfo(int Id);
+        ResultModel<PlantInfoResDto> GetPlantInfo(int Id);
+
+        /// <summary>
+        /// 植物搜索
+        /// </summary>
+        /// <param name="plantListSearchReqDto">植物搜索请求类</param>
+        /// <returns></returns>
+        ResultModel<PageList<PlantListResDto>> GetSearch(PlantListSearchReqDto plantListSearchReqDto);
     }
 }
