@@ -200,6 +200,10 @@ builder.Services.AddScoped<ISystemLogService, SystemLogService>();
 builder.Services.AddScoped<IAppUserService,AppUserService>();
 //注入植物类
 builder.Services.AddScoped<IPlantService, PlantService>();
+//注册第三方类
+builder.Services.AddScoped<IOtherSystemService, OtherSystemService>();
+//注入httphelper
+builder.Services.AddTransient(typeof(HttpHelper));
 
 #region jwt验证
 
