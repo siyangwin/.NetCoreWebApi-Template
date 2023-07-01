@@ -41,7 +41,7 @@ namespace Service.App
             ResultModel<PageList<PlantFamilyListResDto>> resultModel = new ResultModel<PageList<PlantFamilyListResDto>>();
 
             var PlantFamilyListResDto = connection.QuerySet<vm_app_PlantFamily>()
-            .OrderBy(s => s.NameCN)
+            .OrderByDescing(s => s.CountNum)
             .PageList(plantFamilyListReqDto.PageIndex, plantFamilyListReqDto.PageSize, x => new PlantFamilyListResDto()
             {
                 Id = x.Id,

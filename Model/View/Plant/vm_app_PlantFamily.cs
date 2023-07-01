@@ -22,5 +22,10 @@ namespace Model.View
         /// 植物科属中文名称
         /// </summary>
         public string NameCN { get; set; }
-    }
+
+        /// <summary>
+        /// 下级产品数量
+        /// </summary>
+        public int CountNum{ get; set; }
+}
 }
