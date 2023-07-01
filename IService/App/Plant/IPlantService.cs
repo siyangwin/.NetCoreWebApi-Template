@@ -42,5 +42,18 @@ namespace IService.App
         /// <param name="plantListSearchReqDto">植物搜索请求类</param>
         /// <returns></returns>
         ResultModel<PageList<PlantListResDto>> GetSearch(PlantListSearchReqDto plantListSearchReqDto);
+
+        /// <summary>
+        /// 植物市场规格关系
+        /// </summary>
+        /// <param name="Id">植物编号</param>
+        /// <returns></returns>
+        ResultModel<AreaInfoListResDto> GetAreaInfoByPlantId(int Id);
+
+        /// <summary>
+        /// 默认植物市场规格关系
+        /// </summary>
+        /// <returns></returns>
+        ResultModels<AreaInfoListResDto> GetAreaInfoByDefaultPlantId();
     }
 }

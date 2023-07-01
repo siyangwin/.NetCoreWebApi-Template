@@ -79,5 +79,32 @@ namespace Project.AppApi.Controllers.Plant
         {
             return plantService.GetSearch(plantListSearchReqDto);
         }
+
+        /// <summary>
+        /// 植物市场规格关系
+        /// </summary>
+        /// <param name="Id">植物编号</param>
+        /// <returns></returns>
+        [Route("/api/plant/areainfo")]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ResultModel<AreaInfoListResDto>> GetAreaInfoByPlantId(int Id)
+        {
+            return plantService.GetAreaInfoByPlantId(Id);
+        }
+
+
+
+        /// <summary>
+        /// 默认植物市场规格关系
+        /// </summary>
+        /// <returns></returns>
+        [Route("/api/plant/defaultareainfo")]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ResultModels<AreaInfoListResDto>> GetAreaInfoByDefaultPlantId()
+        {
+            return plantService.GetAreaInfoByDefaultPlantId();
+        }
     }
 }

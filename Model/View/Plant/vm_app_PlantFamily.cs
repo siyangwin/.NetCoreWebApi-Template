@@ -14,7 +14,7 @@ namespace Model.View
     public class vm_app_PlantFamily
     {
         /// <summary>
-        /// 植物科属编号
+        /// 植物编号
         /// </summary>
         public int Id { get; set; }
 
