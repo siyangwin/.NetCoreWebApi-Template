@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ViewModel.App;
 using ViewModel;
+using Microsoft.AspNetCore.Http;
 
 namespace IService.App
 {
@@ -28,12 +29,18 @@ namespace IService.App
         /// <returns></returns>
         ResultModel ProductInsert(LanguageEnum language, List<ProductInfoReqDto> Req);
 
-
-
         /// <summary>
         /// 写入产品名称数据
         /// </summary>
         /// <returns></returns>
         ResultModel ProductNameInsert(LanguageEnum language, List<ProductReqDto> Req);
+
+        /// <summary>
+        /// 获取小程序用户编号
+        /// </summary>
+        /// <param name="getUserOpenIdResDto">请求类</param>
+        /// <param name="httpContext">请求数据</param>
+        /// <returns></returns>
+        ResultModel<GetUserOpenIdReqDto> GetUserOpenId(GetUserOpenIdResDto getUserOpenIdResDto, HttpContext httpContext);
     }
 }

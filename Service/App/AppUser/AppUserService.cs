@@ -1,8 +1,12 @@
-﻿using IService;
+﻿using Core;
+using IService;
 using IService.App;
+using Microsoft.AspNetCore.Http;
 using Model.EnumModel;
 using Model.Table;
 using MvcCore.Extension.Auth;
+using Newtonsoft.Json;
+using System.Security.Policy;
 using ViewModel;
 using ViewModel.App;
 
@@ -23,10 +27,13 @@ namespace Service.App
         /// </summary>
         private readonly GenerateJwt generateJwt;
 
-        public AppUserService(IRepository connection, GenerateJwt generateJwt)
+        private readonly HttpHelper httpHelper; //API请求
+
+        public AppUserService(IRepository connection, GenerateJwt generateJwt, HttpHelper httpHelper)
         {
             this.connection = connection;
             this.generateJwt = generateJwt;
+            this.httpHelper = httpHelper;
         }
 
 
@@ -410,6 +417,132 @@ namespace Service.App
             }
 
             resultModel.message = "传入数量：" + Req.Count() + ",写入成功数据：" + success;
+            return resultModel;
+        }
+
+
+        /// <summary>
+        /// 获取小程序用户编号
+        /// </summary>
+        /// <param name="getUserOpenIdResDto">请求类</param>
+        /// <param name="httpContext">请求数据</param>
+        /// <returns></returns>
+        public ResultModel<GetUserOpenIdReqDto> GetUserOpenId(GetUserOpenIdResDto getUserOpenIdResDto, HttpContext httpContext)
+        {
+            ResultModel<GetUserOpenIdReqDto> resultModel = new ResultModel<GetUserOpenIdReqDto>();
+            //OpenId
+            string openid = "";
+            //Wechat
+            if (getUserOpenIdResDto.Type == 1)
+            {
+                string Url = "https://api.weixin.qq.com/sns/jscode2session";
+                string appid = "wxc80fb977dc7e9e0e";
+                string secret = "d123a8aaffdba053f07f732272239260";
+
+                Url += "?appid=" + appid + "&secret=" + secret + "&js_code="+ getUserOpenIdResDto.Code + "&grant_type=authorization_code";
+
+                //調用接口註冊
+                var httpResult = httpHelper.GetHtml(new HttpItem()
+                {
+                    URL = Url,
+                    Method = "get",
+                    PostDataType = PostDataType.String,
+                    ContentType = "application/json",
+                    Timeout = 1800000
+                }, httpContext);
+
+                if (httpResult.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    if (!string.IsNullOrEmpty(httpResult.Html))
+                    {
+                        var UserInfo = JsonConvert.DeserializeObject<Dictionary<string, string>>(httpResult.Html);
+
+                        if (!UserInfo.ContainsKey("openid"))
+                        {
+                            resultModel.success = false;
+                            return resultModel;
+                        }
+                        openid = UserInfo["openid"];
+                    }
+                    else
+                    {
+                        resultModel.success = false;
+                        return resultModel;
+                    }
+                }
+                else
+                {
+                    resultModel.success = false;
+                    return resultModel;
+                }
+            }
+            else
+            {
+                //TikTok
+                string Url = "https://open-sandbox.douyin.com/api/apps/v2/jscode2session";
+                string appid = "tt991eefa30622bebb01";
+                string secret = "0cad3606b9ee7d0fc4a4bff041a80783451503de";
+
+                var req = new
+                {
+                    appid = appid,
+                    secret = secret,
+                    code= getUserOpenIdResDto.Code
+                };
+
+                //查询
+                var httpResult = httpHelper.GetHtml(new HttpItem()
+                {
+                    URL = Url,
+                    Method = "Post",
+                    PostDataType = PostDataType.Byte,
+                    ContentType = "application/json",
+                    PostdataByte = httpHelper.GetPostDate(req),
+                    Timeout = 1800000
+                }, httpContext);
+
+                if (httpResult.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    if (!string.IsNullOrEmpty(httpResult.Html))
+                    {
+                        TikTokCode2SessionResDto tikTokCode2SessionResDto= JsonConvert.DeserializeObject<TikTokCode2SessionResDto>(httpResult.Html);
+
+                        if (string.IsNullOrEmpty(tikTokCode2SessionResDto.TikTokCode2SessionData.openid))
+                        {
+                            resultModel.success = false;
+                            return resultModel;
+                        }
+
+                        openid = tikTokCode2SessionResDto.TikTokCode2SessionData.openid;
+                    }
+                    else
+                    {
+                        resultModel.success = false;
+                        return resultModel;
+                    }
+                }
+                else
+                {
+                    resultModel.success = false;
+                    return resultModel;
+                }
+            }
+
+            //查询OpenId是否存在
+            //if (string.IsNullOrEmpty(openid))
+            //{
+            //    resultModel.success = false;
+            //    return resultModel;
+            //}
+            //查询数据库存在就Return
+
+            GetUserOpenIdReqDto getUserOpenIdReq = new GetUserOpenIdReqDto();
+            getUserOpenIdReq.Token = openid;
+            getUserOpenIdReq.Avatar = "";
+            getUserOpenIdReq.Name = "";
+            getUserOpenIdReq.IsNewUser = true;
+            //不存在就新增
+            resultModel.data = getUserOpenIdReq;
             return resultModel;
         }
     }

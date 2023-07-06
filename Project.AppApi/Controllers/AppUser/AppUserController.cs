@@ -1,6 +1,7 @@
 using IService.App;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Model.EnumModel;
 using ViewModel;
 using ViewModel.App;
 
@@ -94,6 +95,18 @@ namespace Project.AppApi.Controllers
         }
 
 
+        /// <summary>
+        /// 获取小程序用户编号
+        /// </summary>
+        /// <param name="getUserOpenIdResDto">请求类</param>
+        /// <returns></returns>
+        [Route("/api/appuser/getuser")]
+        [AllowAnonymous]
+        [HttpPost]
+        public ResultModel<GetUserOpenIdReqDto> GetUserOpenId(GetUserOpenIdResDto getUserOpenIdResDto)
+        {
+            return appUserService.GetUserOpenId(getUserOpenIdResDto, HttpContext);
+        }
 
     }
 }
