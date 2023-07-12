@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ViewModel.App;
 using ViewModel;
 using Microsoft.AspNetCore.Http;
+using System.Runtime.InteropServices;
 
 namespace IService.App
 {
@@ -41,6 +42,21 @@ namespace IService.App
         /// <param name="getUserOpenIdResDto">请求类</param>
         /// <param name="httpContext">请求数据</param>
         /// <returns></returns>
-        ResultModel<GetUserOpenIdReqDto> GetUserOpenId(GetUserOpenIdResDto getUserOpenIdResDto, HttpContext httpContext);
+        ResultModel<GetUserOpenIdResDto> GetUserOpenId(GetUserOpenIdReqDto getUserOpenIdResDto, HttpContext httpContext);
+
+        /// <summary>
+        ///修改用户信息
+        /// </summary>
+        /// <param name="changeUserInfoResDto"></param>
+        /// <returns></returns>
+        ResultModel ChangeUserInfo(ChangeUserInfoReqDto changeUserInfoResDto);
+
+
+        /// <summary>
+        /// 查看头像信息
+        /// </summary>
+        /// <param name="token">用户信息</param>
+        /// <returns></returns>
+        ResultModels<GetAvatarListResDto> GetAvatarList(string token);
     }
 }

@@ -1,20 +1,23 @@
-﻿using System;
+﻿using Kogel.Dapper.Extension.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
-namespace ViewModel.App
+namespace Model.View
 {
     /// <summary>
-    /// 获取Openid返回类
+    /// 所有用户信息
     /// </summary>
-    public class GetUserOpenIdResDto
+    [Display(Rename = "vm_app_UserInfo")]
+    public class vm_app_UserInfo
     {
         /// <summary>
         /// 用户编号
         /// </summary>
-        public string Token { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// 头像
@@ -27,8 +30,13 @@ namespace ViewModel.App
         public string Name { get; set; }
 
         /// <summary>
-        /// 是否新用户
+        /// 微信小程序唯一编号
         /// </summary>
-        public bool IsNewUser { get; set; }
+        public string WechatOpenid { get; set; }
+
+        /// <summary>
+        /// 抖音小程序唯一编号
+        /// </summary>
+        public string TikTokOpenid { get; set; }
     }
 }

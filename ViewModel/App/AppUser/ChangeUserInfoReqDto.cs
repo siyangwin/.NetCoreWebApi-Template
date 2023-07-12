@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace ViewModel.App
 {
     /// <summary>
-    /// 获取Openid返回类
+    /// 修改用户信息请求类
     /// </summary>
-    public class GetUserOpenIdResDto
+    public class ChangeUserInfoReqDto
     {
         /// <summary>
         /// 用户编号
@@ -25,10 +25,5 @@ namespace ViewModel.App
         /// 名称
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// 是否新用户
-        /// </summary>
-        public bool IsNewUser { get; set; }
     }
 }

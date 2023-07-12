@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 namespace ViewModel.App
 {
     /// <summary>
-    /// 获取Openid请求类
+    /// 头像返回类
     /// </summary>
-    public class GetUserOpenIdReqDto
+    public class GetAvatarListResDto
     {
         /// <summary>
-        /// 临时Code(五分钟有效)
+        /// 编号
         /// </summary>
-        public string Code{ get; set; }
+        public int Id { get; set; }
 
         /// <summary>
-        /// 1:Wechat  2：TikTok
+        /// 路径
         /// </summary>
-        public int Type { get; set; }
+        public string Url { get; set; }
     }
 }

@@ -103,10 +103,36 @@ namespace Project.AppApi.Controllers
         [Route("/api/appuser/getuser")]
         [AllowAnonymous]
         [HttpPost]
-        public ResultModel<GetUserOpenIdReqDto> GetUserOpenId(GetUserOpenIdResDto getUserOpenIdResDto)
+        public ResultModel<GetUserOpenIdResDto> GetUserOpenId(GetUserOpenIdReqDto getUserOpenIdResDto)
         {
             return appUserService.GetUserOpenId(getUserOpenIdResDto, HttpContext);
         }
 
+
+        /// <summary>
+        /// 修改用户信息
+        /// </summary>
+        /// <param name="changeUserInfoResDto">请求类</param>
+        /// <returns></returns>
+        [Route("/api/appuser/changeinfo")]
+        [AllowAnonymous]
+        [HttpPost]
+        public ResultModel ChangeUserInfo(ChangeUserInfoReqDto changeUserInfoResDto)
+        {
+            return appUserService.ChangeUserInfo(changeUserInfoResDto);
+        }
+
+        /// <summary>
+        /// 查看头像信息
+        /// </summary>
+        /// <param name="token">用户信息</param>
+        /// <returns></returns>
+        [Route("/api/appuser/avatarlist")]
+        [AllowAnonymous]
+        [HttpGet]
+        public ResultModels<GetAvatarListResDto> GetAvatarList(string token)
+        {
+            return appUserService.GetAvatarList(token);
+        }
     }
 }

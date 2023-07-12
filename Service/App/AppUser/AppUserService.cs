@@ -4,9 +4,12 @@ using IService.App;
 using Microsoft.AspNetCore.Http;
 using Model.EnumModel;
 using Model.Table;
+using Model.View;
 using MvcCore.Extension.Auth;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Security.Policy;
+using System.Text;
 using ViewModel;
 using ViewModel.App;
 
@@ -427,9 +430,9 @@ namespace Service.App
         /// <param name="getUserOpenIdResDto">请求类</param>
         /// <param name="httpContext">请求数据</param>
         /// <returns></returns>
-        public ResultModel<GetUserOpenIdReqDto> GetUserOpenId(GetUserOpenIdResDto getUserOpenIdResDto, HttpContext httpContext)
+        public ResultModel<GetUserOpenIdResDto> GetUserOpenId(GetUserOpenIdReqDto getUserOpenIdResDto, HttpContext httpContext)
         {
-            ResultModel<GetUserOpenIdReqDto> resultModel = new ResultModel<GetUserOpenIdReqDto>();
+            ResultModel<GetUserOpenIdResDto> resultModel = new ResultModel<GetUserOpenIdResDto>();
             //OpenId
             string openid = "";
             //Wechat
@@ -528,21 +531,169 @@ namespace Service.App
                 }
             }
 
-            //查询OpenId是否存在
-            //if (string.IsNullOrEmpty(openid))
-            //{
-            //    resultModel.success = false;
-            //    return resultModel;
-            //}
+            var vm_app_UserInfo = connection.QuerySet<vm_app_UserInfo>()
+                .WhereIf(getUserOpenIdResDto.Type == 1,s=>s.WechatOpenid==openid,s=>s.TikTokOpenid== openid)
+                .Get();
+
+            GetUserOpenIdResDto getUserOpenIdReq = new GetUserOpenIdResDto();
+            //查询用户是否存在
+            if (vm_app_UserInfo!=null)
+            {
+                getUserOpenIdReq.Token = openid;
+                getUserOpenIdReq.Avatar = vm_app_UserInfo.Avatar;
+                getUserOpenIdReq.Name = vm_app_UserInfo.Name;
+                getUserOpenIdReq.IsNewUser = false;
+
+                resultModel.data = getUserOpenIdReq;
+                return resultModel;
+            }
+
             //查询数据库存在就Return
 
-            GetUserOpenIdReqDto getUserOpenIdReq = new GetUserOpenIdReqDto();
-            getUserOpenIdReq.Token = openid;
-            getUserOpenIdReq.Avatar = "";
-            getUserOpenIdReq.Name = "";
-            getUserOpenIdReq.IsNewUser = true;
+
+            //随机生成头像
+            Random AvatarRandom = new Random();
+            int randomNumber = AvatarRandom.Next(1, 21); // 生成 1-20 之间的随机整数
+
+            //随机生成姓名
+            Random NameRandom = new Random();
+            StringBuilder nameBuilder = new StringBuilder();
+
+            string letters = "abcdefghijklmnopqrstuvwxyz"; // 字母表
+
+            for (int i = 0; i < 10; i++)
+            {
+                int index = NameRandom.Next(letters.Length);
+                char randomChar = letters[index];
+                nameBuilder.Append(randomChar);
+            }
+
+            //写入数据库
+            UserInfo userInfo = new UserInfo();
+            userInfo.Avatar = randomNumber.ToString() + ".png";
+            userInfo.Name = nameBuilder.ToString();
+            if (getUserOpenIdResDto.Type == 1)
+            {
+                userInfo.WechatOpenid = openid;
+                userInfo.TikTokOpenid = "";
+            }
+            else
+            {
+                userInfo.WechatOpenid = "";
+                userInfo.TikTokOpenid = openid;
+            }
+
+            userInfo.CreateTime = DateTime.Now;
+            userInfo.CreateUser = "System";
             //不存在就新增
-            resultModel.data = getUserOpenIdReq;
+            //写入数据库
+            bool userInfoNum = connection.CommandSet<UserInfo>().Insert(userInfo) > 0;
+
+            //返回信息
+            if (userInfoNum)
+            {
+                getUserOpenIdReq.Token = openid;
+                getUserOpenIdReq.Avatar = "https://wechat.xunfan.ltd/other/pic/"+ randomNumber.ToString() + ".png";
+                getUserOpenIdReq.Name = nameBuilder.ToString();
+                getUserOpenIdReq.IsNewUser = true;
+                resultModel.data = getUserOpenIdReq;
+            }
+            else
+            {
+                resultModel.success = false;
+                resultModel.message = "获取授权失败";
+            }
+
+            return resultModel;
+        }
+
+
+
+        /// <summary>
+        ///修改用户信息
+        /// </summary>
+        /// <param name="changeUserInfoResDto"></param>
+        /// <returns></returns>
+        public ResultModel ChangeUserInfo(ChangeUserInfoReqDto changeUserInfoResDto)
+        {
+            ResultModel resultModel = new ResultModel();
+
+            var vm_app_UserInfo = connection.QuerySet<vm_app_UserInfo>()
+            .Where(s => s.WechatOpenid == changeUserInfoResDto.Token || s.TikTokOpenid == changeUserInfoResDto.Token)
+            .Get();
+
+            //查询用户是否存在
+            if (vm_app_UserInfo == null)
+            {
+                resultModel.success = false;
+                resultModel.message = "用户不存在";
+                return resultModel;
+            }
+
+
+            bool userInfoNum = connection.CommandSet<UserInfo>()
+                  .Where(x => x.IsDelete == false && x.Id == vm_app_UserInfo.Id)
+                  .Update(x => new UserInfo
+                  {
+                     Avatar = changeUserInfoResDto.Avatar+".png",
+                     Name= changeUserInfoResDto.Name,
+                     UpdateTime = DateTime.Now,
+                     UpdateUser = vm_app_UserInfo.Id.ToString()
+                  })> 0;
+
+            if (!userInfoNum)
+            {
+                resultModel.success = false;
+                resultModel.message = "编辑失败";
+            }
+            else
+            {
+                resultModel.message = "编辑成功";
+            }
+
+            return resultModel;
+        }
+
+
+
+
+
+        /// <summary>
+        /// 查看头像信息
+        /// </summary>
+        /// <param name="token">用户信息</param>
+        /// <returns></returns>
+        public ResultModels<GetAvatarListResDto> GetAvatarList(string token)
+        {
+            ResultModels<GetAvatarListResDto> resultModel = new ResultModels<GetAvatarListResDto>();
+
+           var vm_app_Avatar = connection.QuerySet<vm_app_Avatar>()
+           .ToList(x => new GetAvatarListResDto
+           {
+               Id = x.Id,
+               Url = x.Url,
+           });
+
+            var vm_app_UserInfo = connection.QuerySet<vm_app_UserInfo>()
+            .Where(s => s.WechatOpenid == token || s.TikTokOpenid == token)
+            .Get()?.Avatar??"";
+
+
+            //查询用户是否存在
+            if (!string.IsNullOrEmpty(vm_app_UserInfo))
+            {
+                GetAvatarListResDto getAvatarListResDto =vm_app_Avatar.FirstOrDefault(x => x.Url == vm_app_UserInfo);
+
+                if (getAvatarListResDto != null)
+                {
+                    // 将找到的元素从列表中移除
+                    vm_app_Avatar.Remove(getAvatarListResDto);
+                    // 将找到的元素插入到列表的第一个位置
+                    vm_app_Avatar.Insert(0, getAvatarListResDto);
+                }
+            }
+
+            resultModel.data = vm_app_Avatar;
             return resultModel;
         }
     }
