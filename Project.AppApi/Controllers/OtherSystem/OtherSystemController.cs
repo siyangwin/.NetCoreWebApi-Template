@@ -31,7 +31,6 @@ namespace Project.AppApi.Controllers.OtherSystem
         /// <returns></returns>
         [Route("/api/othersystem/getprice")]
         [HttpGet]
-        [AllowAnonymous]
         public async Task<ResultModel> GetPriceByPlantId()
         {
             return otherSystemService.GetPriceByPlantId(HttpContext);
