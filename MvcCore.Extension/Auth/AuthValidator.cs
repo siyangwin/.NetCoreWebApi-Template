@@ -20,14 +20,14 @@ namespace MvcCore.Extension.Auth
     /// <summary>
     /// 自定义身份认证
     /// </summary>
-    public class AuthValidator
+    public class AuthValidator : IAuthorizationFilter
     {
-        private readonly RequestDelegate _next;
+        //private readonly RequestDelegate _next;
 
-        public AuthValidator(RequestDelegate next)
-        {
-            _next = next;
-        }
+        //public AuthValidator(RequestDelegate next)
+        //{
+        //    _next = next;
+        //}
 
         public async Task Invoke(HttpContext context)
         {
@@ -50,7 +50,7 @@ namespace MvcCore.Extension.Auth
                 // 如果当前Action 不需要身份验证，则直接调用下一个中间件或控制器
                 if (allowAnonymous || !context.User.Identity.IsAuthenticated)
                 {
-                    await _next(context);
+                    //await _next(context);
                 }
                 else
                 {
@@ -60,7 +60,7 @@ namespace MvcCore.Extension.Auth
                     // 如果 JWT 验证成功并且用户已经被认证，则调用黑名单服务进行检查
                     if (principal.Identity.IsAuthenticated)  //&& !blacklistService.IsTokenBlacklisted(principal)
                     {
-                        await _next(context);
+                        //await _next(context);
                     }
                     else
                     {
@@ -121,7 +121,8 @@ namespace MvcCore.Extension.Auth
             {
                 try
                 {
-                   //此处可以分别为APP和CMS做不同的操作
+                    this.Invoke(context.HttpContext);
+                    //此处可以分别为APP和CMS做不同的操作
                 }
                 catch (Exception ex)
                 {
