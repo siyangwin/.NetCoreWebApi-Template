@@ -145,97 +145,72 @@ namespace MvcCore.Extension.Filter
         public async Task<string> GetParamString(HttpContext context)
         {
             StringBuilder builder = new StringBuilder();
-            if (context.Request.HasFormContentType && context.Request.Form != null)
+            try
             {
-                foreach (var key in context.Request.Form.Keys)
+                if (context.Request.HasFormContentType && context.Request.Form != null)
                 {
-                    builder.Append(key + ":" + context.Request.Form[key].ToString() + "|");
+                    foreach (var key in context.Request.Form.Keys)
+                    {
+                        builder.Append(key + ":" + context.Request.Form[key].ToString() + "|");
+                    }
                 }
+
+                if (context.Request.Query != null)
+                {
+                    foreach (var key in context.Request.Query.Keys)
+                    {
+                        builder.Append(key + ":" + context.Request.Query[key].ToString() + "|");
+                    }
+                }
+
+
+                // 验证是否存在 Raw 参数
+                SemaphoreSlim semaphore = new SemaphoreSlim(1);
+                if (context.Request.Body.CanRead && context.Request.Body is not null) //&& context.Request.ContentLength > 0
+                {
+                    MemoryStream memory;
+                    await semaphore.WaitAsync();
+                    try
+                    {
+                        memory = new MemoryStream();
+                        await context.Request.Body.CopyToAsync(memory);
+                        memory.Position = 0;
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+
+                    // 记录 header
+                    string header = JsonConvert.SerializeObject(context.Request.Headers);
+                    // 记录参数内容
+                    string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
+                    builder.Append(JsonConvert.SerializeObject(new { header, content }));
+                    builder.Append(Environment.NewLine);
+
+                    // 恢复流位置
+                    memory.Position = 0;
+                    //context.Request.Body.Position = 0;
+                    if (context.Request.Body.CanSeek)
+                    {
+                        context.Request.Body.Position = 0;
+                    }
+
+                    // 创建新的内存流对象并拷贝内容
+                    var newMemory = new MemoryStream();
+                    await memory.CopyToAsync(newMemory);
+                    newMemory.Position = 0;
+                    context.Request.Body = newMemory;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //发送错误
+                //写入日志
+                await systemLogService.LogAdd(SystemLogTypeEnum.Information, context, "异常", JsonConvert.SerializeObject(ex), "", null, ex);
             }
 
-            if (context.Request.Query != null)
-            {
-                foreach (var key in context.Request.Query.Keys)
-                {
-                    builder.Append(key + ":" + context.Request.Query[key].ToString() + "|");
-                }
-            }
-
-            //// 验证是否存在 Raw 参数
-            //SemaphoreSlim semaphore = new SemaphoreSlim(1);
-            //if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)
-            //{
-            //    MemoryStream memory;
-            //    await semaphore.WaitAsync();
-            //    try
-            //    {
-            //        memory = new MemoryStream();
-            //        await context.Request.Body.CopyToAsync(memory);
-            //        memory.Position = 0;
-            //    }
-            //    finally
-            //    {
-            //        semaphore.Release();
-            //    }
-
-            //    // 记录 header
-            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
-            //    // 记录参数内容
-            //    string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
-            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
-            //    builder.Append(Environment.NewLine);
-
-            //    // 恢复流位置
-            //    memory.Position = 0;
-            //    context.Request.Body.Position = 0;
-
-            //    // 创建新的内存流对象并拷贝内容
-            //    var newMemory = new MemoryStream();
-            //    await memory.CopyToAsync(newMemory);
-            //    newMemory.Position = 0;
-            //    context.Request.Body = newMemory;
-            //}
-
-
-            ////验证是否存在 Raw 参数 this
-            //if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)
-            //{
-            //    var memory = new MemoryStream();
-            //    await context.Request.Body.CopyToAsync(memory);
-            //    memory.Position = 0;
-            //    // 记录 header
-            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
-            //    // 记录参数内容
-            //    string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
-            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
-            //    builder.Append(Environment.NewLine);
-            //    memory.Position = 0;
-            //    context.Request.Body = memory;
-            //}
-
-
-            //if (context.Request.Body.CanRead && context.Request.Body is not null && context.Request.ContentLength > 0)
-            //{
-            //    var memory = new MemoryStream();
-            //    await context.Request.Body.CopyToAsync(memory);
-            //    memory.Position = 0;
-            //    // 记录 header
-            //    string header = JsonConvert.SerializeObject(context.Request.Headers);
-            //    // 记录参数内容
-            //    string content = new StreamReader(memory, Encoding.UTF8).ReadToEnd();
-            //    builder.Append(JsonConvert.SerializeObject(new { header, content }));
-            //    builder.Append(Environment.NewLine);
-
-            //    // 恢复流位置
-            //    memory.Position = 0;
-            //    context.Request.Body.Position = 0;
-
-            //    // 创建新的内存流对象并拷贝内容
-            //    var newMemory = new MemoryStream();
-            //    await memory.CopyToAsync(newMemory);
-            //    newMemory.Position = 0;
-            //    context.Request.Body = newMemory;
-            //}
             return builder.ToString();
         }
     }

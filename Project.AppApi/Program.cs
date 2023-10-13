@@ -21,6 +21,7 @@ using IService.App;
 using Service.App;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Policy;
+using Newtonsoft.Json;
 
 var ApiName = "Project.AppApi";
 
@@ -81,7 +82,7 @@ builder.Services.AddMvc(options =>
     options.Filters.Add(typeof(ErrorFilterAttribute));
     //接口请求拦截器
     options.Filters.Add(typeof(ApiFilterAttribute));
-    ////授权验证拦截器
+    //授权验证拦截器
     //options.Filters.Add(typeof(AuthValidator));
 });
 
@@ -257,8 +258,8 @@ builder.Services.AddAuthentication(option =>
                 context.HandleResponse();
 
                 //自定义自己想要返回的数据结果，我这里要返回的是Json对象，通过引用Newtonsoft.Json库进行转换
-                //var payload = JsonConvert.SerializeObject(new { api_version = "v1", success = false, code = "401", message = "很抱歉，您无权访问,请授权!" });
-                var payload = "no";
+                var payload = JsonConvert.SerializeObject(new { api_version = "v1", success = false, code = "401", message = "很抱歉，您无权访问,请授权!" });
+                //var payload = "no";
                 //自定义返回的数据类型
                 context.Response.ContentType = "application/json";
                 //自定义返回状态码，默认为401 我这里改成 200
