@@ -1,4 +1,5 @@
 ﻿using Kogel.Dapper.Extension.Model;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,5 +56,13 @@ namespace IService.App
         /// </summary>
         /// <returns></returns>
         ResultModels<AreaInfoListResDto> GetAreaInfoByDefaultPlantId();
+
+        /// <summary>
+        /// 获取植物市场规格的价格
+        /// </summary>
+        /// <param name="priceid">植物市场规格对应编号</param>
+        /// <param name="httpContext">请求参数</param>
+        /// <returns></returns>
+        ResultModel<GetPriceResDto> GetPriceByMid(string priceid, HttpContext httpContext);
     }
 }

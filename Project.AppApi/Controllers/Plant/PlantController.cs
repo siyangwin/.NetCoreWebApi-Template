@@ -86,7 +86,7 @@ namespace Project.AppApi.Controllers.Plant
         /// <param name="Id">植物编号</param>
         /// <returns></returns>
         [Route("/api/plant/areainfo")]
-        [HttpPost]
+        [HttpGet]
         [AllowAnonymous]
         public async Task<ResultModel<AreaInfoListResDto>> GetAreaInfoByPlantId(int Id)
         {
@@ -106,5 +106,22 @@ namespace Project.AppApi.Controllers.Plant
         {
             return plantService.GetAreaInfoByDefaultPlantId();
         }
+
+
+
+        /// <summary>
+        /// 获取植物市场规格的价格
+        /// </summary>
+        /// <param name="priceid">植物市场规格对应编号</param>
+        /// <returns></returns>
+        [Route("/api/plant/price")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ResultModel<GetPriceResDto>> GetPriceByMid(string priceid)
+        {
+            return plantService.GetPriceByMid(priceid, HttpContext); ;
+        }
+
+
     }
 }

@@ -12,6 +12,11 @@ namespace ViewModel.App
     public class AreaInfoListResDto
     {
         /// <summary>
+        /// 产品编号
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
         /// 植物名称
         /// </summary>
         public string PlantName { get; set; }

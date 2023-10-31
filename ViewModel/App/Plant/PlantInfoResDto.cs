@@ -11,6 +11,9 @@ namespace ViewModel.App
     /// </summary>
     public class PlantInfoResDto
     {
+        //产品编号
+        public int Id { get; set; }
+
         // 中文名
         public string NameCN { get; set; }
 

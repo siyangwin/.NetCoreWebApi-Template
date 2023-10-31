@@ -1,12 +1,16 @@
-﻿using IService;
+﻿using Core;
+using IService;
 using IService.App;
 using Kogel.Dapper.Extension.Model;
+using Microsoft.AspNetCore.Http;
 using Model.EnumModel;
 using Model.View;
 using Model.View.Plant;
 using MvcCore.Extension.Auth;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,10 +29,11 @@ namespace Service.App
         /// </summary>
         private readonly IRepository connection;
 
-
-        public PlantService(IRepository connection)
+        private readonly HttpHelper httpHelper; //API请求
+        public PlantService(IRepository connection, HttpHelper httpHelper)
         {
             this.connection = connection;
+            this.httpHelper = httpHelper;
         }
 
         /// <summary>
@@ -93,6 +98,7 @@ namespace Service.App
             .Where(s => s.Id == Id)
             .Get(x => new PlantInfoResDto()
             {
+                Id=x.Id,
                 NameCN = x.NameCN,
                 Provenance = x.Provenance,
                 NamePY = x.NamePY,
@@ -165,7 +171,8 @@ namespace Service.App
             {
                 AreaInfoListResDto areaInfoListResDto = new AreaInfoListResDto();
 
-                var PlantInfo = vm_app_AreaInfoByPlantRes.Select(s => new { s.PlantName, s.PlantPictures }).Distinct().FirstOrDefault();
+                var PlantInfo = vm_app_AreaInfoByPlantRes.Select(s => new { s.Id,s.PlantName, s.PlantPictures }).Distinct().FirstOrDefault();
+                areaInfoListResDto.Id = PlantInfo.Id;
                 areaInfoListResDto.PlantName = PlantInfo.PlantName;
                 areaInfoListResDto.PlantPictures = PlantInfo.PlantPictures;
 
@@ -206,8 +213,6 @@ namespace Service.App
             return resultModels;
         }
 
-
-
         /// <summary>
         /// 默认植物市场规格关系
         /// </summary>
@@ -230,7 +235,8 @@ namespace Service.App
 
                     var vm_app_AreaInfoByPlantRes = vm_app_AreaInfoByPlant.Where(s => s.Id == AreaInfoitem.Key).ToList();
 
-                    var PlantInfo = vm_app_AreaInfoByPlantRes.Select(s => new { s.PlantName, s.PlantPictures }).Distinct().FirstOrDefault();
+                    var PlantInfo = vm_app_AreaInfoByPlantRes.Select(s => new { s.Id,s.PlantName, s.PlantPictures }).Distinct().FirstOrDefault();
+                    areaInfoListResDto.Id = PlantInfo.Id;
                     areaInfoListResDto.PlantName = PlantInfo.PlantName;
                     areaInfoListResDto.PlantPictures = PlantInfo.PlantPictures;
 
@@ -270,6 +276,97 @@ namespace Service.App
             }
 
             return resultModels;;
+        }
+
+        /// <summary>
+        /// 获取植物市场规格的价格
+        /// </summary>
+        /// <param name="priceid">植物市场规格对应编号</param>
+        /// <param name="httpContext">请求参数</param>
+        /// <returns></returns>
+        public ResultModel<GetPriceResDto> GetPriceByMid(string priceid, HttpContext httpContext)
+        {
+            ResultModel<GetPriceResDto> resultModel = new ResultModel<GetPriceResDto>();
+
+            GetPriceResDto getPriceResDto = new GetPriceResDto();
+
+            //GetPriceTable 获取价格时间表格
+            string Url = "https://www.zyctd.com/Breeds/GetPriceTable";
+            var req = new
+            {
+                mid = priceid
+            };
+
+            //查询
+            var httpResult = httpHelper.GetHtml(new HttpItem()
+            {
+                URL = Url,
+                Method = "Post",
+                PostDataType = PostDataType.Byte,
+                ContentType = "application/json",
+                PostdataByte = httpHelper.GetPostDate(req),
+                Timeout = 600
+            }, httpContext);
+
+            if (httpResult.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                if (!string.IsNullOrEmpty(httpResult.Html))
+                {
+                    GetPriceTableResDto GetPriceTableResDto = JsonConvert.DeserializeObject<GetPriceTableResDto>(httpResult.Html);
+
+                    List<GetPriceTable> GetPriceTables = new List<GetPriceTable>();
+                    foreach (var item in GetPriceTableResDto.Data)
+                    {
+                        GetPriceTable getPriceTable = new GetPriceTable();
+                        getPriceTable.Year=item.Year;
+
+                        List<MonthPrices> monthPrices = new List<MonthPrices>();
+                        foreach (var items in item.ListTdMonthPrice)
+                        {
+                            MonthPrices monthPrices1 = new MonthPrices();
+                            monthPrices1.IsHave=items.IsHave; 
+                            monthPrices1.Month=items.Month;
+                            monthPrices1.Price = items.Price;
+                            monthPrices.Add(monthPrices1);
+                        }
+                        getPriceTable.MonthPriceList = monthPrices;
+                        GetPriceTables.Add(getPriceTable);
+                    }
+
+                    getPriceResDto.PriceTable = GetPriceTables;
+                }
+            }
+
+            //GetPriceChart 获取价格走势图和进入价格
+            Url = "https://www.zyctd.com/Breeds/GetPriceChart";
+            var GetPriceChartReq = new
+            {
+                mid = priceid,
+                PriceType = "month"
+             };
+
+            //查询
+            var GetPriceCharthttpResult = httpHelper.GetHtml(new HttpItem()
+            {
+                URL = Url,
+                Method = "Post",
+                PostDataType = PostDataType.Byte,
+                ContentType = "application/json",
+                PostdataByte = httpHelper.GetPostDate(GetPriceChartReq),
+                Timeout = 600
+            }, httpContext);
+
+            if (GetPriceCharthttpResult.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                if (!string.IsNullOrEmpty(GetPriceCharthttpResult.Html))
+                {
+                    GetPriceChartResDto GetPriceChartResDto = JsonConvert.DeserializeObject<GetPriceChartResDto>(GetPriceCharthttpResult.Html);
+                    getPriceResDto.TodayPrice = GetPriceChartResDto.Data.TodayPrice; 
+                }
+            }
+
+            resultModel.data = getPriceResDto;
+            return resultModel;
         }
     }
 }
