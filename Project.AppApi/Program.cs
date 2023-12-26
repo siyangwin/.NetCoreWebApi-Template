@@ -22,6 +22,7 @@ using Service.App;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Policy;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.DataProtection;
 
 var ApiName = "Project.AppApi";
 
@@ -98,22 +99,48 @@ var columnOpts = new ColumnOptions
 {
     AdditionalColumns = new Collection<SqlColumn>
     {
-        //唯一编号
-        new SqlColumn{ColumnName = "Guid", PropertyName = "Guid", DataType = SqlDbType.NVarChar, DataLength = 32, AllowNull = false},
+        ////唯一编号
+        //new SqlColumn{ColumnName = "Guid", PropertyName = "Guid", DataType = SqlDbType.NVarChar, DataLength = 32, AllowNull = false},
+        ////請求客戶類型 APP CMS
+        //new SqlColumn{ColumnName = "ClientType", DataType = SqlDbType.NVarChar, DataLength = 10, AllowNull = false},
+        ////API名称
+        //new SqlColumn{ColumnName = "APIName", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = false},
+        ////请求方式 POST GET等
+        //new SqlColumn{ColumnName = "Request", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = false},
+        ////用户编号
+        //new SqlColumn{ColumnName = "UserId", DataType = SqlDbType.Int, AllowNull = false},
+        ////设备唯一编号,如果有，默认0
+        //new SqlColumn{ColumnName = "DeviceId", DataType = SqlDbType.Int, AllowNull = true},
+        ////操作说明
+        //new SqlColumn{ColumnName = "Instructions", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = false},
+        ////请求参数内容
+        //new SqlColumn{ColumnName = "ReqParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = false},
+        ////返回参数内容
+        //new SqlColumn{ColumnName = "ResParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = true},
+        ////耗费时间
+        //new SqlColumn{ColumnName = "Time", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
+        ////访问用户IP
+        //new SqlColumn{ColumnName = "IP", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
+        // //服务器名称(负载均衡记录)
+        //new SqlColumn{ColumnName = "Server", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = false}
+
+
+         //唯一编号
+        new SqlColumn{ColumnName = "Guid", PropertyName = "Guid", DataType = SqlDbType.NVarChar, DataLength = 32, AllowNull = true},
         //請求客戶類型 APP CMS
-        new SqlColumn{ColumnName = "ClientType", DataType = SqlDbType.NVarChar, DataLength = 10, AllowNull = false},
+        new SqlColumn{ColumnName = "ClientType", DataType = SqlDbType.NVarChar, DataLength = 10, AllowNull = true},
         //API名称
-        new SqlColumn{ColumnName = "APIName", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = false},
+        new SqlColumn{ColumnName = "APIName", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = true},
         //请求方式 POST GET等
-        new SqlColumn{ColumnName = "Request", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = false},
+        new SqlColumn{ColumnName = "Request", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
         //用户编号
-        new SqlColumn{ColumnName = "UserId", DataType = SqlDbType.Int, AllowNull = false},
+        new SqlColumn{ColumnName = "UserId", DataType = SqlDbType.Int, AllowNull = true},
         //设备唯一编号,如果有，默认0
         new SqlColumn{ColumnName = "DeviceId", DataType = SqlDbType.Int, AllowNull = true},
         //操作说明
-        new SqlColumn{ColumnName = "Instructions", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = false},
+        new SqlColumn{ColumnName = "Instructions", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = true},
         //请求参数内容
-        new SqlColumn{ColumnName = "ReqParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = false},
+        new SqlColumn{ColumnName = "ReqParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = true},
         //返回参数内容
         new SqlColumn{ColumnName = "ResParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = true},
         //耗费时间
@@ -121,13 +148,15 @@ var columnOpts = new ColumnOptions
         //访问用户IP
         new SqlColumn{ColumnName = "IP", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
          //服务器名称(负载均衡记录)
-        new SqlColumn{ColumnName = "Server", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = false}
+        new SqlColumn{ColumnName = "Server", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = true}
     }
 };
 
-columnOpts.Store.Remove(StandardColumn.Message);
-columnOpts.Store.Remove(StandardColumn.Properties);
-columnOpts.Store.Remove(StandardColumn.MessageTemplate);
+
+//columnOpts.Store.Remove(StandardColumn.Message);  //日志消息的文本内容，即人类可读的日志信息。
+//columnOpts.Store.Remove(StandardColumn.Properties);//结构化日志中的属性集合。当你使用 Serilog 记录结构化日志时，这个列用于表示附加的结构化数据。
+//columnOpts.Store.Remove(StandardColumn.MessageTemplate);//日志消息的模板，即日志消息的格式模板。这个模板可以包含占位符，用于渲染消息文本和结构化数据。
+
 //columnOpts.Store.Add(StandardColumn.LogEvent);
 //columnOpts.LogEvent.DataLength = 2048;
 //columnOpts.PrimaryKey = columnOpts.TimeStamp;
@@ -175,7 +204,6 @@ Log.Logger = new LoggerConfiguration()
 //Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmentVariable("USERNAME"), Environment.CurrentManagedThreadId);
 //Log.Warning("No coins remain at position {@Position}", new { Lat = 25, Long = 134 });
 //Log.Error("{UserName}{UserId}{RequestUri}", 1, 2, 3);
-//Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmentVariable("USERNAME"), Environment.CurrentManagedThreadId);
 #endregion
 
 //注入 替换默认日志
@@ -274,14 +302,22 @@ builder.Services.AddAuthentication(option =>
 
 #endregion
 
+//判断文件夹是否存在,不存在则创建
+string folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"other");
+if (!Directory.Exists(folderPath))
+{
+    Directory.CreateDirectory(folderPath);
+}
 
-
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(folderPath, "keys")))
+    .ProtectKeysWithDpapi();// 以 DPAPI 保护密钥，可替换为其他适合的保护机制,只适配windows，如果Linux 或 macOS 等非 Windows 环境下，使用.ProtectKeysWithCertificate("thumbprint");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
-app.UseHttpsRedirection();
+// Configure the HTTP request pipeline. 會把 http 轉到 https。
+//使用http,可以禁止使用
+//app.UseHttpsRedirection();
 
 //跨域第一種版本，請要ConfigureService中配置服務 services.AddCors();
 //app.UseCors();
@@ -291,13 +327,6 @@ app.UseCors("cors");
 if (getconfig)
 {
     app.UseSwaggers(ApiName);
-}
-
-//判断文件夹是否存在,不存在则创建
-string folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"other");
-if (!Directory.Exists(folderPath))
-{
-    Directory.CreateDirectory(folderPath);
 }
 
 app.UseStaticFiles(new StaticFileOptions()
