@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Model.EnumModel;
-using Model.Table;
 using ViewModel;
 using ViewModel.App;
 

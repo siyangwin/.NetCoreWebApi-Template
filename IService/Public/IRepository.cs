@@ -2,7 +2,7 @@
 
 namespace IService
 {
-	public interface IRepository : IBaseRepository<IRepository>
+	public interface IRepository : IBaseRepository<IRepository>,IBaseService
 	{
 	}
 }

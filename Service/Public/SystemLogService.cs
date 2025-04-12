@@ -2,7 +2,6 @@
 using Model.Table;
 using Model.EnumModel;
 using IService;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace Service

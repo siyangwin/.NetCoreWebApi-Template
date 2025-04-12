@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Project.AppApi.Controllers
 {
+	/// <summary>
+	/// 自动生成模板
+	/// </summary>
 	[ApiExplorerSettings(IgnoreApi = false)]
 	[Route("api/[controller]")]
 	[ApiController]

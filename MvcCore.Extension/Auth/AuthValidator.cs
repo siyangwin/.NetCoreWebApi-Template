@@ -1,26 +1,19 @@
-﻿using Core;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MvcCore.Extension.Auth
 {
     /// <summary>
     /// 自定义身份认证
     /// </summary>
-    public class AuthValidator : IAuthorizationFilter
+    public class AuthValidator : Attribute, IAuthorizationFilter
     {
         //private readonly RequestDelegate _next;
 
@@ -34,7 +27,9 @@ namespace MvcCore.Extension.Auth
             try
             {
                 // 获取用户 ID (sub) 声明值
-                var UserId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+               // var UserId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                // 获取 UserId 声明
+                var UserId = context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
 
                 if (UserId != null && !string.IsNullOrEmpty(UserId))
                 {
@@ -104,35 +99,86 @@ namespace MvcCore.Extension.Auth
             }
         }
 
-
         /// <summary>
         /// 重新自定義認證
         /// </summary>
         /// <param name="context"></param>
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            //是否需要授权的Api
-            bool isAllowAnonymous = context.ActionDescriptor.FilterDescriptors.Any(x => x.Filter.ToString() == typeof(AllowAnonymousFilter).ToString());
+            this.Invoke(context.HttpContext);
+            ////检查当前的接口是否需要验证
+            //// 检查当前 Action 是否带有 [AllowAnonymous] 特性
+            //var actionDescriptor = context.HttpContext.GetEndpoint()?.Metadata?.GetMetadata<ControllerActionDescriptor>();
+            //var allowAnonymous = actionDescriptor != null && actionDescriptor.ControllerTypeInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any() || actionDescriptor.MethodInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any();
 
-            //从Header中获取token
-            string token = context.HttpContext.Request.Headers["Token"];
+            //// 如果当前Action 不需要身份验证，则直接调用下一个中间件或控制器
+            //// context.HttpContext.User.Identity.IsAuthenticated 标识是否通过身份验证
+            //if (allowAnonymous || !context.HttpContext.User.Identity.IsAuthenticated)
+            //{
+            //    //API不需要校验
+            //}
+            //else
+            //{
+            //    //API需要校验
+            //    //从Header中获取token
+            //    string token = context.HttpContext.Request.Headers["Token"];
 
-            if (!string.IsNullOrEmpty(token))
-            {
-                try
-                {
-                    this.Invoke(context.HttpContext);
-                    //此处可以分别为APP和CMS做不同的操作
-                }
-                catch (Exception ex)
-                {
-            
-                }
-            }
-            else
-            {
-                
-            }
+            //    //如果为空，则尝试从Query中获取
+            //    if (string.IsNullOrEmpty(token))
+            //        token = context.HttpContext.Request.Query["Token"];
+
+            //    if (!string.IsNullOrEmpty(token))
+            //    {
+            //        try
+            //        {
+            //            //this.Invoke(context.HttpContext);
+            //            //此处可以分别为APP和CMS做不同的操作
+            //            //获取Token缓存数据
+            //            var claims = MemoryCacheHelper.Get<ClaimsIdentity>(token);
+            //            //获取请求目标，判断何种检验方式
+            //            //if (context.HttpContext.Request.Headers["ClientType"] == "APP")
+            //            //{ 
+
+            //            //}
+
+            //            if (claims != null)
+            //            {
+            //                context.HttpContext.Request.Headers.Add("UserId", claims.Claims.FirstOrDefault(a => a.Type == "UserId")?.Value);
+            //            }
+            //            else
+            //            {
+            //                if (allowAnonymous)
+            //                    return;
+            //                if (context.HttpContext.Request.Path != "/api/appuser/loginout")
+            //                {
+            //                    //不存在的token直接拒絕
+            //                    context.Result = new JsonResult(new { success = false, Code = "401", Message = "沒有授權" });
+            //                    context.HttpContext.Response.StatusCode = 200;
+
+            //                    //写入日志
+            //                    //NewMethod(context);
+            //                }
+            //            }
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            if (allowAnonymous)
+            //                return;
+            //            if (context.HttpContext.Request.Path != "/api/appuser/loginout")
+            //            {
+            //                //不存在的token直接拒絕
+            //                context.Result = new JsonResult(new { success = false, Code = "401", Message = "沒有授權" });
+            //                context.HttpContext.Response.StatusCode = 200;
+            //                //写入日志
+            //                //NewMethod(context);
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+
+            //    }
+            //}
         }
     }
 }

@@ -52,5 +52,30 @@ namespace MvcCore.Extension.Auth
 
             return access_token;
         }
+
+
+        /// <summary>
+        /// 生成token
+        /// </summary>
+        /// <param name="UserId">携带的用户信息</param>
+        /// <returns></returns>
+        public string GenerateEncodedTokenAsync(Claim[] claim)
+        {
+            //创建用户身份标识，可按需要添加更多信息
+            var claims = claim.ToList();
+
+            //创建令牌
+            var jwt = new JwtSecurityToken(
+                issuer: _jwtConfig.Issuer,
+                audience: _jwtConfig.Audience,
+                claims: claims,
+                notBefore: _jwtConfig.NotBefore,
+                expires: _jwtConfig.Expiration,
+                signingCredentials: _jwtConfig.SigningCredentials);
+
+            string access_token = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            return access_token;
+        }
     }
 }

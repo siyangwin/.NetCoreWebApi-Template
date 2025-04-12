@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using IService;
 using Model.EnumModel;
+using Core;
 
 namespace MvcCore.Extension.Filter
 {
@@ -11,8 +12,6 @@ namespace MvcCore.Extension.Filter
 	/// </summary>
 	public class ErrorFilterAttribute:  ExceptionFilterAttribute
 	{
-
-
         /// <summary>
         ///日志
         /// </summary>
@@ -22,12 +21,11 @@ namespace MvcCore.Extension.Filter
         /// 注入
         /// </summary>
         /// <param name="systemLogService">日志</param>
-        public ErrorFilterAttribute(ISystemLogService systemLogService) 
+        public ErrorFilterAttribute(ISystemLogService systemLogService)
         {
             //日志
             this.systemLogService = systemLogService;
         }
-
 
         /// <summary>
         /// 異步獲取異常
@@ -38,7 +36,7 @@ namespace MvcCore.Extension.Filter
 		{
 
             //写入日志
-             systemLogService.LogAdd(SystemLogTypeEnum.Error, context.HttpContext, "异常", JsonConvert.SerializeObject(context.Exception), "", null, context.Exception);
+            systemLogService.LogAdd(SystemLogTypeEnum.Error, context.HttpContext, "异常", JsonConvert.SerializeObject(context.Exception), "", null, context.Exception);
 
 			return base.OnExceptionAsync(context);
 		}

@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace Model.Table
 {
-    /// <summary>
+    /// <summary>   
     /// 用户表
     /// </summary>
     [Display(Rename = "UserInfo")]

@@ -1,13 +1,13 @@
-﻿using Core;
+﻿using IService;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IService
+namespace Service
 {
-    public interface ISystemLogService: ILogService,IBaseService
-	{
-
+    public class BaseService: IBaseService
+    {
     }
 }

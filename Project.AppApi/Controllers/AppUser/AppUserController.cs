@@ -1,44 +1,101 @@
 using IService.App;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model.EnumModel;
+using MvcCore.Extension.Auth;
+using System.Security.Claims;
 using ViewModel;
 using ViewModel.App;
 
 namespace Project.AppApi.Controllers
 {
     /// <summary>
-    /// æµ‹è¯•
+    /// ²âÊÔ-Jwt
     /// </summary>
-    //[Route("[controller]")]
-    public class AppUserController: BaseController
+    /// [Route("[controller]")]
+    public class AppUserController : BaseController
     {
         private readonly IAppUserService appUserService;
 
         /// <summary>
-        /// æ³¨å…¥
+        /// Jwt¹¤¾ßÀà
         /// </summary>
-        /// <param name="appUserService">ç”¨æˆ·ç±»</param>
-        public AppUserController(IAppUserService appUserService)
+        private readonly GenerateJwt generateJwt;
+
+        /// <summary>
+        /// ×¢Èë
+        /// </summary>
+        /// <param name="appUserService">ÓÃ»§Àà</param>
+        public AppUserController(IAppUserService appUserService, GenerateJwt generateJwt)
         {
             this.appUserService = appUserService;
+            this.generateJwt = generateJwt;
+        }
+
+
+        /// <summary>
+        /// µÇÂ¼
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/user/login")]
+        [AllowAnonymous]
+        [HttpPost]
+        public ResultModel<string> Login([FromBody] AuthorizationReqDto AuthorizationInfo)
+        {
+            ResultModel<string> resultModel = new ResultModel<string>();
+            if (AuthorizationInfo == null)
+            {
+                resultModel.success = false;
+            }
+            else
+            {
+                //string token = Guid.NewGuid().ToString();
+                //Œ‘ÈëÉí·İĞÅÏ¢µ½ÕJ×CÖĞĞÄ
+                var claims = new[]
+                {
+                    new Claim("UserId",AuthorizationInfo.account.ToString())
+                };
+                //µÇä›²¢«@È¡token
+                //userResDto.Token = token;
+                //HttpContext.SignInAsync(claims, token, userResDto.Id.ToString(), 240, true);
+                resultModel.data = generateJwt.GenerateEncodedTokenAsync(claims);
+            }
+            return resultModel;
         }
 
         /// <summary>
-        /// æˆæƒ
+        /// µÇ³ö
         /// </summary>
-        /// <param name="AuthorizationInfo">æˆæƒä¿¡æ¯</param>
         /// <returns></returns>
+        [Route("/api/user/loginout")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ResultModel> LoginOut()
+        {
+            ResultModel resultModel = new ResultModel();
+            resultModel.message = "µÇ³ö³É¹¦";
+            HttpContext.SignOutAsync();
+            return resultModel;
+        }
+
+        /// <summary>
+        /// ÊÚÈ¨ ÓëµÇÂ¼Ò»ÖÂ  account:123 pwd:admin
+        /// </summary>
+        /// <param name="AuthorizationInfo">ÊÚÈ¨ĞÅÏ¢</param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Route("/api/appuser/authorization")]
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ResultModel<AuthorizationResDto>> Authorization(AuthorizationReqDto AuthorizationInfo)
+        public async Task<ResultModel<AuthorizationResDto>> Authorization([FromBody] AuthorizationReqDto AuthorizationInfo)
         {
             return appUserService.Authorization(Language, AuthorizationInfo);
         }
 
         /// <summary>
-        /// æŸ¥çœ‹æˆæƒä¿¡æ¯--æˆæƒ
+        /// ²é¿´ÊÚÈ¨ĞÅÏ¢--ÊÚÈ¨
         /// </summary>
         /// <returns></returns>
         [Route("/api/appuser/checkauthorizationinfo")]
@@ -48,13 +105,13 @@ namespace Project.AppApi.Controllers
             ResultModel<string> resultModel = new ResultModel<string>();
 
 
-            resultModel.data = "å½“å‰ç”¨æˆ·ä¸ºï¼š" + UserId;
+            resultModel.data = "µ±Ç°ÓÃ»§Îª£º" + UserId;
             return resultModel;
         }
 
 
         /// <summary>
-        /// æŸ¥çœ‹æ•°æ®-æ— éœ€æˆæƒ
+        /// ²é¿´Êı¾İ-ÎŞĞèÊÚÈ¨
         /// </summary>
         /// <returns></returns>
         [Route("/api/appuser/checknoAuthorizationinfo")]
@@ -63,76 +120,8 @@ namespace Project.AppApi.Controllers
         public async Task<ResultModel<string>> CheckNoAuthorizationInfo()
         {
             ResultModel<string> resultModel = new ResultModel<string>();
-            resultModel.data = "å½“å‰ç”¨æˆ·ä¸ºï¼š" + UserId;
+            resultModel.data = "µ±Ç°ÓÃ»§Îª£º" + UserId;
             return resultModel;
-        }
-
-        /// <summary>
-        /// å†™å…¥æ•°æ®-æ— éœ€æˆæƒ
-        /// </summary>
-        /// <param name="Req">è¯·æ±‚å‚æ•°</param>
-        /// <returns></returns>
-        [Route("/api/appuser/productinsert")]
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ResultModel> ProductInsert(List<ProductInfoReqDto> Req)
-        {
-            return appUserService.ProductInsert(Language, Req); ;
-        }
-
-
-        /// <summary>
-        /// å†™å…¥äº§å“åç§°æ•°æ®-æ— éœ€æˆæƒ
-        /// </summary>
-        /// <param name="Req">è¯·æ±‚å‚æ•°</param>
-        /// <returns></returns>
-        [Route("/api/appuser/productnameinsert")]
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ResultModel> ProductNameInsert(List<ProductReqDto> Req)
-        {
-            return appUserService.ProductNameInsert(Language, Req); ;
-        }
-
-
-        /// <summary>
-        /// è·å–å°ç¨‹åºç”¨æˆ·ç¼–å·
-        /// </summary>
-        /// <param name="getUserOpenIdResDto">è¯·æ±‚ç±»</param>
-        /// <returns></returns>
-        [Route("/api/appuser/getuser")]
-        [AllowAnonymous]
-        [HttpPost]
-        public ResultModel<GetUserOpenIdResDto> GetUserOpenId(GetUserOpenIdReqDto getUserOpenIdResDto)
-        {
-            return appUserService.GetUserOpenId(getUserOpenIdResDto, HttpContext);
-        }
-
-
-        /// <summary>
-        /// ä¿®æ”¹ç”¨æˆ·ä¿¡æ¯
-        /// </summary>
-        /// <param name="changeUserInfoResDto">è¯·æ±‚ç±»</param>
-        /// <returns></returns>
-        [Route("/api/appuser/changeinfo")]
-        [AllowAnonymous]
-        [HttpPost]
-        public ResultModel ChangeUserInfo(ChangeUserInfoReqDto changeUserInfoResDto)
-        {
-            return appUserService.ChangeUserInfo(changeUserInfoResDto);
-        }
-
-        /// <summary>
-        /// æŸ¥çœ‹å¤´åƒä¿¡æ¯
-        /// </summary>
-        /// <param name="token">ç”¨æˆ·ä¿¡æ¯</param>
-        /// <returns></returns>
-        [Route("/api/appuser/avatarlist")]
-        [AllowAnonymous]
-        [HttpGet]
-        public ResultModels<GetAvatarListResDto> GetAvatarList(string token)
-        {
-            return appUserService.GetAvatarList(token);
         }
     }
 }

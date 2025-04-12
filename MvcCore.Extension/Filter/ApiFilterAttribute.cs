@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Model.Table;
 using Core;
 using Microsoft.Extensions.Logging;
 using IService;
 using Model.EnumModel;
 using Azure.Core;
+using System.ComponentModel.DataAnnotations;
 
 namespace MvcCore.Extension.Filter
 {
@@ -40,7 +40,6 @@ namespace MvcCore.Extension.Filter
         public void OnActionExecuting(ActionExecutingContext context)
         {
              //Console.Out.WriteLineAsync("OnActionExecuting");
-
             //驗證參數
             if (!context.ModelState.IsValid)
             {
@@ -54,6 +53,7 @@ namespace MvcCore.Extension.Filter
                 }
                 message = message.TrimEnd(new char[] { ' ', '|' });
                 throw new Exception(message);
+                //throw new ValidationException(message); // 使用自定义的 ValidationException
             }
         }
 
@@ -93,12 +93,6 @@ namespace MvcCore.Extension.Filter
                 RequestRemoteIp = (context.HttpContext.Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString() + ":" + context.HttpContext.Request.HttpContext.Connection.RemotePort),
                 RequestParam = GetParamString(context.HttpContext)
             };
-
-
-            //var logData = new
-            //{
-            //    kjjj = 1
-            //};
 
             string responseJson = string.Empty;
 
@@ -208,7 +202,7 @@ namespace MvcCore.Extension.Filter
             {
                 //发送错误
                 //写入日志
-                await systemLogService.LogAdd(SystemLogTypeEnum.Information, context, "异常", JsonConvert.SerializeObject(ex), "", null, ex);
+               await systemLogService.LogAdd(SystemLogTypeEnum.Information, context, "异常", JsonConvert.SerializeObject(ex), "", null, ex);
             }
 
             return builder.ToString();

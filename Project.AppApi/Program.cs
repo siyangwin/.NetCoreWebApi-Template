@@ -14,60 +14,63 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MvcCore.Extension.Auth;
-using System.Configuration;
-using Autofac.Core;
-using System.Net;
 using IService.App;
 using Service.App;
 using Microsoft.Extensions.FileProviders;
-using System.Security.Policy;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
+using System.Configuration;
+using Newtonsoft.Json.Linq;
 
 var ApiName = "Project.AppApi";
 
 var builder = WebApplication.CreateBuilder(args);
 
-//è®¾ç½®è·¨åŸŸ
-//è¨­ç½®Corså…±äº«ä¸æ””æˆª
+//ÉèÖÃ¿çÓò
+//ÔOÖÃCors¹²Ïí²»”r½Ø
 builder.Services.AddCors(options =>
 {
     //options.AddDefaultPolicy(builders =>
     //{
     //    builders
-    //        .AllowAnyOrigin()  //æ‰€æœ‰æ¥æº
-    //        .AllowAnyHeader()  //æ‰€æœ‰æ ‡å¤´
-    //        .AllowAnyMethod();  //æ‰€æœ‰ HTTP æ–¹æ³•
+    //        .AllowAnyOrigin()  //ËùÓĞÀ´Ô´
+    //        .AllowAnyHeader()  //ËùÓĞ±êÍ·
+    //        .AllowAnyMethod();  //ËùÓĞ HTTP ·½·¨
     //});
-
-    options.AddPolicy("cors", builders =>
-    {
-        builders
-            .AllowAnyOrigin()  //æ‰€æœ‰æ¥æº
-            .AllowAnyHeader()  //æ‰€æœ‰æ ‡å¤´
-            .AllowAnyMethod();  //æ‰€æœ‰ HTTP æ–¹æ³•
-            //.AllowCredentials();   //æ˜¯ä¸€ä¸ªè·¨åŸŸè¯·æ±‚ï¼ˆCORSï¼‰é€‰é¡¹ï¼Œç”¨äºæŒ‡ç¤ºæœåŠ¡ç«¯æ˜¯å¦å…è®¸å®¢æˆ·ç«¯åœ¨è·¨åŸŸè¯·æ±‚ä¸­åŒ…å«å‡­æ®ä¿¡æ¯ï¼Œå¦‚ Cookiesã€Authorization æ ‡å¤´ç­‰ã€‚
-    });
-
 
     //options.AddPolicy("cors", builders =>
     //{
     //    builders
-    //        //.WithOrigins(builder.Configuration.GetValue<string>("ConfigSettings:Orgins").Split(','))  //éƒ¨åˆ†æ¥æºï¼Œå¦‚æœéœ€è¦æŒ‰åŸŸåçš„è·¨åŸŸï¼Œè®¾ç½®è¿™ä¸ª
-    //        .AllowAnyHeader()  //æ‰€æœ‰æ ‡å¤´
-    //        .AllowAnyMethod()  //æ‰€æœ‰ HTTP æ–¹æ³•
-    //        .AllowCredentials();   //æ˜¯ä¸€ä¸ªè·¨åŸŸè¯·æ±‚ï¼ˆCORSï¼‰é€‰é¡¹ï¼Œç”¨äºæŒ‡ç¤ºæœåŠ¡ç«¯æ˜¯å¦å…è®¸å®¢æˆ·ç«¯åœ¨è·¨åŸŸè¯·æ±‚ä¸­åŒ…å«å‡­æ®ä¿¡æ¯ï¼Œå¦‚ Cookiesã€Authorization æ ‡å¤´ç­‰ã€‚
+    //        .AllowAnyOrigin()  //ËùÓĞÀ´Ô´
+    //        .AllowAnyHeader()  //ËùÓĞ±êÍ·
+    //        .AllowAnyMethod();  //ËùÓĞ HTTP ·½·¨
+    //        //.AllowCredentials();   //ÊÇÒ»¸ö¿çÓòÇëÇó£¨CORS£©Ñ¡Ïî£¬ÓÃÓÚÖ¸Ê¾·şÎñ¶ËÊÇ·ñÔÊĞí¿Í»§¶ËÔÚ¿çÓòÇëÇóÖĞ°üº¬Æ¾¾İĞÅÏ¢£¬Èç Cookies¡¢Authorization ±êÍ·µÈ¡£
     //});
+
+
+    options.AddPolicy("cors", builders =>
+    {
+        builders
+            .WithOrigins(builder.Configuration.GetValue<string>("ConfigSettings:Orgins").Split(','))  //²¿·ÖÀ´Ô´£¬Èç¹ûĞèÒª°´ÓòÃûµÄ¿çÓò£¬ÉèÖÃÕâ¸ö
+            .AllowAnyHeader()  //ËùÓĞ±êÍ·
+            .AllowAnyMethod()  //ËùÓĞ HTTP ·½·¨
+            .AllowCredentials();   //ÊÇÒ»¸ö¿çÓòÇëÇó£¨CORS£©Ñ¡Ïî£¬ÓÃÓÚÖ¸Ê¾·şÎñ¶ËÊÇ·ñÔÊĞí¿Í»§¶ËÔÚ¿çÓòÇëÇóÖĞ°üº¬Æ¾¾İĞÅÏ¢£¬Èç Cookies¡¢Authorization ±êÍ·µÈ¡£
+    });
 });
 
-
-//è·å–è¿æ¥å­—ç¬¦ä¸²
+//»ñÈ¡Á¬½Ó×Ö·û´®
 GlobalConfig.ConnectionString = builder.Configuration.GetValue<string>("ConnectionStrings:SqlServer");
 
 // Add services to the container.
 builder.Services.AddControllers();
 
-//æ˜¯å¦å¼€å¯Swagger
+
+//½ûÓÃ´ËĞĞÎª,²»½ûÓÃ»áµ¼ÖÂ£¬²ÎÊı²»´«»áÌáÊ¾Îª¿Õ
+builder.Services.AddControllers(
+    options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
+
+//ÊÇ·ñ¿ªÆôSwagger
 var getconfig = builder.Configuration.GetValue<bool>("ConfigSettings:SwaggerEnable");
 //Swagger
 if (getconfig)
@@ -75,22 +78,25 @@ if (getconfig)
     builder.Services.AddSwaggerGens(ApiName, new string[] { "ViewModel.xml" });
 }
 
+//netocreÄ¬ÈÏÊ¹ÓÃNewtonsoft.Json×÷ÎªJson½âÎöÆ÷£¬ÔÚ3.0+²»ÔÙÊÇÄ¬ÈÏ£¬¶øÊÇÊ¹ÓÃSystem.Text.JsonÌæ»»Newtonsoft.Json
+//builder.Services.AddControllers().AddNewtonsoftJson();
 
-// å°†æ¥å£è¯·æ±‚æ‹¦æˆªå™¨å’Œé”™è¯¯æ‹¦æˆªå™¨ æ³¨å†Œä¸ºå…¨å±€è¿‡æ»¤å™¨
+
+// ½«½Ó¿ÚÇëÇóÀ¹½ØÆ÷ºÍ´íÎóÀ¹½ØÆ÷ ×¢²áÎªÈ«¾Ö¹ıÂËÆ÷
 builder.Services.AddMvc(options =>
 {
-    //é”™è¯¯æ‹¦æˆªå™¨
+    //´íÎóÀ¹½ØÆ÷
     options.Filters.Add(typeof(ErrorFilterAttribute));
-    //æ¥å£è¯·æ±‚æ‹¦æˆªå™¨
+    //½Ó¿ÚÇëÇóÀ¹½ØÆ÷
     options.Filters.Add(typeof(ApiFilterAttribute));
-    //æˆæƒéªŒè¯æ‹¦æˆªå™¨
+    //ÊÚÈ¨ÑéÖ¤À¹½ØÆ÷
     options.Filters.Add(typeof(AuthValidator));
 });
 
-#region SerilLogé…ç½®
+#region SerilLogÅäÖÃ
 
-//SerilLogå†Serviceä¸­å¼•ç”¨æ¬¡NuGetåŒ…
-//ThreadIdéœ€è¦å¼•ç”¨ä¸“ç”¨çš„NuGetåŒ…
+//SerilLogÔÙServiceÖĞÒıÓÃ´ÎNuGet°ü
+//ThreadIdĞèÒªÒıÓÃ×¨ÓÃµÄNuGet°ü
 //const string OUTPUT_TEMPLATE = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} <{ThreadId}> [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 const string OUTPUT_TEMPLATE = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
@@ -99,97 +105,99 @@ var columnOpts = new ColumnOptions
 {
     AdditionalColumns = new Collection<SqlColumn>
     {
-        ////å”¯ä¸€ç¼–å·
+        ////Î¨Ò»±àºÅ
         //new SqlColumn{ColumnName = "Guid", PropertyName = "Guid", DataType = SqlDbType.NVarChar, DataLength = 32, AllowNull = false},
-        ////è«‹æ±‚å®¢æˆ¶é¡å‹ APP CMS
+        ////ÕˆÇó¿Í‘ôîĞÍ APP CMS
         //new SqlColumn{ColumnName = "ClientType", DataType = SqlDbType.NVarChar, DataLength = 10, AllowNull = false},
-        ////APIåç§°
+        ////APIÃû³Æ
         //new SqlColumn{ColumnName = "APIName", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = false},
-        ////è¯·æ±‚æ–¹å¼ POST GETç­‰
+        ////ÇëÇó·½Ê½ POST GETµÈ
         //new SqlColumn{ColumnName = "Request", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = false},
-        ////ç”¨æˆ·ç¼–å·
+        ////ÓÃ»§±àºÅ
         //new SqlColumn{ColumnName = "UserId", DataType = SqlDbType.Int, AllowNull = false},
-        ////è®¾å¤‡å”¯ä¸€ç¼–å·,å¦‚æœæœ‰ï¼Œé»˜è®¤0
+        ////Éè±¸Î¨Ò»±àºÅ,Èç¹ûÓĞ£¬Ä¬ÈÏ0
         //new SqlColumn{ColumnName = "DeviceId", DataType = SqlDbType.Int, AllowNull = true},
-        ////æ“ä½œè¯´æ˜
+        ////²Ù×÷ËµÃ÷
         //new SqlColumn{ColumnName = "Instructions", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = false},
-        ////è¯·æ±‚å‚æ•°å†…å®¹
+        ////ÇëÇó²ÎÊıÄÚÈİ
         //new SqlColumn{ColumnName = "ReqParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = false},
-        ////è¿”å›å‚æ•°å†…å®¹
+        ////·µ»Ø²ÎÊıÄÚÈİ
         //new SqlColumn{ColumnName = "ResParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = true},
-        ////è€—è´¹æ—¶é—´
+        ////ºÄ·ÑÊ±¼ä
         //new SqlColumn{ColumnName = "Time", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
-        ////è®¿é—®ç”¨æˆ·IP
+        ////·ÃÎÊÓÃ»§IP
         //new SqlColumn{ColumnName = "IP", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
-        // //æœåŠ¡å™¨åç§°(è´Ÿè½½å‡è¡¡è®°å½•)
+        // //·şÎñÆ÷Ãû³Æ(¸ºÔØ¾ùºâ¼ÇÂ¼)
         //new SqlColumn{ColumnName = "Server", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = false}
 
 
-         //å”¯ä¸€ç¼–å·
+         //Î¨Ò»±àºÅ
         new SqlColumn{ColumnName = "Guid", PropertyName = "Guid", DataType = SqlDbType.NVarChar, DataLength = 32, AllowNull = true},
-        //è«‹æ±‚å®¢æˆ¶é¡å‹ APP CMS
+        //ÕˆÇó¿Í‘ôîĞÍ APP CMS
         new SqlColumn{ColumnName = "ClientType", DataType = SqlDbType.NVarChar, DataLength = 10, AllowNull = true},
-        //APIåç§°
+        //APIÃû³Æ
         new SqlColumn{ColumnName = "APIName", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = true},
-        //è¯·æ±‚æ–¹å¼ POST GETç­‰
+        //ÇëÇó·½Ê½ POST GETµÈ
         new SqlColumn{ColumnName = "Request", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
-        //ç”¨æˆ·ç¼–å·
+        //ÓÃ»§±àºÅ
         new SqlColumn{ColumnName = "UserId", DataType = SqlDbType.Int, AllowNull = true},
-        //è®¾å¤‡å”¯ä¸€ç¼–å·,å¦‚æœæœ‰ï¼Œé»˜è®¤0
+        //Éè±¸Î¨Ò»±àºÅ,Èç¹ûÓĞ£¬Ä¬ÈÏ0
         new SqlColumn{ColumnName = "DeviceId", DataType = SqlDbType.Int, AllowNull = true},
-        //æ“ä½œè¯´æ˜
+        //²Ù×÷ËµÃ÷
         new SqlColumn{ColumnName = "Instructions", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = true},
-        //è¯·æ±‚å‚æ•°å†…å®¹
+        //ÇëÇó²ÎÊıÄÚÈİ
         new SqlColumn{ColumnName = "ReqParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = true},
-        //è¿”å›å‚æ•°å†…å®¹
+        //·µ»Ø²ÎÊıÄÚÈİ
         new SqlColumn{ColumnName = "ResParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = true},
-        //è€—è´¹æ—¶é—´
+        //ºÄ·ÑÊ±¼ä
         new SqlColumn{ColumnName = "Time", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
-        //è®¿é—®ç”¨æˆ·IP
+        //·ÃÎÊÓÃ»§IP
         new SqlColumn{ColumnName = "IP", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
-         //æœåŠ¡å™¨åç§°(è´Ÿè½½å‡è¡¡è®°å½•)
+         //·şÎñÆ÷Ãû³Æ(¸ºÔØ¾ùºâ¼ÇÂ¼)
         new SqlColumn{ColumnName = "Server", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = true}
     }
 };
 
 
-//columnOpts.Store.Remove(StandardColumn.Message);  //æ—¥å¿—æ¶ˆæ¯çš„æ–‡æœ¬å†…å®¹ï¼Œå³äººç±»å¯è¯»çš„æ—¥å¿—ä¿¡æ¯ã€‚
-//columnOpts.Store.Remove(StandardColumn.Properties);//ç»“æ„åŒ–æ—¥å¿—ä¸­çš„å±æ€§é›†åˆã€‚å½“ä½ ä½¿ç”¨ Serilog è®°å½•ç»“æ„åŒ–æ—¥å¿—æ—¶ï¼Œè¿™ä¸ªåˆ—ç”¨äºè¡¨ç¤ºé™„åŠ çš„ç»“æ„åŒ–æ•°æ®ã€‚
-//columnOpts.Store.Remove(StandardColumn.MessageTemplate);//æ—¥å¿—æ¶ˆæ¯çš„æ¨¡æ¿ï¼Œå³æ—¥å¿—æ¶ˆæ¯çš„æ ¼å¼æ¨¡æ¿ã€‚è¿™ä¸ªæ¨¡æ¿å¯ä»¥åŒ…å«å ä½ç¬¦ï¼Œç”¨äºæ¸²æŸ“æ¶ˆæ¯æ–‡æœ¬å’Œç»“æ„åŒ–æ•°æ®ã€‚
+//columnOpts.Store.Remove(StandardColumn.Message);  //ÈÕÖ¾ÏûÏ¢µÄÎÄ±¾ÄÚÈİ£¬¼´ÈËÀà¿É¶ÁµÄÈÕÖ¾ĞÅÏ¢¡£
+columnOpts.Store.Remove(StandardColumn.Properties);//½á¹¹»¯ÈÕÖ¾ÖĞµÄÊôĞÔ¼¯ºÏ¡£µ±ÄãÊ¹ÓÃ Serilog ¼ÇÂ¼½á¹¹»¯ÈÕÖ¾Ê±£¬Õâ¸öÁĞÓÃÓÚ±íÊ¾¸½¼ÓµÄ½á¹¹»¯Êı¾İ¡£
+columnOpts.Store.Remove(StandardColumn.MessageTemplate);//ÈÕÖ¾ÏûÏ¢µÄÄ£°å£¬¼´ÈÕÖ¾ÏûÏ¢µÄ¸ñÊ½Ä£°å¡£Õâ¸öÄ£°å¿ÉÒÔ°üº¬Õ¼Î»·û£¬ÓÃÓÚäÖÈ¾ÏûÏ¢ÎÄ±¾ºÍ½á¹¹»¯Êı¾İ¡£
 
 //columnOpts.Store.Add(StandardColumn.LogEvent);
 //columnOpts.LogEvent.DataLength = 2048;
 //columnOpts.PrimaryKey = columnOpts.TimeStamp;
-columnOpts.TimeStamp.NonClusteredIndex = true; //è®¾ç½®ä¸ºéèšç±»ç´¢å¼•
+columnOpts.TimeStamp.NonClusteredIndex = true; //ÉèÖÃÎª·Ç¾ÛÀàË÷Òı
 
 //BatchPeriod
-string interval = "00:00:05"; //è¡¨ç¤º5ç§’
+string interval = "00:00:05"; //±íÊ¾5Ãë
 TimeSpan ts;
 TimeSpan.TryParse(interval, out ts);
 
-//è¾“å‡ºæ—¥å¿—ç­‰çº§, å¯ä»¥ç¦æ­¢è¾“å‡º ASP.NET Core åº”ç”¨ç¨‹åºå¯åŠ¨æ—¶è®°å½•çš„ï¼Œå¹¶ä¸”æ˜¯é€šè¿‡é»˜è®¤çš„æ—¥å¿—è®°å½•å™¨è¾“å‡ºçš„ï¼ˆInformationï¼‰
+//Êä³öÈÕÖ¾µÈ¼¶, ¿ÉÒÔ½ûÖ¹Êä³ö ASP.NET Core Ó¦ÓÃ³ÌĞòÆô¶¯Ê±¼ÇÂ¼µÄ£¬²¢ÇÒÊÇÍ¨¹ıÄ¬ÈÏµÄÈÕÖ¾¼ÇÂ¼Æ÷Êä³öµÄ£¨Information£©
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug() //è®¾ç½®æ—¥å¿—è®°å½•å™¨çš„æœ€å°çº§åˆ«ä¸º Debugï¼Œå³åªè®°å½• Debugã€Informationã€Warningã€Error å’Œ Fatal çº§åˆ«çš„æ—¥å¿—äº‹ä»¶ã€‚
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//å¯¹ Microsoft å‘½åç©ºé—´ä¸‹çš„æ‰€æœ‰æ—¥å¿—äº‹ä»¶è¿›è¡Œé‡å†™ï¼Œå°†æœ€å°çº§åˆ«è®¾ç½®ä¸º Informationï¼Œå³åªè®°å½• Informationã€Warningã€Error å’Œ Fatal çº§åˆ«çš„æ—¥å¿—äº‹ä»¶ã€‚
-    //.ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRODUCTION"}.json", optional: true).Build())
-    .Enrich.FromLogContext() //å¯ç”¨æ—¥å¿—ä¸Šä¸‹æ–‡åŠŸèƒ½ï¼Œè‡ªåŠ¨è·å–å½“å‰çº¿ç¨‹å’Œæ–¹æ³•çš„ä¸€äº›ä¿¡æ¯ï¼Œå¹¶æ·»åŠ åˆ°æ¯ä¸ªæ—¥å¿—äº‹ä»¶ä¸­ã€‚
+    .MinimumLevel.Debug() //ÉèÖÃÈÕÖ¾¼ÇÂ¼Æ÷µÄ×îĞ¡¼¶±ğÎª Debug£¬¼´Ö»¼ÇÂ¼ Debug¡¢Information¡¢Warning¡¢Error ºÍ Fatal ¼¶±ğµÄÈÕÖ¾ÊÂ¼ş¡£
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//¶Ô Microsoft ÃüÃû¿Õ¼äÏÂµÄËùÓĞÈÕÖ¾ÊÂ¼ş½øĞĞÖØĞ´£¬½«×îĞ¡¼¶±ğÉèÖÃÎª Information£¬¼´Ö»¼ÇÂ¼ Information¡¢Warning¡¢Error ºÍ Fatal ¼¶±ğµÄÈÕÖ¾ÊÂ¼ş¡£
+                                                              //.ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRODUCTION"}.json", optional: true).Build())
+    .Enrich.FromLogContext() //ÆôÓÃÈÕÖ¾ÉÏÏÂÎÄ¹¦ÄÜ£¬×Ô¶¯»ñÈ¡µ±Ç°Ïß³ÌºÍ·½·¨µÄÒ»Ğ©ĞÅÏ¢£¬²¢Ìí¼Óµ½Ã¿¸öÈÕÖ¾ÊÂ¼şÖĞ¡£
     .WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
     .WriteTo.File("logs/app.txt"
         , rollingInterval: RollingInterval.Day,
-         rollOnFileSizeLimit: true, // å½“æ—¥å¿—æ–‡ä»¶å¤§å°è¶…è¿‡æŒ‡å®šå¤§å°æ—¶è‡ªåŠ¨æ»šåŠ¨æ—¥å¿—æ–‡ä»¶
-         fileSizeLimitBytes: 1048576, // æ—¥å¿—æ–‡ä»¶æœ€å¤§å¤§å°ä¸º 1MB
-          retainedFileCountLimit: 7, // æœ€å¤šä¿ç•™ 7 å¤©çš„æ—¥å¿—æ–‡ä»¶
+         rollOnFileSizeLimit: true, // µ±ÈÕÖ¾ÎÄ¼ş´óĞ¡³¬¹ıÖ¸¶¨´óĞ¡Ê±×Ô¶¯¹ö¶¯ÈÕÖ¾ÎÄ¼ş
+         fileSizeLimitBytes: 1048576, // ÈÕÖ¾ÎÄ¼ş×î´ó´óĞ¡Îª 1MB
+          retainedFileCountLimit: 7, // ×î¶à±£Áô 7 ÌìµÄÈÕÖ¾ÎÄ¼ş
           outputTemplate: OUTPUT_TEMPLATE)
-    .AuditTo.MSSqlServer(
-        connectionString: GlobalConfig.ConnectionString,
-        sinkOptions: new MSSqlServerSinkOptions { TableName = "SystemLog", SchemaName = "dbo", AutoCreateSqlTable = true, BatchPeriod=ts,BatchPostingLimit = 50 },
-        columnOptions: columnOpts)
+#region SerilLogÊÇ·ñĞèÒªÆô¶¯SqlServer
+    //.AuditTo.MSSqlServer(
+    //    connectionString: GlobalConfig.ConnectionString,
+    //    sinkOptions: new MSSqlServerSinkOptions { TableName = "SystemLog", SchemaName = "dbo", AutoCreateSqlTable = true, BatchPeriod = ts, BatchPostingLimit = 50 },
+    //    columnOptions: columnOpts)
+#endregion
     .CreateLogger();
 
-#region SerilLogå†™å…¥æ•°æ®åº“Demo
-//WriteToç”Ÿæ•ˆ AuditToä¸ç”Ÿæ•ˆ
-//BatchPostingLimit: ç”¨äºè®¾ç½®æ‰¹å¤„ç†æ—¥å¿—äº‹ä»¶çš„æ•°é‡é™åˆ¶ã€‚é»˜è®¤å€¼ä¸º 50ï¼Œå³å½“ç´¯ç§¯äº† 50 æ¡æ—¥å¿—äº‹ä»¶æ—¶å°±ä¼šå°†å®ƒä»¬ä½œä¸ºä¸€ä¸ªæ‰¹æ¬¡è¿›è¡Œå†™å…¥æ•°æ®åº“ã€‚è¿™ä¸ªé€‰é¡¹å¯ä»¥å¸®åŠ©ä¼˜åŒ–æ€§èƒ½ï¼Œå› ä¸ºä¸€æ¬¡æäº¤å¤§é‡çš„æ—¥å¿—äº‹ä»¶æ¯”ä¸€æ¬¡æäº¤å°‘é‡çš„æ—¥å¿—äº‹ä»¶æ•ˆç‡æ›´é«˜ã€‚
-//BatchPeriod: ç”¨äºè®¾ç½®æ‰¹å¤„ç†çš„æ—¶é—´é—´éš”ã€‚é»˜è®¤å€¼ä¸º 2 ç§’ï¼Œå³æ¯éš” 2 ç§’å°±ä¼šå°†æ‰€æœ‰å·²ç¼“å­˜çš„æ—¥å¿—äº‹ä»¶ä½œä¸ºä¸€ä¸ªæ‰¹æ¬¡è¿›è¡Œå†™å…¥æ•°æ®åº“ã€‚è¿™ä¸ªé€‰é¡¹å¯ä»¥ä¿è¯åœ¨ä¸€å®šçš„æ—¶é—´é—´éš”å†…ä¸€å®šä¼šå‘æ•°æ®åº“æäº¤æ—¥å¿—äº‹ä»¶ï¼Œä»¥ä¿è¯æ•°æ®çš„å®æ—¶æ€§å’Œå®Œæ•´æ€§ã€‚
+#region SerilLogĞ´ÈëÊı¾İ¿âDemo
+//WriteToÉúĞ§ AuditTo²»ÉúĞ§
+//BatchPostingLimit: ÓÃÓÚÉèÖÃÅú´¦ÀíÈÕÖ¾ÊÂ¼şµÄÊıÁ¿ÏŞÖÆ¡£Ä¬ÈÏÖµÎª 50£¬¼´µ±ÀÛ»ıÁË 50 ÌõÈÕÖ¾ÊÂ¼şÊ±¾Í»á½«ËüÃÇ×÷ÎªÒ»¸öÅú´Î½øĞĞĞ´ÈëÊı¾İ¿â¡£Õâ¸öÑ¡Ïî¿ÉÒÔ°ïÖúÓÅ»¯ĞÔÄÜ£¬ÒòÎªÒ»´ÎÌá½»´óÁ¿µÄÈÕÖ¾ÊÂ¼ş±ÈÒ»´ÎÌá½»ÉÙÁ¿µÄÈÕÖ¾ÊÂ¼şĞ§ÂÊ¸ü¸ß¡£
+//BatchPeriod: ÓÃÓÚÉèÖÃÅú´¦ÀíµÄÊ±¼ä¼ä¸ô¡£Ä¬ÈÏÖµÎª 2 Ãë£¬¼´Ã¿¸ô 2 Ãë¾Í»á½«ËùÓĞÒÑ»º´æµÄÈÕÖ¾ÊÂ¼ş×÷ÎªÒ»¸öÅú´Î½øĞĞĞ´ÈëÊı¾İ¿â¡£Õâ¸öÑ¡Ïî¿ÉÒÔ±£Ö¤ÔÚÒ»¶¨µÄÊ±¼ä¼ä¸ôÄÚÒ»¶¨»áÏòÊı¾İ¿âÌá½»ÈÕÖ¾ÊÂ¼ş£¬ÒÔ±£Ö¤Êı¾İµÄÊµÊ±ĞÔºÍÍêÕûĞÔ¡£
 
 //Log.Logger = new LoggerConfiguration()
 //    .WriteTo
@@ -200,130 +208,86 @@ Log.Logger = new LoggerConfiguration()
 //    .CreateLogger();
 
 
-//æµ‹è¯•æ—¥å¿—è¾“å‡º
+//²âÊÔÈÕÖ¾Êä³ö
 //Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmentVariable("USERNAME"), Environment.CurrentManagedThreadId);
 //Log.Warning("No coins remain at position {@Position}", new { Lat = 25, Long = 134 });
 //Log.Error("{UserName}{UserId}{RequestUri}", 1, 2, 3);
 #endregion
 
-//æ³¨å…¥ æ›¿æ¢é»˜è®¤æ—¥å¿—
+//×¢Èë Ìæ»»Ä¬ÈÏÈÕÖ¾
 builder.Host.UseSerilog(Log.Logger, dispose: true);
 #endregion
 
+
+#region ·şÎñ×¢Èë
+//×¢²á MVC£¨Model-View-Controller£©·şÎñ
 builder.Services.AddControllersWithViews();
 
-
-
-//GlobalConfigæ–¹æ³•æ³¨å…¥
-//æ³¨å…¥é…ç½®æ—¥å¿—
+//GlobalConfig·½·¨×¢Èë
+//×¢ÈëÅäÖÃÈÕÖ¾
 //GlobalConfig.SystemLogService()
 
-// æ‰¹é‡æ³¨å†ŒæœåŠ¡
-//builder.Services.AddAutoFacs(new string[] { "Service.dll" });
+// ÅúÁ¿×¢²á·şÎñ
+builder.Services.Scan(scan => scan
+          .FromAssemblyOf<BaseService>() // ´Ó Startup ÀàËùÔÚµÄ³ÌĞò¼¯¿ªÊ¼É¨Ãè
+          .AddClasses(classes => classes.AssignableTo<IBaseService>()) // É¨ÃèÊµÏÖÁË IService ½Ó¿ÚµÄÀà
+              .AsImplementedInterfaces() // ×¢²áÕâĞ©ÀàÊµÏÖµÄËùÓĞ½Ó¿Ú
+              .WithScopedLifetime()); // Ê¹ÓÃÖ¸¶¨µÄÉúÃüÖÜÆÚ½øĞĞ×¢²á£¬ÕâÀïÊÇ Scoped ÉúÃüÖÜÆÚÊ¾Àı
 
-//æ³¨å…¥DBé“¾æ¥
-builder.Services.AddScoped<IRepository, Repository>();
-//æ³¨å…¥Log
-builder.Services.AddScoped<ISystemLogService, SystemLogService>();
-//æ³¨å…¥ç”¨æˆ·ç±»
-builder.Services.AddScoped<IAppUserService,AppUserService>();
-//æ³¨å…¥æ¤ç‰©ç±»
-builder.Services.AddScoped<IPlantService, PlantService>();
-//æ³¨å†Œç¬¬ä¸‰æ–¹ç±»
-builder.Services.AddScoped<IOtherSystemService, OtherSystemService>();
-//æ³¨å…¥httphelper
+////×¢ÈëDBÁ´½Ó
+//builder.Services.AddScoped<IRepository, Repository>();
+////×¢ÈëLog
+//builder.Services.AddScoped<ISystemLogService, SystemLogService>();
+////×¢ÈëÓÃ»§Àà
+//builder.Services.AddScoped<IAppUserService, AppUserService>();
+////×¢ÈëÖ²ÎïÀà
+//builder.Services.AddScoped<IPlantService, PlantService>();
+////×¢²áµÚÈı·½Àà
+//builder.Services.AddScoped<IOtherSystemService, OtherSystemService>();
+////×¢ÈëWebHooksÀà
+//builder.Services.AddScoped<IWebhooksService, WebhooksService>();
+////×¢ÈëEasyCardÀà
+//builder.Services.AddScoped<IEasyCardServices, EasyCardServices>();
+////×¢ÈëConfigÀà
+//builder.Services.AddScoped<IConfigService, ConfigService>();
+
+//×¢Èëhttphelper
 builder.Services.AddTransient(typeof(HttpHelper));
 
-#region jwtéªŒè¯
-
-//æ³¨å…¥jwt
-builder.Services.AddScoped<GenerateJwt>();
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
-
-//å®ä¾‹åŒ–å¯¹è±¡
-var jwtConfig = new JwtConfig();
-//ä»Appsetting.configä¸­è¯»å–å‡ºæ¥èµ‹å€¼ç»™å¯¹è±¡
-builder.Configuration.Bind("JwtConfig", jwtConfig);
-
-builder.Services.AddAuthentication(option =>
-    {
-        //è®¤è¯middlewareé…ç½®
-        option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        //æŒ‡å®šJwtçš„éªŒè¯
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            //Tokené¢å‘æœºæ„
-            //æŒ‡å®š JWT çš„é¢å‘è€…ï¼ˆissuerï¼‰ï¼Œå³è¡¨ç¤º JWT ä»¤ç‰Œçš„æ¥æºã€‚
-            ValidIssuer = jwtConfig.Issuer,
-            //é¢å‘ç»™è°
-            //æŒ‡å®š JWT çš„å—ä¼—ï¼ˆaudienceï¼‰ï¼Œå³è¡¨ç¤º JWT ä»¤ç‰Œåº”è¯¥è¢«å“ªäº›å®¢æˆ·ç«¯ä½¿ç”¨ã€‚
-            ValidAudience = jwtConfig.Audience,
-            //è¿™é‡Œçš„keyè¦è¿›è¡ŒåŠ å¯†
-            //æŒ‡å®šç”¨äºå¯¹ JWT ç­¾åè¿›è¡ŒéªŒè¯çš„å¯†é’¥ã€‚åœ¨è¿™é‡Œä½¿ç”¨ SymmetricSecurityKey ç±»å‹æ¥æŒ‡å®šå¯†é’¥ï¼Œå…¶å¯ä»¥æ˜¯ä»»ä½•å­—èŠ‚æ•°ç»„ï¼Œä¾‹å¦‚ä½¿ç”¨ Encoding.UTF8.GetBytes() æ–¹æ³•å°†å­—ç¬¦ä¸²è½¬æ¢ä¸ºå­—èŠ‚æ•°ç»„ã€‚
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey)),
-            //æ˜¯å¦éªŒè¯Tokenæœ‰æ•ˆæœŸï¼Œä½¿ç”¨å½“å‰æ—¶é—´ä¸Tokençš„Claimsä¸­çš„NotBeforeå’ŒExpireså¯¹æ¯”
-            //æŒ‡ç¤ºæ˜¯å¦éªŒè¯ JWT ä»¤ç‰Œçš„æœ‰æ•ˆæœŸã€‚å½“æœåŠ¡å™¨æ”¶åˆ°ä¸€ä¸ª JWT ä»¤ç‰Œæ—¶ï¼Œä¼šæ£€æŸ¥å…¶ Claims ä¸­çš„ NotBefore å’Œ Expires æ˜¯å¦åœ¨å½“å‰æ—¶é—´èŒƒå›´å†…ã€‚å¦‚æœ ValidateLifetime è®¾ç½®ä¸º trueï¼Œåˆ™æœåŠ¡å™¨å°†æ‹’ç»è¿‡æœŸçš„ JWT ä»¤ç‰Œï¼Œå¹¶è®¤ä¸ºå®ƒæ˜¯æ— æ•ˆçš„ã€‚
-            ValidateLifetime = true,
-            //æŒ‡ç¤ºæ˜¯å¦éªŒè¯ JWT çš„ç­¾åå¯†é’¥ã€‚
-            ValidateIssuerSigningKey = true,
-            //æŒ‡ç¤ºæ˜¯å¦éªŒè¯ JWT çš„é¢å‘è€…ã€‚
-            ValidateIssuer =true,
-            //æŒ‡ç¤ºæ˜¯å¦éªŒè¯ JWT çš„å—ä¼—ã€‚
-            ValidateAudience =true,
-        };
-
-        //æŒ‡å®šJwtçš„è¿”å›å†…å®¹
-        options.Events = new JwtBearerEvents
-        {
-            //æ­¤å¤„ä¸ºæƒé™éªŒè¯å¤±è´¥åè§¦å‘çš„äº‹ä»¶
-            OnChallenge = context =>
-            {
-                //æ­¤å¤„ä»£ç ä¸ºç»ˆæ­¢.Net Coreé»˜è®¤çš„è¿”å›ç±»å‹å’Œæ•°æ®ç»“æœï¼Œè¿™ä¸ªå¾ˆé‡è¦å“¦ï¼Œå¿…é¡»
-                context.HandleResponse();
-
-                //è‡ªå®šä¹‰è‡ªå·±æƒ³è¦è¿”å›çš„æ•°æ®ç»“æœï¼Œæˆ‘è¿™é‡Œè¦è¿”å›çš„æ˜¯Jsonå¯¹è±¡ï¼Œé€šè¿‡å¼•ç”¨Newtonsoft.Jsonåº“è¿›è¡Œè½¬æ¢
-                var payload = JsonConvert.SerializeObject(new { api_version = "v1", success = false, code = "401", message = "å¾ˆæŠ±æ­‰ï¼Œæ‚¨æ— æƒè®¿é—®,è¯·æˆæƒ!" });
-                //var payload = "no";
-                //è‡ªå®šä¹‰è¿”å›çš„æ•°æ®ç±»å‹
-                context.Response.ContentType = "application/json";
-                //è‡ªå®šä¹‰è¿”å›çŠ¶æ€ç ï¼Œé»˜è®¤ä¸º401 æˆ‘è¿™é‡Œæ”¹æˆ 200
-                context.Response.StatusCode = StatusCodes.Status200OK;
-                //context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                //è¾“å‡ºJsonæ•°æ®ç»“æœ
-                context.Response.WriteAsync(payload);
-                return Task.FromResult(0);
-            }
-        };
-    });
+//Ìí¼Ó HttpClientFactory ·şÎñ
+builder.Services.AddHttpClient();
 
 #endregion
 
-//åˆ¤æ–­æ–‡ä»¶å¤¹æ˜¯å¦å­˜åœ¨,ä¸å­˜åœ¨åˆ™åˆ›å»º
+#region jwtÉí·İÑéÖ¤
+//Éí·İÕJ×C
+//builder.Services.AddAuthentications(builder.Configuration.GetValue<string>("ConfigSettings:Domain"), "/api/appuser/denied");
+builder.Services.AddAuthentications(builder.Configuration);
+#endregion
+
+
+//½«ĞèÒªÊ¹ÓÃµÄÎÄ¼ş¼Ğ£¬ÔÚ´Ë´¦´´½¨¡£ÅĞ¶ÏÎÄ¼ş¼ĞÊÇ·ñ´æÔÚ,²»´æÔÚÔò´´½¨
 string folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"other");
 if (!Directory.Exists(folderPath))
 {
     Directory.CreateDirectory(folderPath);
 }
 
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(folderPath, "keys")))
-    .ProtectKeysWithDpapi();// ä»¥ DPAPI ä¿æŠ¤å¯†é’¥ï¼Œå¯æ›¿æ¢ä¸ºå…¶ä»–é€‚åˆçš„ä¿æŠ¤æœºåˆ¶,åªé€‚é…windowsï¼Œå¦‚æœLinux æˆ– macOS ç­‰é Windows ç¯å¢ƒä¸‹ï¼Œä½¿ç”¨.ProtectKeysWithCertificate("thumbprint");
+//builder.Services.AddDataProtection()
+//    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(folderPath, "keys")))
+//    .ProtectKeysWithDpapi();// ÒÔ DPAPI ±£»¤ÃÜÔ¿£¬¿ÉÌæ»»ÎªÆäËûÊÊºÏµÄ±£»¤»úÖÆ,Ö»ÊÊÅäwindows£¬Èç¹ûLinux »ò macOS µÈ·Ç Windows »·¾³ÏÂ£¬Ê¹ÓÃ.ProtectKeysWithCertificate("thumbprint");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline. æœƒæŠŠ http è½‰åˆ° httpsã€‚
-//ä½¿ç”¨http,å¯ä»¥ç¦æ­¢ä½¿ç”¨
+// Configure the HTTP request pipeline. •ş°Ñ http ŞDµ½ https¡£
+//Ê¹ÓÃhttp,¿ÉÒÔ½ûÖ¹Ê¹ÓÃ
 //app.UseHttpsRedirection();
 
-//è·¨åŸŸç¬¬ä¸€ç¨®ç‰ˆæœ¬ï¼Œè«‹è¦ConfigureServiceä¸­é…ç½®æœå‹™ services.AddCors();
+//¿çÓòµÚÒ»·N°æ±¾£¬ÕˆÒªConfigureServiceÖĞÅäÖÃ·ş„Õ services.AddCors();
 //app.UseCors();
 app.UseCors("cors");
 
-//æ˜¯å¦å¼€å¯Swagger
+//ÊÇ·ñ¿ªÆôSwagger
 if (getconfig)
 {
     app.UseSwaggers(ApiName);
@@ -331,16 +295,16 @@ if (getconfig)
 
 app.UseStaticFiles(new StaticFileOptions()
 {
-    //æŒ‡å®šè¦å…¬å¼€çš„é™æ€æ–‡ä»¶æ‰€åœ¨çš„ç›®å½•è·¯å¾„ã€‚åœ¨æ­¤ç¤ºä¾‹ä¸­ï¼Œå®ƒå°†å½“å‰å·¥ä½œç›®å½•ä¸‹çš„â€œFilesâ€å­ç›®å½•æŒ‡å®šä¸ºé™æ€æ–‡ä»¶çš„æ ¹ç›®å½•ã€‚
+    //Ö¸¶¨Òª¹«¿ªµÄ¾²Ì¬ÎÄ¼şËùÔÚµÄÄ¿Â¼Â·¾¶¡£ÔÚ´ËÊ¾ÀıÖĞ£¬Ëü½«µ±Ç°¹¤×÷Ä¿Â¼ÏÂµÄ¡°Files¡±×ÓÄ¿Â¼Ö¸¶¨Îª¾²Ì¬ÎÄ¼şµÄ¸ùÄ¿Â¼¡£
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"other")),
 
-    //æŒ‡å®šå¯ç”¨äºè®¿é—®é™æ€æ–‡ä»¶çš„ URL è·¯å¾„ã€‚åœ¨æ­¤ç¤ºä¾‹ä¸­ï¼Œå®ƒå°† "/Files" è·¯å¾„æ˜ å°„åˆ° "Files" ç›®å½•ã€‚
+    //Ö¸¶¨¿ÉÓÃÓÚ·ÃÎÊ¾²Ì¬ÎÄ¼şµÄ URL Â·¾¶¡£ÔÚ´ËÊ¾ÀıÖĞ£¬Ëü½« "/Files" Â·¾¶Ó³Éäµ½ "Files" Ä¿Â¼¡£
     RequestPath = new PathString("/other"),
 
-    //ä¸€ä¸ªå¸ƒå°”å€¼ï¼ŒæŒ‡å®šæ˜¯å¦åº”è¯¥åœ¨è¯·æ±‚çš„æ–‡ä»¶ç±»å‹æœªçŸ¥æ—¶å…è®¸æœåŠ¡é™æ€æ–‡ä»¶ã€‚é»˜è®¤æƒ…å†µä¸‹ï¼Œè¿™ä¸ªå±æ€§è®¾ç½®ä¸º falseï¼Œè¡¨ç¤ºåªæœ‰å·²çŸ¥ MIME ç±»å‹çš„æ–‡ä»¶æ‰ä¼šè¢«æœåŠ¡ã€‚å¦‚æœè®¾ç½®ä¸º trueï¼Œåˆ™æœªçŸ¥æ–‡ä»¶ç±»å‹ä¹Ÿå¯ä»¥è¢«æœåŠ¡ã€‚
+    //Ò»¸ö²¼¶ûÖµ£¬Ö¸¶¨ÊÇ·ñÓ¦¸ÃÔÚÇëÇóµÄÎÄ¼şÀàĞÍÎ´ÖªÊ±ÔÊĞí·şÎñ¾²Ì¬ÎÄ¼ş¡£Ä¬ÈÏÇé¿öÏÂ£¬Õâ¸öÊôĞÔÉèÖÃÎª false£¬±íÊ¾Ö»ÓĞÒÑÖª MIME ÀàĞÍµÄÎÄ¼ş²Å»á±»·şÎñ¡£Èç¹ûÉèÖÃÎª true£¬ÔòÎ´ÖªÎÄ¼şÀàĞÍÒ²¿ÉÒÔ±»·şÎñ¡£
     ServeUnknownFileTypes = true,
 
-    //ç”¨äºæŒ‡å®šç‰¹å®šæ–‡ä»¶æ‰©å±•åçš„ MIME ç±»å‹çš„å­—å…¸ã€‚å¦‚æœè¯·æ±‚çš„æ–‡ä»¶æ‰©å±•åä¸æ­¤åˆ—è¡¨ä¸åŒ¹é…ï¼Œåˆ™æœåŠ¡å™¨è¿”å›ä¸€ä¸ª 404 å“åº”ã€‚åœ¨æ­¤ç¤ºä¾‹ä¸­ï¼Œæ³¨é‡Šæ‰äº†è¿™ä¸ªå±æ€§ï¼Œå› æ­¤æ‰€æœ‰å“åº”çš„æ–‡ä»¶ç±»å‹å°†æ ¹æ®å…¶æ–‡ä»¶æ‰©å±•åè‡ªåŠ¨è¯†åˆ«ã€‚
+    //ÓÃÓÚÖ¸¶¨ÌØ¶¨ÎÄ¼şÀ©Õ¹ÃûµÄ MIME ÀàĞÍµÄ×Öµä¡£Èç¹ûÇëÇóµÄÎÄ¼şÀ©Õ¹ÃûÓë´ËÁĞ±í²»Æ¥Åä£¬Ôò·şÎñÆ÷·µ»ØÒ»¸ö 404 ÏìÓ¦¡£ÔÚ´ËÊ¾ÀıÖĞ£¬×¢ÊÍµôÁËÕâ¸öÊôĞÔ£¬Òò´ËËùÓĞÏìÓ¦µÄÎÄ¼şÀàĞÍ½«¸ù¾İÆäÎÄ¼şÀ©Õ¹Ãû×Ô¶¯Ê¶±ğ¡£
     //ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
     //{
     //     { ".apk","application/vnd.android.package-archive"}
@@ -348,7 +312,7 @@ app.UseStaticFiles(new StaticFileOptions()
 
     //OnPrepareResponse = ctx =>
     //{
-    //    // æ£€æŸ¥æ–‡ä»¶å¤¹æ˜¯å¦å­˜åœ¨ï¼Œå¦‚æœä¸å­˜åœ¨åˆ™åˆ›å»º
+    //    // ¼ì²éÎÄ¼ş¼ĞÊÇ·ñ´æÔÚ£¬Èç¹û²»´æÔÚÔò´´½¨
     //    string filePath = Path.Combine(ctx.Context.Request.Path.Value, ctx.File.Name);
     //    string folderPath = Path.GetDirectoryName(filePath);
     //    if (!Directory.Exists(folderPath))
@@ -361,46 +325,48 @@ app.UseStaticFiles(new StaticFileOptions()
 
 app.Use(async (context, next) =>
 {
-    //è¡¨ç¤ºæ­¤APIæ˜¯ä»€ä¹ˆç«¯
+    //±íÊ¾´ËAPIÊÇÊ²Ã´¶Ë
     context.Request.Headers.Add("ClientType", "APP");
 
-    //æ³¨å…¥Guidæ¯æ¬¡è¯·æ±‚å”¯ä¸€ç¼–ç 
+    //×¢ÈëGuidÃ¿´ÎÇëÇóÎ¨Ò»±àÂë
     context.Request.Headers.Add("Guid", Guid.NewGuid().ToString("N"));
 
-    //è·å–é»˜è®¤è¯­è¨€
+    //»ñÈ¡Ä¬ÈÏÓïÑÔ
     string language = context.QueryOrHeaders("language");
     if (string.IsNullOrEmpty(language))
-    { 
-        language = ((int)LanguageEnum.CN).ToString(); 
+    {
+        language = ((int)LanguageEnum.CN).ToString();
     }
     context.SetHeaders("Language", language);
 
+
     //Token
     //context.SetHeaders("Token", context.QueryOrHeaders("Token"));
-    string Token = context.QueryOrHeaders("Authorization");
-    context.SetHeaders("Token", Token);
-    
-    ////è¡—å¸‚id
-    //string marketId = context.QueryOrHeaders("marketId");
-    //if (string.IsNullOrEmpty(marketId))
-    //{
-    //    //é»˜è®¤MarkertId
-    //    marketId = "1";
-    //}
-    //context.SetHeaders("MarketId", marketId);
+    string Token = context.QueryOrHeaders("Token");
+    //½« Token Öµ¸³¸ø Authorization ÇëÇóÍ·
+    if (!string.IsNullOrEmpty(Token))
+    {
+        context.Request.Headers["Authorization"] = "Bearer " + Token;
+    }
+    //context.SetHeaders("Authorization", Token);
 
+    //string Authorization = context.QueryOrHeaders("Authorization");
+    //if (!string.IsNullOrEmpty(Authorization))
+    //{
+    //    context.Request.Headers["Token"] = Authorization;
+    //}
+    //context.SetHeaders("Token", Token);
     await next();
 });
 
 app.UseRouting();
 
+//×¢ÒâË³Ğò£¬ÏÈÈÏÖ¤ºóÊÚÈ¨£¬²»È»½Ó¿Ú¼ÓÈëTokenÈÏÖ¤Ò²²»»áÍ¨¹ı
+app.UseAuthentication();//Æô¶¯ÈÏÖ¤   
 
-//æ³¨æ„é¡ºåºï¼Œå…ˆè®¤è¯åæˆæƒï¼Œä¸ç„¶æ¥å£åŠ å…¥Tokenè®¤è¯ä¹Ÿä¸ä¼šé€šè¿‡
-app.UseAuthentication();//å¯åŠ¨è®¤è¯   
+app.UseAuthorization();//Æô¶¯ÊÚÈ¨
 
-app.UseAuthorization();//å¯åŠ¨æˆæƒ
-
-//æ·»åŠ  JWT å¼‚å¸¸å¤„ç†ä¸­é—´ä»¶
+////Ìí¼Ó JWT Òì³£´¦ÀíÖĞ¼ä¼ş
 //app.UseMiddleware<AuthValidator>();
 
 app.MapControllers();
