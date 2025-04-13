@@ -1,2 +1,2 @@
-# .NetCore-Template
-.NetCore6.0开发模板
+# .NetCoreWebApi-Template
+NetCoreWebApi 开发模板 .Net6.0 7.0 8.0 属性切换即可。
