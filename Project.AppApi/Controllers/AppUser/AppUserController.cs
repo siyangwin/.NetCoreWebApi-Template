@@ -11,7 +11,7 @@ using ViewModel.App;
 namespace Project.AppApi.Controllers
 {
     /// <summary>
-    /// ²âÊÔ-Jwt
+    /// æµ‹è¯•-Jwt
     /// </summary>
     /// [Route("[controller]")]
     public class AppUserController : BaseController
@@ -19,14 +19,14 @@ namespace Project.AppApi.Controllers
         private readonly IAppUserService appUserService;
 
         /// <summary>
-        /// Jwt¹¤¾ßÀà
+        /// Jwtå·¥å…·ç±»
         /// </summary>
         private readonly GenerateJwt generateJwt;
 
         /// <summary>
-        /// ×¢Èë
+        /// æ³¨å…¥
         /// </summary>
-        /// <param name="appUserService">ÓÃ»§Àà</param>
+        /// <param name="appUserService">ç”¨æˆ·ç±»</param>
         public AppUserController(IAppUserService appUserService, GenerateJwt generateJwt)
         {
             this.appUserService = appUserService;
@@ -35,7 +35,7 @@ namespace Project.AppApi.Controllers
 
 
         /// <summary>
-        /// µÇÂ¼
+        /// ç™»å½•
         /// </summary>
         /// <returns></returns>
         [Route("api/user/login")]
@@ -51,12 +51,12 @@ namespace Project.AppApi.Controllers
             else
             {
                 //string token = Guid.NewGuid().ToString();
-                //Œ‘ÈëÉí·İĞÅÏ¢µ½ÕJ×CÖĞĞÄ
+                //å¯«å…¥èº«ä»½ä¿¡æ¯åˆ°èªè­‰ä¸­å¿ƒ
                 var claims = new[]
                 {
                     new Claim("UserId",AuthorizationInfo.account.ToString())
                 };
-                //µÇä›²¢«@È¡token
+                //ç™»éŒ„å¹¶ç²å–token
                 //userResDto.Token = token;
                 //HttpContext.SignInAsync(claims, token, userResDto.Id.ToString(), 240, true);
                 resultModel.data = generateJwt.GenerateEncodedTokenAsync(claims);
@@ -65,7 +65,7 @@ namespace Project.AppApi.Controllers
         }
 
         /// <summary>
-        /// µÇ³ö
+        /// ç™»å‡º
         /// </summary>
         /// <returns></returns>
         [Route("/api/user/loginout")]
@@ -75,15 +75,15 @@ namespace Project.AppApi.Controllers
         public async Task<ResultModel> LoginOut()
         {
             ResultModel resultModel = new ResultModel();
-            resultModel.message = "µÇ³ö³É¹¦";
+            resultModel.message = "ç™»å‡ºæˆåŠŸ";
             HttpContext.SignOutAsync();
             return resultModel;
         }
 
         /// <summary>
-        /// ÊÚÈ¨ ÓëµÇÂ¼Ò»ÖÂ  account:123 pwd:admin
+        /// æˆæƒ ä¸ç™»å½•ä¸€è‡´  account:123 pwd:admin
         /// </summary>
-        /// <param name="AuthorizationInfo">ÊÚÈ¨ĞÅÏ¢</param>
+        /// <param name="AuthorizationInfo">æˆæƒä¿¡æ¯</param>
         /// <returns></returns>
         [ApiExplorerSettings(IgnoreApi = true)]
         [Route("/api/appuser/authorization")]
@@ -95,7 +95,7 @@ namespace Project.AppApi.Controllers
         }
 
         /// <summary>
-        /// ²é¿´ÊÚÈ¨ĞÅÏ¢--ÊÚÈ¨
+        /// æŸ¥çœ‹æˆæƒä¿¡æ¯--æˆæƒ
         /// </summary>
         /// <returns></returns>
         [Route("/api/appuser/checkauthorizationinfo")]
@@ -105,13 +105,13 @@ namespace Project.AppApi.Controllers
             ResultModel<string> resultModel = new ResultModel<string>();
 
 
-            resultModel.data = "µ±Ç°ÓÃ»§Îª£º" + UserId;
+            resultModel.data = "å½“å‰ç”¨æˆ·ä¸ºï¼š" + UserId;
             return resultModel;
         }
 
 
         /// <summary>
-        /// ²é¿´Êı¾İ-ÎŞĞèÊÚÈ¨
+        /// æŸ¥çœ‹æ•°æ®-æ— éœ€æˆæƒ
         /// </summary>
         /// <returns></returns>
         [Route("/api/appuser/checknoAuthorizationinfo")]
@@ -120,7 +120,7 @@ namespace Project.AppApi.Controllers
         public async Task<ResultModel<string>> CheckNoAuthorizationInfo()
         {
             ResultModel<string> resultModel = new ResultModel<string>();
-            resultModel.data = "µ±Ç°ÓÃ»§Îª£º" + UserId;
+            resultModel.data = "å½“å‰ç”¨æˆ·ä¸ºï¼š" + UserId;
             return resultModel;
         }
     }
