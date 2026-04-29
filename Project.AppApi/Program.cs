@@ -79,12 +79,12 @@ if (getconfig)
 // 将接口请求拦截器和错误拦截器 注册为全局过滤器
 builder.Services.AddMvc(options =>
 {
-    //错误拦截器
-    options.Filters.Add(typeof(ErrorFilterAttribute));
+    //错误拦截器  注释掉 与中间件重复 和全局异常处理中间件功能完全重叠
+    //options.Filters.Add(typeof(ErrorFilterAttribute));
     //接口请求拦截器
     options.Filters.Add(typeof(ApiFilterAttribute));
-    //授权验证拦截器
-    options.Filters.Add(typeof(AuthValidator));
+    //授权验证拦截器 注释掉 与中间件重复  与 ASP.NET Core 内置的 UseAuthentication() 系统冲突
+    //options.Filters.Add(typeof(AuthValidator));
 });
 
 #region SerilLog配置
@@ -272,20 +272,45 @@ if (!Directory.Exists(folderPath))
 
 var app = builder.Build();
 
+
+// 全局异常处理中间件应该在路由之前
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        // 记录异常日志
+        Log.Error(ex, "全局异常处理: {Message}", ex.Message);
+        
+        // 返回统一的错误响应
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        
+        var errorResponse = new
+        {
+            success = false,
+            message = "服务器内部错误",
+            error = builder.Environment.IsDevelopment() ? ex.Message : "请联系系统管理员"
+        };
+        
+        await context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(errorResponse));
+    }
+});
+
+
 // Configure the HTTP request pipeline. 會把 http 轉到 https。
 //使用http,可以禁止使用
 //app.UseHttpsRedirection();
-
-//跨域第一種版本，請要ConfigureService中配置服務 services.AddCors();
-//app.UseCors();
-app.UseCors("cors");
-
-//是否开启Swagger
-if (getconfig)
+// 在生产环境中建议启用HTTPS重定向
+if (!builder.Environment.IsDevelopment())
 {
-    app.UseSwaggers(ApiName);
+    app.UseHttpsRedirection();
 }
 
+//静态文件服务（在路由之前处理静态文件请求）
 app.UseStaticFiles(new StaticFileOptions()
 {
     //指定要公开的静态文件所在的目录路径。在此示例中，它将当前工作目录下的“Files”子目录指定为静态文件的根目录。
@@ -315,8 +340,18 @@ app.UseStaticFiles(new StaticFileOptions()
     //}
 });
 
+// 路由中间件（解析URL路径）
 app.UseRouting();
 
+//跨域第一種版本，請要ConfigureService中配置服務 services.AddCors();
+//app.UseCors();
+app.UseCors("cors");
+
+//是否开启Swagger
+if (getconfig)
+{
+    app.UseSwaggers(ApiName);
+}
 
 //自定义中间件在 UseRouting() 之后执行，否则可能导致路由信息无法正确获取。
 app.Use(async (context, next) =>
@@ -354,15 +389,24 @@ app.Use(async (context, next) =>
     await next();
 });
 
-
 //注意顺序，先认证后授权，不然接口加入Token认证也不会通过
 app.UseAuthentication();//启动认证   
 
 app.UseAuthorization();//启动授权
 
+
 ////添加 JWT 异常处理中间件
 //app.UseMiddleware<AuthValidator>();
 
+//端点路由
 app.MapControllers();
+
+// 应用程序启动日志
+Log.Information("应用程序 {ApiName} 已启动 - 环境: {Environment}", ApiName, builder.Environment.EnvironmentName);
+// 环境检查
+if (builder.Environment.IsDevelopment())
+{
+    Log.Warning("当前运行在开发环境，请确保生产环境配置正确");
+}
 
 app.Run();
