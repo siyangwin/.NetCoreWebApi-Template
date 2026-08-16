@@ -100,7 +100,7 @@ var columnOpts = new ColumnOptions
         //用户编号
         new SqlColumn{ColumnName = "UserId", DataType = SqlDbType.Int, AllowNull = true},
         //设备唯一编号,如果有，默认0
-        new SqlColumn{ColumnName = "DeviceId", DataType = SqlDbType.Int, AllowNull = true},
+        new SqlColumn{ColumnName = "DeviceId", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = true},
         //操作说明
         new SqlColumn{ColumnName = "Instructions", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = true},
         //请求参数内容
@@ -145,7 +145,7 @@ Log.Logger = new LoggerConfiguration()
           retainedFileCountLimit: 7, // 最多保留 7 天的日志文件
           outputTemplate: OUTPUT_TEMPLATE)
 #region SerilLog是否需要启动SqlServer
-    .AuditTo.MSSqlServer(
+    .WriteTo.MSSqlServer(
        connectionString: GlobalConfig.ConnectionString,
        sinkOptions: new MSSqlServerSinkOptions { TableName = "SystemLog", SchemaName = "dbo", AutoCreateSqlTable = true, BatchPeriod = ts, BatchPostingLimit = 50 },
        columnOptions: columnOpts)

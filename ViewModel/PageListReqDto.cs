@@ -19,6 +19,7 @@ namespace ViewModel
 		/// <summary>
 		/// 顯示數
 		/// </summary>
+		[Range(1, 100, ErrorMessage = "pageSize 必须在 1-100 之间")]
 		public int pageSize { get; set; } = 20;
 
 		/// <summary>

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System;
 
@@ -18,22 +18,8 @@ namespace MvcCore.Extension.Swagger
 					{
 						Version = version,
 						Title = $"{apiName} 接口文檔",
-						Description = $"{apiName} 接口文檔說明 " + version,
-						License = new OpenApiLicense
-						{
-							Name = "API调用须知",
-							Url = new Uri("http://www.changemall.cn/")
-						}
+						Description = $"{apiName} 接口文檔說明 " + version
 					});
-					//自定義配置文件路徑
-					if (pathArr != null)
-					{
-						foreach (var item in pathArr)
-						{
-							var path = Path.Combine(basePath, item);
-							options.IncludeXmlComments(path, true);
-						}
-					}
 					// 按相對路徑排序
 					options.OrderActionsBy(o => o.RelativePath);
 
@@ -65,6 +51,15 @@ namespace MvcCore.Extension.Swagger
                     });
                     #endregion
                 });
+				//自定義配置文件路徑（移出版本循环，避免多版本时重复注册）
+				if (pathArr != null)
+				{
+					foreach (var item in pathArr)
+					{
+						var path = Path.Combine(basePath, item);
+						options.IncludeXmlComments(path, true);
+					}
+				}
 				var xmlPath = Path.Combine(basePath, $"{apiName}.xml");//xml文件名
 				options.IncludeXmlComments(xmlPath, true);//默認的第二個參數是false，這個是controller的注釋，
 			});
