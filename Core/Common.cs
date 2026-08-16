@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Http;
 using Model.EnumModel;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -268,28 +270,46 @@ namespace Core
         }
 
         /// <summary>
-        /// List<T> 轉DataTable
+        /// List<T> 轉DataTable（基于表达式编译的属性读取器，缓存于 ConcurrentDictionary）
         /// </summary>
         public static DataTable ToDataTable<T>(IEnumerable<T> collection)
         {
-            var props = typeof(T).GetProperties();
             var dt = new DataTable();
+            var props = typeof(T).GetProperties();
             dt.Columns.AddRange(props.Select(p => new DataColumn(p.Name, p.PropertyType)).ToArray());
-            if (collection.Count() > 0)
+            if (collection.Any())
             {
-                for (int i = 0; i < collection.Count(); i++)
+                var getters = GetPropertyGetters<T>(props);
+                foreach (var item in collection)
                 {
-                    ArrayList tempList = new ArrayList();
-                    foreach (PropertyInfo pi in props)
+                    var row = dt.NewRow();
+                    for (int i = 0; i < props.Length; i++)
                     {
-                        object obj = pi.GetValue(collection.ElementAt(i), null);
-                        tempList.Add(obj);
+                        row[i] = getters[i](item) ?? DBNull.Value;
                     }
-                    object[] array = tempList.ToArray();
-                    dt.LoadDataRow(array, true);
+                    dt.Rows.Add(row);
                 }
             }
             return dt;
+        }
+
+        private static readonly ConcurrentDictionary<string, object> GetterCache = new ConcurrentDictionary<string, object>();
+
+        /// <summary>
+        /// 缓存类型 T 的各属性读取器（编译后的委托，避免每次反射）
+        /// </summary>
+        private static Func<T, object>[] GetPropertyGetters<T>(PropertyInfo[] props)
+        {
+            string key = typeof(T).FullName + "|" + string.Join("|", props.Select(p => p.Name));
+            return (Func<T, object>[])GetterCache.GetOrAdd(key, _ =>
+            {
+                var param = Expression.Parameter(typeof(T), "item");
+                return props.Select(p =>
+                {
+                    var convert = Expression.Convert(Expression.Property(param, p), typeof(object));
+                    return Expression.Lambda<Func<T, object>>(convert, param).Compile();
+                }).ToArray();
+            });
         }
         /// <summary>
         /// 生成GUID
@@ -300,6 +320,40 @@ namespace Core
             return Guid.NewGuid().ToString();
         }
 
+        private static readonly ConcurrentDictionary<string, Delegate> ToModelCache = new ConcurrentDictionary<string, Delegate>();
+
+        /// <summary>
+        /// 编译并缓存 T→M 属性复制委托（避免每次反射），lan 参与属性名匹配故作为缓存键
+        /// </summary>
+        private static Action<T, M> GetToModelMapper<T, M>(string lan) where T : class where M : class
+        {
+            string key = $"{typeof(T).FullName}|{typeof(M).FullName}|{lan}";
+            return (Action<T, M>)ToModelCache.GetOrAdd(key, _ =>
+            {
+                PropertyInfo[] mPros = typeof(M).GetProperties(), tPros = typeof(T).GetProperties();
+                Dictionary<string, PropertyInfo> diM = new Dictionary<string, PropertyInfo>(), diT = new Dictionary<string, PropertyInfo>();
+                foreach (var item in mPros) if (!diM.ContainsKey(GetPropName(item.Name, lan))) diM.Add(GetPropName(item.Name, lan), item);
+                foreach (var item in tPros) if (!diT.ContainsKey(GetPropName(item.Name, lan))) diT.Add(GetPropName(item.Name, lan), item);
+
+                var source = Expression.Parameter(typeof(T), "source");
+                var target = Expression.Parameter(typeof(M), "target");
+                var body = new List<Expression>();
+
+                foreach (var item in diM)
+                {
+                    if (diT.TryGetValue(item.Key, out var tProp))
+                    {
+                        var sourceProp = Expression.Property(source, tProp);
+                        var targetProp = Expression.Property(target, item.Value);
+                        body.Add(Expression.Assign(targetProp, Expression.Convert(sourceProp, item.Value.PropertyType)));
+                    }
+                }
+
+                var block = Expression.Block(body);
+                return Expression.Lambda<Action<T, M>>(block, source, target).Compile();
+            });
+        }
+
         public static M ToModel<T, M>(this T t, LanguageEnum lan) where T : class where M : class
         {
             return ToModel<T, M>(t, lan.ToString());
@@ -307,13 +361,9 @@ namespace Core
 
         public static M ToModel<T, M>(this T t, string lan = "") where T : class where M : class
         {
-            M model = Activator.CreateInstance<M>();//创建泛型对象
             if (t == null) return null;
-            PropertyInfo[] mPros = model.GetType().GetProperties(), tPros = t.GetType().GetProperties();
-            Dictionary<string, PropertyInfo> diM = new Dictionary<string, PropertyInfo>(), diT = new Dictionary<string, PropertyInfo>();
-            foreach (var item in mPros) if (!diM.ContainsKey(GetPropName(item.Name, lan))) diM.Add(GetPropName(item.Name, lan), item);
-            foreach (var item in tPros) if (!diT.ContainsKey(GetPropName(item.Name, lan))) diT.Add(GetPropName(item.Name, lan), item);
-            foreach (var item in diM) if (diT.Keys.Contains(item.Key)) item.Value.SetValue(model, diT[item.Key].GetValue(t));
+            M model = Activator.CreateInstance<M>();//创建泛型对象
+            GetToModelMapper<T, M>(lan)(t, model);
             return model;
         }
 

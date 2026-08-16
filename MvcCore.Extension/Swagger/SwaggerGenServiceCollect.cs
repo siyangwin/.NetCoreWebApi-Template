@@ -22,35 +22,36 @@ namespace MvcCore.Extension.Swagger
 					});
 					// 按相對路徑排序
 					options.OrderActionsBy(o => o.RelativePath);
+				});
 
-                    #region 启用swagger验证功能
-                    //添加一个必须的全局安全信息，和AddSecurityDefinition方法指定的方案名称一致即可。
-                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                #region 启用swagger验证功能
+                //添加一个必须的全局安全信息，和AddSecurityDefinition方法指定的方案名称一致即可。
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
                     {
+                        new OpenApiSecurityScheme
                         {
-                            new OpenApiSecurityScheme
-                            {
-                            Reference = new OpenApiReference {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"}
-                             },
-                            new string[] { }
-                        }
-                    });
-
-                    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                    {
-                        Description = "CN:JWT授权(数据将在请求头中进行传输) 在下方输入Bearer {token} 即可，注意两者之间有空格;" +
-						              "EN:JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                        //Name = "Authorization",//jwt默认的参数名称
-                        Name = "Authorization",//jwt默认的参数名称
-                        In = ParameterLocation.Header,//jwt默认存放Authorization信息的位置(请求头中)
-                        Type = SecuritySchemeType.ApiKey,
-                        BearerFormat = "JWT",
-                        Scheme = "Bearer",
-                    });
-                    #endregion
+                        Reference = new OpenApiReference {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"}
+                         },
+                        new string[] { }
+                    }
                 });
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "CN:JWT授权(数据将在请求头中进行传输) 在下方输入Bearer {token} 即可，注意两者之间有空格;" +
+						              "EN:JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    //Name = "Authorization",//jwt默认的参数名称
+                    Name = "Authorization",//jwt默认的参数名称
+                    In = ParameterLocation.Header,//jwt默认存放Authorization信息的位置(请求头中)
+                    Type = SecuritySchemeType.ApiKey,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer",
+                });
+                #endregion
+
 				//自定義配置文件路徑（移出版本循环，避免多版本时重复注册）
 				if (pathArr != null)
 				{
@@ -74,9 +75,9 @@ namespace MvcCore.Extension.Swagger
 		/// V1 版本
 		/// </summary>
 		V1 = 1,
-		///// <summary>
-		///// V2 版本
-		///// </summary>
-		//V2 = 2,
+		/// <summary>
+		/// V2 版本
+		/// </summary>
+		V2 = 2,
 	}
 }

@@ -2,12 +2,13 @@
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Core;
 using Microsoft.Extensions.Logging;
 using IService;
 using Model.EnumModel;
-using Azure.Core;
+using ViewModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace MvcCore.Extension.Filter
@@ -63,7 +64,12 @@ namespace MvcCore.Extension.Filter
         /// <param name="context"></param>
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            //Console.Out.WriteLineAsync("OnActionExecuted");
+            //统一设置 ApiVersion：在 action 执行后、result 序列化前，按请求路径 /api/vN/ 解析，无版本段默认 v1
+            if (context.Result is ObjectResult objectResult && objectResult.Value is ApiResult apiResult)
+            {
+                Match versionMatch = Regex.Match(context.HttpContext.Request.Path.Value ?? "", "/api/v(\\d+)/", RegexOptions.IgnoreCase);
+                apiResult.ApiVersion = versionMatch.Success ? "v" + versionMatch.Groups[1].Value : "v1";
+            }
         }
 
 

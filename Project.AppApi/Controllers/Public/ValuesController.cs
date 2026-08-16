@@ -6,7 +6,7 @@ namespace Project.AppApi.Controllers
 	/// <summary>
 	/// 脚手架示例控制器（模板自带示例，可删除）
 	/// </summary>
-	[ApiExplorerSettings(IgnoreApi = false)]
+	[ApiExplorerSettings(GroupName = "V1", IgnoreApi = false)]
 	[Route("api/[controller]")]
 	[ApiController]
 	public class ValuesController : BaseController

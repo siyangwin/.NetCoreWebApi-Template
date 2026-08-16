@@ -7,7 +7,7 @@ namespace Project.AppApi.Controllers
     /// <summary>
     /// 系统缓存查询
     /// </summary>
-    [ApiExplorerSettings(IgnoreApi = false)] // 默认显示
+    [ApiExplorerSettings(GroupName = "V1", IgnoreApi = false)] // 默认显示
     public class CacheController : BaseController
     {
 

@@ -11,28 +11,12 @@ using ViewModel.App;
 namespace Project.AppApi.Controllers
 {
     /// <summary>
-    /// 测试-Jwt
+    /// 测试-Jwt（示范 C# 12 主构造函数注入）
     /// </summary>
     /// [Route("[controller]")]
-    public class AppUserController : BaseController
+    [ApiExplorerSettings(GroupName = "V1")]
+    public class AppUserController(IAppUserService appUserService, GenerateJwt generateJwt) : BaseController
     {
-        private readonly IAppUserService appUserService;
-
-        /// <summary>
-        /// Jwt工具类
-        /// </summary>
-        private readonly GenerateJwt generateJwt;
-
-        /// <summary>
-        /// 注入
-        /// </summary>
-        /// <param name="appUserService">用户类</param>
-        public AppUserController(IAppUserService appUserService, GenerateJwt generateJwt)
-        {
-            this.appUserService = appUserService;
-            this.generateJwt = generateJwt;
-        }
-
 
         /// <summary>
         /// 登录

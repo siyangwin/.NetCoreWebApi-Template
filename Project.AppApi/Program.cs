@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using System.Configuration;
 using Newtonsoft.Json.Linq;
+using Project.AppApi.Controllers.Demo;
 
 var ApiName = "Project.AppApi";
 
@@ -196,6 +197,11 @@ builder.Services.AddTransient(typeof(HttpHelper));
 //添加 HttpClientFactory 服务
 builder.Services.AddHttpClient();
 
+#region Keyed DI 示范（.NET 8 特性：同一接口按 key 注册不同实现）
+builder.Services.AddKeyedScoped<IKeyedDemoService, KeyedServiceA>("a");
+builder.Services.AddKeyedScoped<IKeyedDemoService, KeyedServiceB>("b");
+#endregion
+
 #endregion
 
 #region jwt身份验证
@@ -214,6 +220,33 @@ if (!Directory.Exists(folderPath))
 //builder.Services.AddDataProtection()
 //    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(folderPath, "keys")))
 //    .ProtectKeysWithDpapi();// 以 DPAPI 保护密钥，可替换为其他适合的保护机制,只适配windows，如果Linux 或 macOS 等非 Windows 环境下，使用.ProtectKeysWithCertificate("thumbprint");
+
+#region SystemLog索引初始化
+//为 SystemLog 表的常用查询列建索引（幂等，索引已存在则跳过；失败仅告警不阻断启动）
+try
+{
+    using (var indexConnection = new Microsoft.Data.SqlClient.SqlConnection(GlobalConfig.ConnectionString))
+    {
+        indexConnection.Open();
+        using (var cmd = indexConnection.CreateCommand())
+        {
+            cmd.CommandText = @"
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_SystemLog_Guid' AND object_id = OBJECT_ID('SystemLog'))
+    CREATE NONCLUSTERED INDEX IX_SystemLog_Guid ON SystemLog(Guid);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_SystemLog_UserId' AND object_id = OBJECT_ID('SystemLog'))
+    CREATE NONCLUSTERED INDEX IX_SystemLog_UserId ON SystemLog(UserId);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_SystemLog_IP' AND object_id = OBJECT_ID('SystemLog'))
+    CREATE NONCLUSTERED INDEX IX_SystemLog_IP ON SystemLog(IP);";
+            cmd.ExecuteNonQuery();
+        }
+    }
+    Log.Information("SystemLog 表索引检查/创建完成");
+}
+catch (Exception ex)
+{
+    Log.Warning("SystemLog 索引初始化失败（不影响启动）：{Message}", ex.Message);
+}
+#endregion
 
 var app = builder.Build();
 

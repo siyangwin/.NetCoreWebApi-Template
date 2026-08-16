@@ -15,11 +15,15 @@ namespace MvcCore.Extension.Auth
     /// </summary>
     public class GenerateJwt
     {
-        private readonly JwtConfig _jwtConfig;
-        public GenerateJwt(IOptions<JwtConfig> jwtConfig)
+        private readonly IOptionsMonitor<JwtConfig> _jwtConfigMonitor;
+
+        public GenerateJwt(IOptionsMonitor<JwtConfig> jwtConfigMonitor)
         {
-            _jwtConfig = jwtConfig.Value;
+            _jwtConfigMonitor = jwtConfigMonitor;
         }
+
+        //每次签发读取最新配置（IOptionsMonitor 支持运行期配置热更新）
+        private JwtConfig Config => _jwtConfigMonitor.CurrentValue;
 
         /// <summary>
         /// 生成token
@@ -32,25 +36,9 @@ namespace MvcCore.Extension.Auth
             var claims = new List<Claim>
             {
                 new Claim("UserId", UserId.ToString()),
-                //new Claim("username", customClaims.username),
-                //new Claim("realname",customClaims.realname),
-                //new Claim("roles", string.Join(";",customClaims.roles)),
-                //new Claim("permissions", string.Join(";",customClaims.permissions)),
-                //new Claim("normalPermissions", string.Join(";",customClaims.normalPermissions)),
                 new Claim(JwtRegisteredClaimNames.Sub, UserId.ToString())
             };
-            //创建令牌
-            var jwt = new JwtSecurityToken(
-                issuer: _jwtConfig.Issuer,
-                audience: _jwtConfig.Audience,
-                claims: claims,
-                notBefore: _jwtConfig.NotBefore,
-                expires: _jwtConfig.Expiration,
-                signingCredentials: _jwtConfig.SigningCredentials);
-
-            string access_token = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            return access_token;
+            return BuildToken(claims);
         }
 
 
@@ -61,21 +49,20 @@ namespace MvcCore.Extension.Auth
         /// <returns></returns>
         public string GenerateEncodedToken(Claim[] claim)
         {
-            //创建用户身份标识，可按需要添加更多信息
-            var claims = claim.ToList();
+            return BuildToken(claim.ToList());
+        }
 
-            //创建令牌
+        private string BuildToken(List<Claim> claims)
+        {
             var jwt = new JwtSecurityToken(
-                issuer: _jwtConfig.Issuer,
-                audience: _jwtConfig.Audience,
+                issuer: Config.Issuer,
+                audience: Config.Audience,
                 claims: claims,
-                notBefore: _jwtConfig.NotBefore,
-                expires: _jwtConfig.Expiration,
-                signingCredentials: _jwtConfig.SigningCredentials);
+                notBefore: Config.NotBefore,
+                expires: Config.Expiration,
+                signingCredentials: Config.SigningCredentials);
 
-            string access_token = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            return access_token;
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
     }
 }

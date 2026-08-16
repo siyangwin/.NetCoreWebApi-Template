@@ -2,6 +2,7 @@ using Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model.EnumModel;
+using Project.AppApi.Controllers.Demo;
 using Project.Core;
 using ViewModel;
 using ViewModel.Demo;
@@ -9,10 +10,11 @@ using ViewModel.Demo;
 namespace Project.AppApi.Controllers
 {
     /// <summary>
-    /// Demo 示范控制器（模板示例，供下载者参考常见写法）
+    /// Demo 示范控制器 V1（模板示例，供下载者参考常见写法）
     /// <para>说明：本控制器全部使用模拟数据，不访问数据库；路由统一带 /api/v1 体现 API 版本。</para>
     /// <para>用法：登录获取 token 后，在 Swagger 右上角 Authorize 填入 Bearer {token}，即可访问需要鉴权的接口。</para>
     /// </summary>
+    [ApiExplorerSettings(GroupName = "V1")]
     [Route("api/v1/demo")]
     public class DemoController : BaseController
     {
@@ -226,6 +228,22 @@ namespace Project.AppApi.Controllers
         {
             ResultModel<string> resultModel = new ResultModel<string>();
             resultModel.Data = $"接口版本：{resultModel.ApiVersion}，环境：{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}";
+            return resultModel;
+        }
+
+        /// <summary>
+        /// 示范14：Keyed DI（.NET 8 特性：同一接口按 key 注入不同实现）
+        /// </summary>
+        /// <remarks>
+        /// 演示：Program.cs 中 AddKeyedScoped 注册了 "a"/"b" 两个 key，
+        /// 通过 [FromKeyedServices] 按 key 解析对应实现
+        /// </remarks>
+        [HttpGet("keyed-di")]
+        [AllowAnonymous]
+        public ResultModel<string> GetKeyedDi([FromKeyedServices("a")] IKeyedDemoService serviceA, [FromKeyedServices("b")] IKeyedDemoService serviceB)
+        {
+            ResultModel<string> resultModel = new ResultModel<string>();
+            resultModel.Data = $"key 'a' → {serviceA.GetName()}，key 'b' → {serviceB.GetName()}";
             return resultModel;
         }
     }
