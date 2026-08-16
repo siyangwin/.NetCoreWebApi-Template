@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViewModel;
 
@@ -18,7 +18,6 @@ namespace Project.AppApi.Controllers
         /// <returns></returns>
         [Route("/api/cache/get-multi")]
         [HttpGet]
-        [AllowAnonymous]
         public ResultModel<List<string>> GetList()
         {
             ResultModel<List<string>> resultModel = new ResultModel<List<string>>();
@@ -32,7 +31,6 @@ namespace Project.AppApi.Controllers
         /// <returns></returns>
         [Route("/api/cache/reset-system-all")]
         [HttpGet]
-        [AllowAnonymous]
         public ResultModel ResetSystemAll()
         {
             ResultModel resultModel = new ResultModel();
@@ -55,7 +53,6 @@ namespace Project.AppApi.Controllers
         /// <returns></returns>
         [Route("/api/cache/reset-system-user")]
         [HttpPost]
-        [AllowAnonymous]
         public ResultModel ResetSystemUser(List<string> UserIdList)
         {
             ResultModel resultModel = new ResultModel();
@@ -82,7 +79,6 @@ namespace Project.AppApi.Controllers
         /// <returns></returns>
         [Route("/api/cache/get-project-multi")]
         [HttpGet]
-        [AllowAnonymous]
         public ResultModel<List<string>> GetProjectList()
         {
             ResultModel<List<string>> resultModel = new ResultModel<List<string>>();
@@ -97,7 +93,6 @@ namespace Project.AppApi.Controllers
         /// <returns></returns>
         [Route("/api/cache/reset")]
         [HttpPost]
-        [AllowAnonymous]
         public ResultModel Reset(List<string> cacheList)
         {
             ResultModel resultModel = new ResultModel();
@@ -125,7 +120,6 @@ namespace Project.AppApi.Controllers
         /// <returns></returns>
         [Route("/api/cache/reset-by-Key")]
         [HttpGet]
-        [AllowAnonymous]
         public ResultModel ResetByKey(string cacheKey)
         {
             ResultModel resultModel = new ResultModel();
@@ -156,7 +150,6 @@ namespace Project.AppApi.Controllers
         /// <returns></returns>
         [Route("/api/cache/reset-all")]
         [HttpGet]
-        [AllowAnonymous]
         public ResultModel ResetAll()
         {
             ResultModel resultModel = new ResultModel();

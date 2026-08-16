@@ -57,12 +57,15 @@ builder.Services.AddCors(options =>
 GlobalConfig.ConnectionString = builder.Configuration.GetValue<string>("ConnectionStrings:SqlServer");
 
 // Add services to the container.
-builder.Services.AddControllers();
-
-
 //禁用此行为,不禁用会导致，参数不传会提示为空
+// 将接口请求拦截器注册为全局过滤器
 builder.Services.AddControllers(
-    options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
+    options =>
+    {
+        options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+        //接口请求拦截器
+        options.Filters.Add(typeof(ApiFilterAttribute));
+    });
 
 //是否开启Swagger
 var getconfig = builder.Configuration.GetValue<bool>("ConfigSettings:SwaggerEnable");
@@ -75,20 +78,7 @@ if (getconfig)
 //netocre默认使用Newtonsoft.Json作为Json解析器，在3.0+不再是默认，而是使用System.Text.Json替换Newtonsoft.Json
 //builder.Services.AddControllers().AddNewtonsoftJson();
 
-
-// 将接口请求拦截器和错误拦截器 注册为全局过滤器
-builder.Services.AddMvc(options =>
-{
-    //错误拦截器  注释掉 与中间件重复 和全局异常处理中间件功能完全重叠
-    //options.Filters.Add(typeof(ErrorFilterAttribute));
-    //接口请求拦截器
-    options.Filters.Add(typeof(ApiFilterAttribute));
-    //授权验证拦截器 注释掉 与中间件重复  与 ASP.NET Core 内置的 UseAuthentication() 系统冲突
-    //options.Filters.Add(typeof(AuthValidator));
-});
-
 #region SerilLog配置
-
 //SerilLog再Service中引用次NuGet包
 //ThreadId需要引用专用的NuGet包
 //const string OUTPUT_TEMPLATE = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} <{ThreadId}> [{Level:u3}] {Message:lj}{NewLine}{Exception}";
@@ -99,32 +89,6 @@ var columnOpts = new ColumnOptions
 {
     AdditionalColumns = new Collection<SqlColumn>
     {
-        ////唯一编号
-        //new SqlColumn{ColumnName = "Guid", PropertyName = "Guid", DataType = SqlDbType.NVarChar, DataLength = 32, AllowNull = false},
-        ////請求客戶類型 APP CMS
-        //new SqlColumn{ColumnName = "ClientType", DataType = SqlDbType.NVarChar, DataLength = 10, AllowNull = false},
-        ////API名称
-        //new SqlColumn{ColumnName = "APIName", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = false},
-        ////请求方式 POST GET等
-        //new SqlColumn{ColumnName = "Request", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = false},
-        ////用户编号
-        //new SqlColumn{ColumnName = "UserId", DataType = SqlDbType.Int, AllowNull = false},
-        ////设备唯一编号,如果有，默认0
-        //new SqlColumn{ColumnName = "DeviceId", DataType = SqlDbType.Int, AllowNull = true},
-        ////操作说明
-        //new SqlColumn{ColumnName = "Instructions", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = false},
-        ////请求参数内容
-        //new SqlColumn{ColumnName = "ReqParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = false},
-        ////返回参数内容
-        //new SqlColumn{ColumnName = "ResParameter", DataType = SqlDbType.NVarChar, DataLength = -1, AllowNull = true},
-        ////耗费时间
-        //new SqlColumn{ColumnName = "Time", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
-        ////访问用户IP
-        //new SqlColumn{ColumnName = "IP", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
-        // //服务器名称(负载均衡记录)
-        //new SqlColumn{ColumnName = "Server", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = false}
-
-
          //唯一编号
         new SqlColumn{ColumnName = "Guid", PropertyName = "Guid", DataType = SqlDbType.NVarChar, DataLength = 32, AllowNull = true},
         //請求客戶類型 APP CMS
@@ -170,7 +134,7 @@ TimeSpan.TryParse(interval, out ts);
 //输出日志等级, 可以禁止输出 ASP.NET Core 应用程序启动时记录的，并且是通过默认的日志记录器输出的（Information）
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug() //设置日志记录器的最小级别为 Debug，即只记录 Debug、Information、Warning、Error 和 Fatal 级别的日志事件。
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//对 Microsoft 命名空间下的所有日志事件进行重写，将最小级别设置为 Information，即只记录 Information、Warning、Error 和 Fatal 级别的日志事件。
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)//对 Microsoft 命名空间下的所有日志事件进行重写，将最小级别设置为 Warning，即只记录 Warning、Error 和 Fatal 级别的日志事件。
                                                               //.ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRODUCTION"}.json", optional: true).Build())
     .Enrich.FromLogContext() //启用日志上下文功能，自动获取当前线程和方法的一些信息，并添加到每个日志事件中。
     .WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
@@ -214,9 +178,6 @@ builder.Host.UseSerilog(Log.Logger, dispose: true);
 
 
 #region 服务注入
-//注册 MVC（Model-View-Controller）服务
-builder.Services.AddControllersWithViews();
-
 //GlobalConfig方法注入
 //注入配置日志
 //GlobalConfig.SystemLogService()
@@ -356,11 +317,11 @@ if (getconfig)
 //自定义中间件在 UseRouting() 之后执行，否则可能导致路由信息无法正确获取。
 app.Use(async (context, next) =>
 {
-    //表示此API是什么端
-    context.Request.Headers.Add("ClientType", "APP");
+    //表示此API是什么端（用索引赋值，客户端已带同名头时也不会抛异常）
+    context.Request.Headers["ClientType"] = "APP";
 
     //注入Guid每次请求唯一编码
-    context.Request.Headers.Add("Guid", Guid.NewGuid().ToString("N"));
+    context.Request.Headers["Guid"] = Guid.NewGuid().ToString("N");
 
     //获取默认语言
     string language = context.QueryOrHeaders("language");

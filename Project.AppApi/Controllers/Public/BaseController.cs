@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using Model.EnumModel;
 using Microsoft.AspNetCore.Authorization;
@@ -14,14 +14,13 @@ namespace Project.AppApi.Controllers
 	[Authorize]  //加了这个，所有的API都会需要鉴权
     public class BaseController : ControllerBase
 	{
-		private string _userid { get => base.HttpContext.Request.Headers["UserId"].ToString(); }
 		private string _token { get => base.HttpContext.Request.Headers["Token"].ToString(); }
 		private string _language { get => base.HttpContext.Request.Headers["Language"].ToString(); }
 
 		/// <summary>
-		/// 用戶id
+		/// 用戶id（从 JWT claims 中读取，客户端无法伪造；未认证时为 0）
 		/// </summary>
-		public int UserId { get => !string.IsNullOrEmpty(_userid) ? Convert.ToInt32(_userid) : 0; }
+		public int UserId { get => int.TryParse(User?.FindFirst("UserId")?.Value, out var id) ? id : 0; }
 
 		/// <summary>
 		/// token
@@ -34,9 +33,9 @@ namespace Project.AppApi.Controllers
 		public LanguageEnum Language { get => !string.IsNullOrEmpty(_language) ? (LanguageEnum)Convert.ToInt32(_language) : LanguageEnum.CN; }
 
 		/// <summary>
-		/// 
+		/// 静态构造函数：仅订阅一次 SqlMapper.Aop 事件，避免实例构造函数重复订阅导致的内存泄漏
 		/// </summary>
-		public BaseController()
+		static BaseController()
 		{
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 		}
@@ -45,7 +44,7 @@ namespace Project.AppApi.Controllers
 		/// sql执行前
 		/// </summary>
 		/// <param name="command"></param>
-		private void Aop_OnExecuting(ref CommandDefinition command)
+		private static void Aop_OnExecuting(ref CommandDefinition command)
 		{
 			if (command.CommandText.Contains("SystemLog"))
 			{

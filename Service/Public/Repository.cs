@@ -1,7 +1,7 @@
-﻿using Kogel.Repository;
+using Kogel.Repository;
 using Core;
 using IService;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Kogel.Dapper.Extension;
 
 namespace Service

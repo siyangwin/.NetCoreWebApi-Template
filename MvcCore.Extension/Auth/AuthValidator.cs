@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace MvcCore.Extension.Auth
 {
     /// <summary>
-    /// 自定义身份认证
+    /// 自定义身份认证（示例代码，默认未注册；如需启用请去掉 Program.cs 中对应注释）
     /// </summary>
-    public class AuthValidator : Attribute, IAuthorizationFilter
+    public class AuthValidator : Attribute, IAsyncAuthorizationFilter
     {
         //private readonly RequestDelegate _next;
 
@@ -40,7 +40,7 @@ namespace MvcCore.Extension.Auth
                 //检查当前的接口是否需要验证
                 // 检查当前 Action 是否带有 [AllowAnonymous] 特性
                 var actionDescriptor = context.GetEndpoint()?.Metadata?.GetMetadata<ControllerActionDescriptor>();
-                var allowAnonymous = actionDescriptor != null && actionDescriptor.ControllerTypeInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any() || actionDescriptor.MethodInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any();
+                var allowAnonymous = actionDescriptor != null && (actionDescriptor.ControllerTypeInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any() || actionDescriptor.MethodInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any());
 
                 // 如果当前Action 不需要身份验证，则直接调用下一个中间件或控制器
                 if (allowAnonymous || !context.User.Identity.IsAuthenticated)
@@ -94,7 +94,7 @@ namespace MvcCore.Extension.Auth
                 else
                 {
                     // 其他错误，交给 ASP.NET Core 处理
-                    throw ex;
+                    throw;
                 }
             }
         }
@@ -103,9 +103,9 @@ namespace MvcCore.Extension.Auth
         /// 重新自定義認證
         /// </summary>
         /// <param name="context"></param>
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            this.Invoke(context.HttpContext);
+            await this.Invoke(context.HttpContext);
             ////检查当前的接口是否需要验证
             //// 检查当前 Action 是否带有 [AllowAnonymous] 特性
             //var actionDescriptor = context.HttpContext.GetEndpoint()?.Metadata?.GetMetadata<ControllerActionDescriptor>();

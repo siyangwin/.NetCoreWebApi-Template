@@ -1,6 +1,7 @@
-﻿using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace ViewModel
@@ -21,13 +22,15 @@ namespace ViewModel
 		public int pageSize { get; set; } = 20;
 
 		/// <summary>
-		/// 排序字段
+		/// 排序字段（白名单：仅允许字母/数字/下划线/逗号/点，防止 SQL 注入）
 		/// </summary>
+		[RegularExpression(@"^[A-Za-z0-9_,.\s]+$", ErrorMessage = "排序字段不合法")]
 		public string sort { get; set; } = "Id";
 
 		/// <summary>
-		/// 排序方式
+		/// 排序方式（白名单：asc / desc）
 		/// </summary>
+		[RegularExpression(@"^(asc|desc)$", ErrorMessage = "排序方式不合法")]
 		public string sortOrder { get; set; } = "asc";
 
 		/// <summary>

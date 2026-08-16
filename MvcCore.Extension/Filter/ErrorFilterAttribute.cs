@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using IService;
@@ -51,7 +51,7 @@ namespace MvcCore.Extension.Filter
 			context.Result = new JsonResult(new
 			{
                 api_version="v1",
-                code = "402",
+                code = "500",
 				success = false,
 				message = "Server internal error"
 			});

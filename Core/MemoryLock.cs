@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +16,8 @@ namespace Project.Core
 	/// </summary>
 	public class MemoryLock : IDisposable
 	{
+		private static readonly object lockObj = new object();
+
 		private string key { get; set; }
 		private int timeOut { get; set; }
 		/// <summary>
@@ -34,17 +36,19 @@ namespace Project.Core
 		/// </summary>
 		public void Wait()
 		{
-			object obj = MemoryCacheHelper.Get(key);
-			if (obj != null)
+			//check-and-set 在锁内原子完成，锁外等待，避免多线程同时持锁
+			while (true)
 			{
+				lock (lockObj)
+				{
+					if (MemoryCacheHelper.Get(key) == null)
+					{
+						MemoryCacheHelper.Set(key, key as object, TimeSpan.FromSeconds(timeOut));
+						return;
+					}
+				}
 				//此处不能使用Task.Delay(500);
 				Thread.Sleep(300);
-				Wait();
-			}
-			else
-			{
-				MemoryCacheHelper.Set(key, key as object, TimeSpan.FromSeconds(timeOut));
-				Thread.Sleep(100);
 			}
 		}
 		/// <summary>

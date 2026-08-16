@@ -1,4 +1,4 @@
-﻿using System.IO.Compression;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Model.EnumModel;
 using Newtonsoft.Json;
-using Serilog;
 
 namespace Core
 {
@@ -68,8 +67,6 @@ namespace Core
             //记录当前时间
             DateTime ReqTime = DateTime.Now;
 
-            //忽略SSL证书
-            ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate;
             try
             {
                 try
@@ -128,10 +125,10 @@ namespace Core
             return result;
         }
 
-        //忽略SSL证书
+        //证书校验：仅当证书链校验通过时才信任
         private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            return true;
+            return sslPolicyErrors == SslPolicyErrors.None;
         }
         #endregion
 
@@ -444,14 +441,14 @@ namespace Core
 
         #region private main
         /// <summary>
-        /// 回调验证证书问题
+        /// 回调验证证书问题（仅在显式指定客户端证书 CerPath 时使用）
         /// </summary>
         /// <param name="sender">流对象</param>
         /// <param name="certificate">证书</param>
         /// <param name="chain">X509Chain</param>
         /// <param name="errors">SslPolicyErrors</param>
         /// <returns>bool</returns>
-        private bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors) { return true; }
+        private bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors) { return errors == SslPolicyErrors.None; }
         #endregion
     }
 

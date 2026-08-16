@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Model.Table;
 using Model.EnumModel;
 using IService;
@@ -31,14 +31,15 @@ namespace Service
 			systemLog.ClientType = httpContext.Request.Headers["ClientType"].ToString();
 			systemLog.APIName = httpContext.Request.Path;
 			systemLog.Request = httpContext.Request.Method;
-            systemLog.UserId = httpContext.Request.Headers["UserId"].ToString() == "" ? 0 : Convert.ToInt32(httpContext.Request.Headers["UserId"]);
+            systemLog.UserId = int.TryParse(httpContext.Request.Headers["UserId"].ToString(), out var userId) ? userId : 0;
 			systemLog.DeviceId = httpContext.Request.Headers["DeviceId"].ToString() == "" ? "0" : httpContext.Request.Headers["DeviceId"].ToString();
             systemLog.Instructions = instructions;
 			systemLog.ReqParameter = reqParameter;
 			systemLog.ResParameter = resParameter;
 			systemLog.Time = string.IsNullOrEmpty(time)?"":time;
-			systemLog.IP = string.IsNullOrEmpty(httpContext.Connection.RemoteIpAddress.ToString()) ? "": httpContext.Connection.RemoteIpAddress.ToString();
-			systemLog.Server = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("USERNAME"))? "": Environment.GetEnvironmentVariable("USERNAME");
+			systemLog.IP = string.IsNullOrEmpty(httpContext.Connection.RemoteIpAddress?.ToString()) ? "": httpContext.Connection.RemoteIpAddress.ToString();
+			//systemLog.Server = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("USERNAME"))? "": Environment.GetEnvironmentVariable("USERNAME");
+            systemLog.Server =Environment.UserName;
 
 
             //string MessageTemplate = "{Guid}{ClientType}{APIName}{Request}{UserId}{DeviceId}{Instructions}{ReqParameter}{ResParameter}{Time}{IP}{Server}";

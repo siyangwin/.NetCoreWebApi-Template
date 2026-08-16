@@ -1,4 +1,4 @@
-﻿ using Microsoft.AspNetCore.Mvc.Filters;
+ using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using System.Text;
@@ -91,10 +91,11 @@ namespace MvcCore.Extension.Filter
                 RequestPath = context.HttpContext.Request.Path,
                 RequestLocalIp = (context.HttpContext.Request.HttpContext.Connection.LocalIpAddress.MapToIPv4().ToString() + ":" + context.HttpContext.Request.HttpContext.Connection.LocalPort),
                 RequestRemoteIp = (context.HttpContext.Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString() + ":" + context.HttpContext.Request.HttpContext.Connection.RemotePort),
-                RequestParam = GetParamString(context.HttpContext)
+                RequestParam = await GetParamString(context.HttpContext)
             };
 
             string responseJson = string.Empty;
+            bool hasException = false;
 
             // 執行前
             try
@@ -113,6 +114,8 @@ namespace MvcCore.Extension.Filter
             }
             catch (Exception ex)
             {
+                hasException = true;
+
                 //获取这个API执行到这里的时间
                 string Time = (DateTime.Now - ReqTime).ToString();
 
@@ -120,14 +123,21 @@ namespace MvcCore.Extension.Filter
 
                 //写入日志
                 await systemLogService.LogAdd(SystemLogTypeEnum.Information, context.HttpContext, "异常", JsonConvert.SerializeObject(logData), responseJson, Time, ex);
+
+                //重新抛出异常，交由全局异常中间件统一处理，避免客户端收到 200 空响应
+                throw;
             }
             finally
             {
-                //获取这个API执行的时间
-                string Time = (DateTime.Now - ReqTime).ToString();
+                //异常路径已在 catch 中记录日志，避免重复写入
+                if (!hasException)
+                {
+                    //获取这个API执行的时间
+                    string Time = (DateTime.Now - ReqTime).ToString();
 
-                //写入日志
-                await systemLogService.LogAdd(SystemLogTypeEnum.Information, context.HttpContext, "请求-返回", JsonConvert.SerializeObject(logData), responseJson, Time,null);
+                    //写入日志
+                    await systemLogService.LogAdd(SystemLogTypeEnum.Information, context.HttpContext, "请求-返回", JsonConvert.SerializeObject(logData), responseJson, Time,null);
+                }
             }
         }
 

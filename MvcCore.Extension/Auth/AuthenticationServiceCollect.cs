@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -52,16 +52,16 @@ namespace MvcCore.Extension.Auth
 
                     //是否验证Token有效期，使用当前时间与Token的Claims中的NotBefore和Expires对比
                     //指示是否验证 JWT 令牌的有效期。当服务器收到一个 JWT 令牌时，会检查其 Claims 中的 NotBefore 和 Expires 是否在当前时间范围内。如果 ValidateLifetime 设置为 true，则服务器将拒绝过期的 JWT 令牌，并认为它是无效的。
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
 
                     //指示是否验证 JWT 的签名密钥。
-                    ValidateIssuerSigningKey = false,
+                    ValidateIssuerSigningKey = true,
 
                     //指示是否验证 JWT 的颁发者。
-                    ValidateIssuer = false,
+                    ValidateIssuer = true,
 
                     //指示是否验证 JWT 的受众。
-                    ValidateAudience = false,
+                    ValidateAudience = true,
                 };
                 //指定Jwt的返回内容
                 options.Events = new JwtBearerEvents
