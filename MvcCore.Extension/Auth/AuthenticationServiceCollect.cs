@@ -105,7 +105,7 @@ namespace MvcCore.Extension.Auth
                     },
                     OnChallenge = context =>
                     {
-                        //当用户的Jwt通过验证,但是状态已过期的情况了
+                        //未带 token 或 token 验证失败时触发（OnChallenge）
                         //此处代码为终止.Net Core默认的返回类型和数据结果，这个很重要哦，必须
                         context.HandleResponse();
 

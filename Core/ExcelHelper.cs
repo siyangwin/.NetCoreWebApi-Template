@@ -25,7 +25,7 @@ namespace Core
             Workbook workbook = new Workbook();
             //将当前路径下的文件内容读取到workbook对象里面
             workbook.LoadFromFile(path);
-            //得到第一个Sheet页
+            //得到指定索引的Sheet页（tableindex）
             Worksheet sheet = workbook.Worksheets[tableindex];
             return SheetToDataTable(hasTitle, sheet);
         }
@@ -41,7 +41,7 @@ namespace Core
             Workbook workbook = new Workbook();
             //将文件流内容读取到workbook对象里面
             workbook.LoadFromStream(stream);
-            //得到第一个Sheet页
+            //得到指定索引的Sheet页（tableindex）
             Worksheet sheet = workbook.Worksheets[tableindex];
 
             int iRowCount = sheet.Rows.Length;
@@ -116,7 +116,7 @@ namespace Core
 
         #region 导出
         /// <summary>
-        /// 将DaTaTable转成byte[]类型
+        /// 将DataTable保存为Excel文件
         /// </summary>
         /// <param name="dt"></param>
         /// <param name="hasTitle">是否有表头</param>

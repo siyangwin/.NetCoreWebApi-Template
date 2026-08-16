@@ -52,8 +52,8 @@ namespace MvcCore.Extension.Filter
                     }
                 }
                 message = message.TrimEnd(new char[] { ' ', '|' });
+                //参数校验失败，抛异常交由全局异常中间件统一处理
                 throw new Exception(message);
-                //throw new ValidationException(message); // 使用自定义的 ValidationException
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
@@ -42,7 +42,7 @@ namespace Project.Core
         ///  把枚舉的描述和值綁定到DropDownList
         /// </summary>
         /// <param name="isNameValue">是否使用枚舉名做為值(value)</param>
-        /// <param name="isNameValue">是否使用枚舉名做為显示(Text)</param>
+        /// <param name="isNameText">是否使用枚舉名做為显示(Text)</param>
         /// <returns></returns>
         public static List<KeyValuePair<string, string>> GetSelectList(Type enumType, string emptyKey, string emptyValue, bool isNameValue = false, bool isNameText = false)
         {

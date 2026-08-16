@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
 
@@ -23,7 +23,7 @@ namespace MvcCore.Extension.Auth
         public string Audience { get; set; }
 
         /// <summary>
-        /// 过期时间
+        /// 过期时间（分钟，实际过期时刻由 Expiration 计算属性决定）
         /// </summary>
         public int Expired { get; set; }
 

@@ -1,4 +1,4 @@
-﻿using Kogel.Dapper.Extension.Attributes;
+using Kogel.Dapper.Extension.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace Model.View
     /// <summary>
     /// 配置
     /// </summary>
-    [Display(Rename = "vw_app_Config")]
+    [Display(Rename = "vw_public_Config")]
     public class vw_public_Config
     {
         /// <summary>

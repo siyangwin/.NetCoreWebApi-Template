@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Project.AppApi.Controllers
 {
 	/// <summary>
-	/// 自动生成模板
+	/// 脚手架示例控制器（模板自带示例，可删除）
 	/// </summary>
 	[ApiExplorerSettings(IgnoreApi = false)]
 	[Route("api/[controller]")]

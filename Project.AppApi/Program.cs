@@ -152,25 +152,9 @@ Log.Logger = new LoggerConfiguration()
 #endregion
     .CreateLogger();
 
-#region SerilLog写入数据库Demo
-//WriteTo生效 AuditTo不生效
-//BatchPostingLimit: 用于设置批处理日志事件的数量限制。默认值为 50，即当累积了 50 条日志事件时就会将它们作为一个批次进行写入数据库。这个选项可以帮助优化性能，因为一次提交大量的日志事件比一次提交少量的日志事件效率更高。
-//BatchPeriod: 用于设置批处理的时间间隔。默认值为 2 秒，即每隔 2 秒就会将所有已缓存的日志事件作为一个批次进行写入数据库。这个选项可以保证在一定的时间间隔内一定会向数据库提交日志事件，以保证数据的实时性和完整性。
-
-//Log.Logger = new LoggerConfiguration()
-//    .WriteTo
-//    .MSSqlServer(
-//        connectionString: GlobalConfig.ConnectionString,
-//        sinkOptions: new MSSqlServerSinkOptions { TableName = "testnew" ,SchemaName="dbo",AutoCreateSqlTable=true,BatchPostingLimit=1},
-//        columnOptions: columnOpts)
-//    .CreateLogger();
-
-
-//测试日志输出
-//Log.Information("Hello {Name} from thread {ThreadId}", Environment.GetEnvironmentVariable("USERNAME"), Environment.CurrentManagedThreadId);
-//Log.Warning("No coins remain at position {@Position}", new { Lat = 25, Long = 134 });
-//Log.Error("{UserName}{UserId}{RequestUri}", 1, 2, 3);
-#endregion
+//BatchPostingLimit: 批量提交日志事件的数量上限（默认 50），达到即写库
+//BatchPeriod: 批量提交的时间间隔（默认 2 秒），保证数据实时性
+//（WriteTo 为异步批量写库，BatchPostingLimit/BatchPeriod 生效）
 
 //注入 替换默认日志
 builder.Host.UseSerilog(Log.Logger, dispose: true);

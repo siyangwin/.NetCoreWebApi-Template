@@ -1,4 +1,4 @@
-﻿using Kogel.Dapper.Extension.Attributes;
+using Kogel.Dapper.Extension.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,7 +29,7 @@ namespace Model.Table
         public string ClientType { get; set; }
 
         /// <summary>
-        /// 条款Url
+        /// API名称（context.Request.Path）
         /// </summary>
         public string APIName { get; set; }
 
@@ -72,11 +72,6 @@ namespace Model.Table
         /// 请求用户的IP
         /// </summary>
         public string IP { get; set; }
-
-        /// <summary>
-        /// Web服务器的主机名或IP地址  context.Request.Host.Value;
-        /// </summary>
-        //public string Host { get; set; }
 
         /// <summary>
         /// 服务器名称(负载均衡记录) Environment.GetEnvironmentVariable("USERNAME")

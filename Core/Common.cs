@@ -97,7 +97,7 @@ namespace Core
         }
 
         /// <summary>
-        /// 獲的十位隨機數
+        /// 获取指定位数的数字随机数
         /// </summary>
         /// <returns></returns>
         public static string GetRandom(int length = 8)
