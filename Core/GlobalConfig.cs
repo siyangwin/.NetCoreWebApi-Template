@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Model.EnumModel;
-using ViewModel;
-using ViewModel.App;
 
 namespace Core
 {
@@ -23,24 +21,9 @@ namespace Core
 		public static string ResourcesUrl { get; set; }
 
 		/// <summary>
-		/// 系统日志
-		/// </summary>
-		public static ILogService SystemLogService { get; set; }
-
-		/// <summary>
 		/// 缓存时间（分钟）
 		/// </summary>
 		public static int MemoryTime { get; set; } = 1 * 60;
-
-		/// <summary>
-		/// 判断小程序权限
-		/// </summary>
-		public static IMiniProgramCoreService MiniProgramCoreService { get; set; }
-
-		/// <summary>
-		/// 授权令牌验证
-		/// </summary>
-		public static IAuthorizationTokenCoreService AuthorizationTokenCoreService { get; set; }
 
 		/// <summary>
 		/// 获取缓存存储服务器地址
@@ -66,30 +49,4 @@ namespace Core
 		/// <returns></returns>
 		Task LogAdd(SystemLogTypeEnum systemLogType, HttpContext httpContext, string instructions, string reqParameter, string resParameter, string? time, Exception? ex);
     }
-
-
-	/// <summary>
-	/// 判断小程序权限
-	/// </summary>
-	public interface IMiniProgramCoreService
-	{
-
-	}
-
-
-	/// <summary>
-	/// 授权令牌验证
-	/// </summary>
-	public interface IAuthorizationTokenCoreService
-	{
-		/// <summary>
-		/// 校验Token是否有效
-		/// </summary>
-		/// <param name="Token">传入Token</param>
-		/// <returns></returns>
-		ResultModel<AuthorizationResDto> CheckAuthorizationToken(string Token);
-
-
-		bool DeleteAuthorizationToken(int UserId);
-	}
 }

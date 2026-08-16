@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ namespace MvcCore.Extension.Auth
         /// </summary>
         /// <param name="UserId">携带的用户信息</param>
         /// <returns></returns>
-        public string GenerateEncodedTokenAsync(int UserId)
+        public string GenerateEncodedToken(int UserId)
         {
             //创建用户身份标识，可按需要添加更多信息
             var claims = new List<Claim>
@@ -59,7 +59,7 @@ namespace MvcCore.Extension.Auth
         /// </summary>
         /// <param name="UserId">携带的用户信息</param>
         /// <returns></returns>
-        public string GenerateEncodedTokenAsync(Claim[] claim)
+        public string GenerateEncodedToken(Claim[] claim)
         {
             //创建用户身份标识，可按需要添加更多信息
             var claims = claim.ToList();

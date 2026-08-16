@@ -46,7 +46,7 @@ namespace Project.AppApi.Controllers
             ResultModel<string> resultModel = new ResultModel<string>();
             if (AuthorizationInfo == null)
             {
-                resultModel.success = false;
+                resultModel.Success = false;
             }
             else
             {
@@ -57,9 +57,7 @@ namespace Project.AppApi.Controllers
                     new Claim("UserId",AuthorizationInfo.account.ToString())
                 };
                 //登錄并獲取token
-                //userResDto.Token = token;
-                //HttpContext.SignInAsync(claims, token, userResDto.Id.ToString(), 240, true);
-                resultModel.data = generateJwt.GenerateEncodedTokenAsync(claims);
+                resultModel.Data = generateJwt.GenerateEncodedToken(claims);
             }
             return resultModel;
         }
@@ -75,7 +73,7 @@ namespace Project.AppApi.Controllers
         public async Task<ResultModel> LoginOut()
         {
             ResultModel resultModel = new ResultModel();
-            resultModel.message = "登出成功";
+            resultModel.Message = "登出成功";
             HttpContext.SignOutAsync();
             return resultModel;
         }
@@ -105,7 +103,7 @@ namespace Project.AppApi.Controllers
             ResultModel<string> resultModel = new ResultModel<string>();
 
 
-            resultModel.data = "当前用户为：" + UserId;
+            resultModel.Data = "当前用户为：" + UserId;
             return resultModel;
         }
 
@@ -120,7 +118,7 @@ namespace Project.AppApi.Controllers
         public async Task<ResultModel<string>> CheckNoAuthorizationInfo()
         {
             ResultModel<string> resultModel = new ResultModel<string>();
-            resultModel.data = "当前用户为：" + UserId;
+            resultModel.Data = "当前用户为：" + UserId;
             return resultModel;
         }
     }

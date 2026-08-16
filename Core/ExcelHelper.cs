@@ -1,4 +1,4 @@
-﻿using Spire.Xls;
+using Spire.Xls;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -70,7 +70,7 @@ namespace Core
                 }
                 dt.Rows.Add(dr);
             }
-            return SheetToDataTable(hasTitle, sheet);
+            return dt;
         }
 
         private static DataTable SheetToDataTable(bool hasTitle, Worksheet sheet)

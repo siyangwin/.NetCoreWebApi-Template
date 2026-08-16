@@ -21,7 +21,7 @@ namespace Project.AppApi.Controllers
         public ResultModel<List<string>> GetList()
         {
             ResultModel<List<string>> resultModel = new ResultModel<List<string>>();
-            resultModel.data = MvcCore.Extension.MemoryCacheHelper.GetCacheKeys();
+            resultModel.Data = MvcCore.Extension.MemoryCacheHelper.GetCacheKeys();
             return resultModel;
         }
 
@@ -34,7 +34,7 @@ namespace Project.AppApi.Controllers
         public ResultModel ResetSystemAll()
         {
             ResultModel resultModel = new ResultModel();
-            resultModel.success = true;
+            resultModel.Success = true;
             int num = 0;
             foreach (var key in MvcCore.Extension.MemoryCacheHelper.GetCacheKeys().ToArray())
             {
@@ -42,7 +42,7 @@ namespace Project.AppApi.Controllers
                 num++;
             }
 
-            resultModel.message = "重置所有(" + num + "个)系统缓存成功!";
+            resultModel.Message = "重置所有(" + num + "个)系统缓存成功!";
             return resultModel;
         }
 
@@ -56,18 +56,16 @@ namespace Project.AppApi.Controllers
         public ResultModel ResetSystemUser(List<string> UserIdList)
         {
             ResultModel resultModel = new ResultModel();
-            resultModel.success = true;
+            resultModel.Success = true;
             int num = 0;
             if (UserIdList != null && UserIdList.Any())
             {
                 foreach (var userID in UserIdList)
                 {
-                    //先擠掉其它登錄用戶
-                    //HttpContext.SignOutByUserAsync(userID);
                     num++;
                 }
             }
-            resultModel.message = "重置(" + num + "个)用户系统缓存成功!";
+            resultModel.Message = "重置(" + num + "个)用户系统缓存成功!";
             return resultModel;
         }
         #endregion
@@ -82,7 +80,7 @@ namespace Project.AppApi.Controllers
         public ResultModel<List<string>> GetProjectList()
         {
             ResultModel<List<string>> resultModel = new ResultModel<List<string>>();
-            resultModel.data = Core.MemoryCacheHelper.GetCacheKeys();
+            resultModel.Data = Core.MemoryCacheHelper.GetCacheKeys();
             return resultModel;
         }
 
@@ -96,7 +94,7 @@ namespace Project.AppApi.Controllers
         public ResultModel Reset(List<string> cacheList)
         {
             ResultModel resultModel = new ResultModel();
-            resultModel.success = true;
+            resultModel.Success = true;
 
             int num = 0;
             if (cacheList != null && cacheList.Any())
@@ -108,7 +106,7 @@ namespace Project.AppApi.Controllers
                 }
             }
 
-            resultModel.message = "重置" + num + "个程序缓存成功!";
+            resultModel.Message = "重置" + num + "个程序缓存成功!";
             return resultModel;
         }
 
@@ -123,7 +121,7 @@ namespace Project.AppApi.Controllers
         public ResultModel ResetByKey(string cacheKey)
         {
             ResultModel resultModel = new ResultModel();
-            resultModel.success = true;
+            resultModel.Success = true;
 
             int num = 0;
 
@@ -140,7 +138,7 @@ namespace Project.AppApi.Controllers
                 }
             }
 
-            resultModel.message = "重置" + num + "个程序缓存成功!";
+            resultModel.Message = "重置" + num + "个程序缓存成功!";
             return resultModel;
         }
 
@@ -153,7 +151,7 @@ namespace Project.AppApi.Controllers
         public ResultModel ResetAll()
         {
             ResultModel resultModel = new ResultModel();
-            resultModel.success = true;
+            resultModel.Success = true;
             int num = 0;
             foreach (var key in Core.MemoryCacheHelper.GetCacheKeys().ToArray())
             {
@@ -161,7 +159,7 @@ namespace Project.AppApi.Controllers
                 num++;
             }
 
-            resultModel.message = "重置所有(" + num + "个)程序缓存成功!";
+            resultModel.Message = "重置所有(" + num + "个)程序缓存成功!";
             return resultModel;
         }
         #endregion

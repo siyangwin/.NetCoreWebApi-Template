@@ -448,7 +448,7 @@ namespace Core
         /// <param name="chain">X509Chain</param>
         /// <param name="errors">SslPolicyErrors</param>
         /// <returns>bool</returns>
-        private bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors) { return errors == SslPolicyErrors.None; }
+        private bool CheckValidationResult(object? sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors errors) { return errors == SslPolicyErrors.None; }
         #endregion
     }
 

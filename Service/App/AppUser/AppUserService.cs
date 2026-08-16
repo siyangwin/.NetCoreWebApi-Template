@@ -1,4 +1,4 @@
-﻿using Core;
+using Core;
 using IService;
 using IService.App;
 using Microsoft.AspNetCore.Http;
@@ -55,8 +55,8 @@ namespace Service.App
 
             if (AuthorizationInfo.account!="123" || AuthorizationInfo.password!="admin")
             {
-                resultModel.success = false;
-                resultModel.message = "用戶帳戶或密碼無效";
+                resultModel.Success = false;
+                resultModel.Message = "用戶帳戶或密碼無效";
                 return resultModel;
             }
 
@@ -64,13 +64,13 @@ namespace Service.App
             int UserId = Convert.ToInt32(AuthorizationInfo.account);
 
             //生成授权信息
-            //authorizationTokenResDto.Authorization = generateJwt.GenerateEncodedTokenAsync(UserId);
+            //authorizationTokenResDto.Authorization = generateJwt.GenerateEncodedToken(UserId);
 
             //写入缓存
 
             //写入数据库
 
-            resultModel.data = authorizationTokenResDto;
+            resultModel.Data = authorizationTokenResDto;
             return resultModel;
         }
     }

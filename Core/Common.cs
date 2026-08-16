@@ -105,10 +105,9 @@ namespace Core
             var resultStr = new StringBuilder();
             for (var i = 0; i < length; i++)
             {
-                var r = new Random(Guid.NewGuid().GetHashCode());
-                resultStr.Append(r.Next(0, 10));
+                resultStr.Append(Random.Shared.Next(0, 10));
             }
-            return "89" + resultStr.ToString();
+            return resultStr.ToString();
         }
 
 
@@ -116,11 +115,10 @@ namespace Core
         //生成纯字母随机数
         public static string Str_char(int Length, bool Sleep)
         {
-            if (Sleep) System.Threading.Thread.Sleep(3);
             char[] Pattern = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
             string result = "";
             int n = Pattern.Length;
-            Random random = new Random(~unchecked((int)DateTime.Now.Ticks));
+            Random random = Random.Shared;
             for (int i = 0; i < Length; i++)
             {
                 int rnd = random.Next(0, n);
