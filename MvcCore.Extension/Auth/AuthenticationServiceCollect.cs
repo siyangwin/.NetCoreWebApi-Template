@@ -20,6 +20,9 @@ namespace MvcCore.Extension.Auth
             //注入jwt
             services.AddScoped<GenerateJwt>();
 
+            //注入RefreshToken服务
+            services.AddScoped<RefreshTokenService>();
+
             // 注册 JwtConfig 到依赖注入容器中
             services.Configure<JwtConfig>(configuration.GetSection("JwtConfig"));
 

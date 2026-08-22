@@ -26,17 +26,19 @@ namespace MvcCore.Extension.Auth
         private JwtConfig Config => _jwtConfigMonitor.CurrentValue;
 
         /// <summary>
-        /// 生成token
+        /// 生成 AccessToken（含 UserId + Role claims）
         /// </summary>
-        /// <param name="UserId">携带的用户信息</param>
+        /// <param name="UserId">用户编号</param>
+        /// <param name="role">角色名称（如"Admin"、"User"、"Guest"）</param>
         /// <returns></returns>
-        public string GenerateEncodedToken(int UserId)
+        public string GenerateEncodedToken(int UserId, string role = "User")
         {
-            //创建用户身份标识，可按需要添加更多信息
             var claims = new List<Claim>
             {
                 new Claim("UserId", UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, UserId.ToString())
+                new Claim(JwtRegisteredClaimNames.Sub, UserId.ToString()),
+                new Claim(ClaimTypes.Role, role),
+                new Claim("Role", role)
             };
             return BuildToken(claims);
         }

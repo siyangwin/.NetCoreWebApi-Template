@@ -40,31 +40,33 @@ namespace Service
 			systemLog.IP = string.IsNullOrEmpty(httpContext.Connection.RemoteIpAddress?.ToString()) ? "": httpContext.Connection.RemoteIpAddress.ToString();
 			//systemLog.Server = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("USERNAME"))? "": Environment.GetEnvironmentVariable("USERNAME");
             systemLog.Server =Environment.UserName;
+            systemLog.AuthType = httpContext.Request.Headers["AuthType"].ToString();
+            systemLog.AuthIdentity = httpContext.Request.Headers["AuthIdentity"].ToString();
 
 
             //string MessageTemplate = "{Guid}{ClientType}{APIName}{Request}{UserId}{DeviceId}{Instructions}{ReqParameter}{ResParameter}{Time}{IP}{Server}";
-            string MessageTemplate = "\"Guid\":\"{Guid}\",\"ClientType\":\"{ClientType}\",\"APIName\":\"{APIName}\",\"Request\":\"{Request}\",\"UserId\":\"{UserId}\",\"DeviceId\":\"{DeviceId}\",\"Instructions\":\"{Instructions}\",\"ReqParameter\":\"{ReqParameter}\",\"ResParameter\":\"{ResParameter}\",\"Time\":\"{Time}\",\"IP\":\"{IP}\",\"Server\":\"{Server}\"";
+            string MessageTemplate = "\"Guid\":\"{Guid}\",\"ClientType\":\"{ClientType}\",\"APIName\":\"{APIName}\",\"Request\":\"{Request}\",\"UserId\":\"{UserId}\",\"DeviceId\":\"{DeviceId}\",\"Instructions\":\"{Instructions}\",\"ReqParameter\":\"{ReqParameter}\",\"ResParameter\":\"{ResParameter}\",\"Time\":\"{Time}\",\"IP\":\"{IP}\",\"Server\":\"{Server}\",\"AuthType\":\"{AuthType}\",\"AuthIdentity\":\"{AuthIdentity}\"";
 
             //判断传入参数
             switch (systemLogType)
 			{
 				case SystemLogTypeEnum.Verbose:
-                    Log.Verbose(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
+                    Log.Verbose(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server, systemLog.AuthType, systemLog.AuthIdentity);
                     break;
                 case SystemLogTypeEnum.Debug:
-                    Log.Debug(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
+                    Log.Debug(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server, systemLog.AuthType, systemLog.AuthIdentity);
                     break;
                 case SystemLogTypeEnum.Information:
-                    Log.Information(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
+                    Log.Information(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server, systemLog.AuthType, systemLog.AuthIdentity);
                     break;
                 case SystemLogTypeEnum.Warning:
-                    Log.Warning(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
+                    Log.Warning(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server, systemLog.AuthType, systemLog.AuthIdentity);
                     break;
                 case SystemLogTypeEnum.Error:
-                    Log.Error(ex, MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
+                    Log.Error(ex, MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server, systemLog.AuthType, systemLog.AuthIdentity);
                     break;
                 case SystemLogTypeEnum.Fatal:
-                    Log.Fatal(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server);
+                    Log.Fatal(MessageTemplate, systemLog.Guid, systemLog.ClientType, systemLog.APIName, systemLog.Request, systemLog.UserId, systemLog.DeviceId, systemLog.Instructions, systemLog.ReqParameter, systemLog.ResParameter, systemLog.Time, systemLog.IP, systemLog.Server, systemLog.AuthType, systemLog.AuthIdentity);
                     break;
                 default:
 					break;

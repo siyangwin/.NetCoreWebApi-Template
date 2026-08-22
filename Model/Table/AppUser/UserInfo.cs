@@ -1,10 +1,5 @@
-﻿using Kogel.Dapper.Extension.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+using Kogel.Dapper.Extension.Attributes;
+using Model.EnumModel;
 
 namespace Model.Table
 {
@@ -33,5 +28,10 @@ namespace Model.Table
         /// 抖音小程序唯一编号
         /// </summary>
         public string TikTokOpenid { get; set; }
+
+        /// <summary>
+        /// 角色（1=Admin, 2=User, 3=Guest）
+        /// </summary>
+        public int Role { get; set; } = (int)RoleEnum.User;
     }
 }

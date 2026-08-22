@@ -23,14 +23,19 @@ namespace MvcCore.Extension.Auth
         public string Audience { get; set; }
 
         /// <summary>
-        /// 过期时间（分钟，实际过期时刻由 Expiration 计算属性决定）
+        /// AccessToken 过期时间（分钟）
         /// </summary>
-        public int Expired { get; set; }
+        public int AccessExpired { get; set; }
+
+        /// <summary>
+        /// RefreshToken 过期时间（分钟，默认 10080 = 7 天）
+        /// </summary>
+        public int RefreshExpired { get; set; } = 10080;
 
 
         public DateTime NotBefore => DateTime.UtcNow;
         public DateTime IssuedAt => DateTime.UtcNow;
-        public DateTime Expiration => IssuedAt.AddMinutes(Expired);
+        public DateTime Expiration => IssuedAt.AddMinutes(AccessExpired);
         private SecurityKey SigningKey => new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
         public SigningCredentials SigningCredentials =>
             new SigningCredentials(SigningKey, SecurityAlgorithms.HmacSha256);

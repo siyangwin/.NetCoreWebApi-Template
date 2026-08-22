@@ -113,7 +113,11 @@ var columnOpts = new ColumnOptions
         //访问用户IP
         new SqlColumn{ColumnName = "IP", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
          //服务器名称(负载均衡记录)
-        new SqlColumn{ColumnName = "Server", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = true}
+        new SqlColumn{ColumnName = "Server", DataType = SqlDbType.NVarChar, DataLength = 50, AllowNull = true},
+        //认证类型（JWT / ApiKey / 空）
+        new SqlColumn{ColumnName = "AuthType", DataType = SqlDbType.NVarChar, DataLength = 20, AllowNull = true},
+        //身份标识（JWT 时为 UserId，API Key 时为 KeyName）
+        new SqlColumn{ColumnName = "AuthIdentity", DataType = SqlDbType.NVarChar, DataLength = 200, AllowNull = true}
     }
 };
 
@@ -207,6 +211,10 @@ builder.Services.AddKeyedScoped<IKeyedDemoService, KeyedServiceB>("b");
 #region jwt身份验证
 //身份認證
 builder.Services.AddAuthentications(builder.Configuration);
+#endregion
+
+#region API Key 认证
+builder.Services.AddSingleton<ApiKeyService>();
 #endregion
 
 
@@ -368,7 +376,35 @@ app.Use(async (context, next) =>
 });
 
 //注意顺序，先认证后授权，不然接口加入Token认证也不会通过
-app.UseAuthentication();//启动认证   
+//API Key 认证中间件（在 JWT 之前执行）
+app.UseMiddleware<ApiKeyMiddleware>();
+app.UseAuthentication();//启动认证
+
+// 身份写入中间件：将认证类型和身份标识写入 Headers，供日志系统记录
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        var authType = context.User.Identity.AuthenticationType;
+        // JWT Bearer 默认 AuthenticationType 为 "Federation"，统一显示为 "JWT"
+        if (authType == "AuthenticationTypes.Federation" || authType == "Bearer")
+            authType = "JWT";
+
+        context.Request.Headers["AuthType"] = authType;
+
+        if (authType == "ApiKey")
+        {
+            var keyName = context.User.Claims.FirstOrDefault(c => c.Type == "ApiKeyName")?.Value;
+            context.Request.Headers["AuthIdentity"] = keyName;
+        }
+        else
+        {
+            var userId = context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            context.Request.Headers["AuthIdentity"] = userId;
+        }
+    }
+    await next();
+});
 
 app.UseAuthorization();//启动授权
 

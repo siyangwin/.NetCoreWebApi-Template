@@ -50,6 +50,32 @@ namespace MvcCore.Extension.Swagger
                     BearerFormat = "JWT",
                     Scheme = "Bearer",
                 });
+
+                //API Key 认证（服务间/第三方调用）
+                options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    Description = "API Key认证（服务间/第三方调用） 在下方输入 API Key 即可。" +
+                                  "请求头: X-Api-Key: {your-api-key}",
+                    Name = "X-Api-Key",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "ApiKey",
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "ApiKey"
+                            }
+                        },
+                        new string[] { }
+                    }
+                });
                 #endregion
 
 				//自定義配置文件路徑（移出版本循环，避免多版本时重复注册）

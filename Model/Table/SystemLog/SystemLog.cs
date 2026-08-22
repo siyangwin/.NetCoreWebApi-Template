@@ -77,6 +77,16 @@ namespace Model.Table
         /// 服务器名称(负载均衡记录) Environment.GetEnvironmentVariable("USERNAME")
         /// </summary>
         public string Server { get; set; }
+
+        /// <summary>
+        /// 认证类型（JWT / ApiKey / 空=未认证）
+        /// </summary>
+        public string AuthType { get; set; }
+
+        /// <summary>
+        /// 身份标识（JWT 时为 UserId，API Key 时为 KeyName）
+        /// </summary>
+        public string AuthIdentity { get; set; }
         #endregion
     }
 }
