@@ -1,0 +1,70 @@
+{
+  "common": {
+    "success": "操作成功",
+    "failed": "操作失败",
+    "param_required": "请求参数不能为空",
+    "server_error": "服务器内部错误",
+    "not_found": "未找到",
+    "name_required": "名称不能为空",
+    "deleted": "已删除"
+  },
+  "auth": {
+    "login_success": "登录成功",
+    "login_failed": "用户账户或密码无效",
+    "token_empty": "Token 不能为空",
+    "token_invalid": "Token 无效或已过期",
+    "token_revoked": "Token 已失效，同族所有 Token 已吊销，请重新登录",
+    "refresh_token_empty": "RefreshToken 不能为空",
+    "refresh_token_invalid": "RefreshToken 无效或已过期",
+    "refresh_token_revoked": "RefreshToken 已失效，同族所有 Token 已吊销，请重新登录",
+    "logout_success": "登出成功",
+    "logout_all_devices": "已吊销所有设备的 Token",
+    "apikey_name_required": "名称不能为空",
+    "apikey_created": "API Key 创建成功",
+    "apikey_deleted": "已删除",
+    "apikey_not_found": "未找到该 API Key"
+  },
+  "demo": {
+    "hello": "Hello World！模板演示接口",
+    "created": "创建成功",
+    "updated": "已更新编号 {0} 的数据，新名称：{1}",
+    "deleted": "已删除编号 {0} 的数据",
+    "file_required": "请选择要上传的文件",
+    "upload_success": "上传成功",
+    "cache_miss": "缓存未命中，已写入",
+    "cache_hit": "缓存命中：{0}",
+    "language_cn": "当前语言：中文",
+    "language_en": "Current Language: English",
+    "user_id": "当前登录用户编号：{0}",
+    "business_error": "这是模拟的业务异常，用于演示全局异常处理中间件",
+    "init_success": "表初始化完成",
+    "name_empty": "姓名不能为空",
+    "create_success": "新增成功，主键：{0}",
+    "user_not_found": "用户不存在",
+    "delete_success": "已软删除用户 {0}",
+    "update_success": "修改成功"
+  },
+  "validation": {
+    "name_required": "Name 不能为空",
+    "name_max_length": "Name 长度不能超过 {0}",
+    "age_range": "Age 必须在 1-120 之间",
+    "pagesize_range": "pageSize 必须在 1-100 之间",
+    "sort_field_invalid": "排序字段不合法",
+    "sort_order_invalid": "排序方式不合法"
+  },
+  "cache": {
+    "reset_all": "重置所有({0}个)系统缓存成功!",
+    "reset_user": "重置({0}个)用户系统缓存成功!",
+    "reset_program": "重置{0}个程序缓存成功!"
+  },
+  "db_demo": {
+    "product_created": "商品创建成功",
+    "product_not_found": "商品不存在",
+    "translation_saved": "翻译已保存",
+    "translation_deleted": "翻译已删除",
+    "article_created": "文章创建成功",
+    "article_not_found": "文章不存在",
+    "init_success": "数据库表初始化成功",
+    "init_failed": "初始化失败：{0}"
+  }
+}

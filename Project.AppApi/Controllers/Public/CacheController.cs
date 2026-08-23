@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViewModel;
+using Core;
 
 namespace Project.AppApi.Controllers
 {
@@ -42,7 +43,7 @@ namespace Project.AppApi.Controllers
                 num++;
             }
 
-            resultModel.Message = "重置所有(" + num + "个)系统缓存成功!";
+            resultModel.Message = Lang.GetFormat("cache:reset_all", num);
             return resultModel;
         }
 
@@ -65,7 +66,7 @@ namespace Project.AppApi.Controllers
                     num++;
                 }
             }
-            resultModel.Message = "重置(" + num + "个)用户系统缓存成功!";
+            resultModel.Message = Lang.GetFormat("cache:reset_user", num);
             return resultModel;
         }
         #endregion
@@ -106,7 +107,7 @@ namespace Project.AppApi.Controllers
                 }
             }
 
-            resultModel.Message = "重置" + num + "个程序缓存成功!";
+            resultModel.Message = Lang.GetFormat("cache:reset_program", num);
             return resultModel;
         }
 
@@ -138,7 +139,7 @@ namespace Project.AppApi.Controllers
                 }
             }
 
-            resultModel.Message = "重置" + num + "个程序缓存成功!";
+            resultModel.Message = Lang.GetFormat("cache:reset_program", num);
             return resultModel;
         }
 
@@ -159,7 +160,7 @@ namespace Project.AppApi.Controllers
                 num++;
             }
 
-            resultModel.Message = "重置所有(" + num + "个)程序缓存成功!";
+            resultModel.Message = Lang.GetFormat("cache:reset_all", num);
             return resultModel;
         }
         #endregion

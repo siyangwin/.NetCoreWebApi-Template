@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MvcCore.Extension.Auth;
 using ViewModel;
 using ViewModel.Auth;
+using Core;
 
 namespace Project.AppApi.Controllers.Auth
 {
@@ -30,7 +31,7 @@ namespace Project.AppApi.Controllers.Auth
             if (string.IsNullOrEmpty(req?.Name))
             {
                 result.Success = false;
-                result.Message = "名称不能为空";
+                result.Message = Lang.Get("auth:apikey_name_required");
                 return result;
             }
 
@@ -67,7 +68,7 @@ namespace Project.AppApi.Controllers.Auth
             var result = new ResultModel();
             bool success = apiKeyService.RevokeApiKey(id);
             result.Success = success;
-            result.Message = success ? "已删除" : "未找到该 API Key";
+            result.Message = success ? Lang.Get("auth:apikey_deleted") : Lang.Get("auth:apikey_not_found");
             return result;
         }
     }

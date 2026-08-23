@@ -53,7 +53,7 @@ namespace MvcCore.Extension.Filter
                 api_version="v1",
                 code = "500",
 				success = false,
-				message = "Server internal error"
+				message = Lang.Get("common:server_error")
 			});
         }
 	}

@@ -1,0 +1,70 @@
+{
+  "common": {
+    "success": "Operation successful",
+    "failed": "Operation failed",
+    "param_required": "Request parameter is required",
+    "server_error": "Server internal error",
+    "not_found": "Not found",
+    "name_required": "Name is required",
+    "deleted": "Deleted"
+  },
+  "auth": {
+    "login_success": "Login successful",
+    "login_failed": "Invalid account or password",
+    "token_empty": "Token is required",
+    "token_invalid": "Token is invalid or expired",
+    "token_revoked": "Token has been revoked, all tokens in the family have been revoked. Please log in again",
+    "refresh_token_empty": "RefreshToken is required",
+    "refresh_token_invalid": "RefreshToken is invalid or expired",
+    "refresh_token_revoked": "RefreshToken has been revoked, all tokens in the family have been revoked. Please log in again",
+    "logout_success": "Logged out successfully",
+    "logout_all_devices": "All device tokens have been revoked",
+    "apikey_name_required": "Name is required",
+    "apikey_created": "API Key created successfully",
+    "apikey_deleted": "Deleted",
+    "apikey_not_found": "API Key not found"
+  },
+  "demo": {
+    "hello": "Hello World! Template demo endpoint",
+    "created": "Created successfully",
+    "updated": "Updated data {0}, new name: {1}",
+    "deleted": "Deleted data {0}",
+    "file_required": "Please select a file to upload",
+    "upload_success": "Upload successful",
+    "cache_miss": "Cache miss, written to cache",
+    "cache_hit": "Cache hit: {0}",
+    "language_cn": "Current Language: Chinese",
+    "language_en": "Current Language: English",
+    "user_id": "Current user ID: {0}",
+    "business_error": "This is a simulated business exception for demonstrating global exception handling middleware",
+    "init_success": "Table initialization completed",
+    "name_empty": "Name cannot be empty",
+    "create_success": "Created successfully, ID: {0}",
+    "user_not_found": "User not found",
+    "delete_success": "Soft deleted user {0}",
+    "update_success": "Updated successfully"
+  },
+  "validation": {
+    "name_required": "Name is required",
+    "name_max_length": "Name length cannot exceed {0}",
+    "age_range": "Age must be between 1 and 120",
+    "pagesize_range": "pageSize must be between 1 and 100",
+    "sort_field_invalid": "Sort field is invalid",
+    "sort_order_invalid": "Sort order is invalid"
+  },
+  "cache": {
+    "reset_all": "Reset all ({0}) system caches successfully!",
+    "reset_user": "Reset ({0}) user system caches successfully!",
+    "reset_program": "Reset {0} program caches successfully!"
+  },
+  "db_demo": {
+    "product_created": "Product created successfully",
+    "product_not_found": "Product not found",
+    "translation_saved": "Translation saved",
+    "translation_deleted": "Translation deleted",
+    "article_created": "Article created successfully",
+    "article_not_found": "Article not found",
+    "init_success": "Database tables initialized successfully",
+    "init_failed": "Initialization failed: {0}"
+  }
+}

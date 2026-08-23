@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Core.Validation;
 
 namespace ViewModel.Demo
 {
@@ -10,14 +11,14 @@ namespace ViewModel.Demo
         /// <summary>
         /// 名称（必填，示范 Required 校验）
         /// </summary>
-        [Required(ErrorMessage = "Name 不能为空")]
-        [StringLength(50, ErrorMessage = "Name 长度不能超过 50")]
+        [LocalizedRequired("validation:name_required")]
+        [LocalizedStringLength(50, "validation:name_max_length")]
         public string Name { get; set; }
 
         /// <summary>
         /// 年龄（示范 Range 校验）
         /// </summary>
-        [Range(1, 120, ErrorMessage = "Age 必须在 1-120 之间")]
+        [LocalizedRange(1, 120, "validation:age_range")]
         public int Age { get; set; }
 
         /// <summary>

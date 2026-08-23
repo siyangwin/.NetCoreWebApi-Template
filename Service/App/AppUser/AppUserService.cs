@@ -56,7 +56,7 @@ namespace Service.App
             if (AuthorizationInfo.account!="123" || AuthorizationInfo.password!="admin")
             {
                 resultModel.Success = false;
-                resultModel.Message = "用戶帳戶或密碼無效";
+                resultModel.Message = Lang.Get("auth:login_failed", language);
                 return resultModel;
             }
 

@@ -26,7 +26,7 @@ namespace Project.AppApi.Controllers
         [AllowAnonymous]
         public ResultModel Hello()
         {
-            return new ResultModel().SetMessage("Hello World！模板演示接口");
+            return new ResultModel().SetMessage(Lang.Get("demo:hello"));
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Project.AppApi.Controllers
                 Name = req.Name,
                 CreateTime = DateTime.Now
             };
-            resultModel.SetMessage("创建成功");
+            resultModel.SetMessage(Lang.Get("demo:created"));
             return resultModel;
         }
 
@@ -125,7 +125,7 @@ namespace Project.AppApi.Controllers
         [AllowAnonymous]
         public ResultModel Update(int id, [FromBody] DemoReqDto req)
         {
-            return new ResultModel().SetMessage($"已更新编号 {id} 的数据，新名称：{req.Name}");
+            return new ResultModel().SetMessage(Lang.GetFormat("demo:updated", id, req.Name));
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace Project.AppApi.Controllers
         [AllowAnonymous]
         public ResultModel Delete(int id)
         {
-            return new ResultModel().SetMessage($"已删除编号 {id} 的数据");
+            return new ResultModel().SetMessage(Lang.GetFormat("demo:deleted", id));
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace Project.AppApi.Controllers
         {
             if (file == null || file.Length == 0)
             {
-                return new ResultModel<string>().SetMessage("请选择要上传的文件", false);
+                return new ResultModel<string>().SetMessage(Lang.Get("demo:file_required"), false);
             }
 
             string savePath = Path.Combine(Directory.GetCurrentDirectory(), "other");
@@ -156,7 +156,7 @@ namespace Project.AppApi.Controllers
 
             ResultModel<string> resultModel = new ResultModel<string>();
             resultModel.Data = $"/other/{fileName}";
-            resultModel.SetMessage("上传成功");
+            resultModel.SetMessage(Lang.Get("demo:upload_success"));
             return resultModel;
         }
 
@@ -178,9 +178,9 @@ namespace Project.AppApi.Controllers
                 MemoryCacheHelper.Set(cacheKey, value, TimeSpan.FromSeconds(30));
                 ResultModel<string> resultModel = new ResultModel<string>();
                 resultModel.Data = value;
-                return resultModel.SetMessage("缓存未命中，已写入");
+                return resultModel.SetMessage(Lang.Get("demo:cache_miss"));
             }
-            return new ResultModel<string>().SetMessage($"缓存命中：{cached}");
+            return new ResultModel<string>().SetMessage(Lang.GetFormat("demo:cache_hit", cached));
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace Project.AppApi.Controllers
         public ResultModel<string> GetLanguage()
         {
             ResultModel<string> resultModel = new ResultModel<string>();
-            resultModel.Data = Language == LanguageEnum.CN ? "当前语言：中文" : "Current Language: English";
+            resultModel.Data = Language == LanguageEnum.CN ? Lang.Get("demo:language_cn") : Lang.Get("demo:language_en");
             return resultModel;
         }
 
@@ -205,7 +205,7 @@ namespace Project.AppApi.Controllers
         public ResultModel<string> GetAuthorizeInfo()
         {
             ResultModel<string> resultModel = new ResultModel<string>();
-            resultModel.Data = $"当前登录用户编号：{UserId}";
+            resultModel.Data = Lang.GetFormat("demo:user_id", UserId);
             return resultModel;
         }
 
@@ -216,7 +216,7 @@ namespace Project.AppApi.Controllers
         [AllowAnonymous]
         public ResultModel GetError()
         {
-            throw new Exception("这是模拟的业务异常，用于演示全局异常处理中间件");
+            throw new Exception(Lang.Get("demo:business_error"));
         }
 
         /// <summary>

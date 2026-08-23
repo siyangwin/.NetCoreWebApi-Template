@@ -8,6 +8,7 @@ using System.Security.Claims;
 using ViewModel;
 using ViewModel.App;
 using ViewModel.Auth;
+using Core;
 
 namespace Project.AppApi.Controllers
 {
@@ -35,7 +36,7 @@ namespace Project.AppApi.Controllers
             if (AuthorizationInfo == null)
             {
                 resultModel.Success = false;
-                resultModel.Message = "请求参数不能为空";
+                resultModel.Message = Lang.Get("common:param_required");
                 return resultModel;
             }
 
@@ -101,7 +102,7 @@ namespace Project.AppApi.Controllers
             if (string.IsNullOrEmpty(req?.RefreshToken))
             {
                 resultModel.Success = false;
-                resultModel.Message = "RefreshToken 不能为空";
+                resultModel.Message = Lang.Get("auth:refresh_token_empty");
                 return resultModel;
             }
 
@@ -115,11 +116,11 @@ namespace Project.AppApi.Controllers
                 {
                     // 已吊销的 Token 被再次使用 → 整个 Family 吊销（安全措施）
                     refreshTokenService.RevokeTokenFamily(familyId);
-                    resultModel.Message = "RefreshToken 已失效，同族所有 Token 已吊销，请重新登录";
+                    resultModel.Message = Lang.Get("auth:refresh_token_revoked");
                 }
                 else
                 {
-                    resultModel.Message = "RefreshToken 无效或已过期";
+                    resultModel.Message = Lang.Get("auth:refresh_token_invalid");
                 }
                 resultModel.Success = false;
                 return resultModel;
@@ -194,24 +195,24 @@ namespace Project.AppApi.Controllers
                     if (familyId != null)
                     {
                         refreshTokenService.RevokeTokenFamily(familyId);
-                        resultModel.Message = "已吊销所有设备的 Token";
+                        resultModel.Message = Lang.Get("auth:logout_all_devices");
                     }
                 }
                 else
                 {
                     refreshTokenService.RevokeToken(tokenHash);
-                    resultModel.Message = "登出成功";
+                    resultModel.Message = Lang.Get("auth:logout_success");
                 }
             }
             else if (req?.AllDevices == true && UserId > 0)
             {
                 // 通过 JWT 中的 UserId 吊销所有 Token
                 // 注意：需要遍历该用户所有 FamilyId
-                resultModel.Message = "登出成功（全设备）";
+                resultModel.Message = Lang.Get("auth:logout_all_devices");
             }
             else
             {
-                resultModel.Message = "登出成功";
+                resultModel.Message = Lang.Get("auth:logout_success");
             }
 
             return resultModel;

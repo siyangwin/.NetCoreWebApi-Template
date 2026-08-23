@@ -28,6 +28,10 @@ var ApiName = "Project.AppApi";
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 加载多语言资源文件（JSON 格式，默认语言: en）
+string resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
+Lang.Load(resourcePath);
+
 //设置跨域
 //設置Cors共享不攔截
 builder.Services.AddCors(options =>
@@ -348,13 +352,10 @@ app.Use(async (context, next) =>
     //注入Guid每次请求唯一编码
     context.Request.Headers["Guid"] = Guid.NewGuid().ToString("N");
 
-    //获取默认语言
-    string language = context.QueryOrHeaders("language");
-    if (string.IsNullOrEmpty(language))
-    {
-        language = ((int)LanguageEnum.CN).ToString();
-    }
-    context.SetHeaders("Language", language);
+    //获取默认语言（支持 zh/en/ja 等标准语言代码，兼容旧格式 1/2/3）
+    string languageInput = context.QueryOrHeaders("language");
+    var languageEnum = LanguageHelper.Parse(languageInput);
+    context.SetHeaders("Language", languageEnum.ToString());
 
     //Token
     //context.SetHeaders("Token", context.QueryOrHeaders("Token"));

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model.Table;
 using ViewModel;
+using Core;
 
 namespace Project.AppApi.Controllers
 {
@@ -51,7 +52,7 @@ BEGIN
     );
 END";
             connection.Orm.Execute(sql);
-            return new ResultModel().SetMessage("UserInfo 表初始化完成");
+            return new ResultModel().SetMessage(Lang.Get("demo:init_success"));
         }
 
         /// <summary>
@@ -69,14 +70,14 @@ END";
             ResultModel<int> resultModel = new ResultModel<int>();
             if (string.IsNullOrWhiteSpace(name))
             {
-                return resultModel.SetMessage("姓名不能为空", false);
+                return resultModel.SetMessage(Lang.Get("demo:name_empty"), false);
             }
 
             UserInfo user = new UserInfo { Name = name };
             //审计字段由 InsertWithAudit 自动填充
             int id = connection.InsertWithAudit(user, UserId.ToString());
             resultModel.Data = id;
-            resultModel.SetMessage("新增成功，主键：" + id);
+            resultModel.SetMessage(Lang.GetFormat("demo:create_success", id));
             return resultModel;
         }
 
@@ -111,7 +112,7 @@ END";
         public ResultModel SoftDeleteUser(int id)
         {
             int rows = connection.SoftDelete<UserInfo>(id);
-            return new ResultModel().SetMessage(rows > 0 ? $"已软删除用户 {id}" : $"用户 {id} 不存在", rows > 0);
+            return new ResultModel().SetMessage(rows > 0 ? Lang.GetFormat("demo:delete_success", id) : Lang.Get("demo:user_not_found"), rows > 0);
         }
 
         /// <summary>
@@ -128,12 +129,12 @@ END";
                 .Get();
             if (user == null)
             {
-                return new ResultModel().SetMessage("用户不存在", false);
+                return new ResultModel().SetMessage(Lang.Get("demo:user_not_found"), false);
             }
             user.Name = name;
             //审计字段 UpdateTime/UpdateUser 由 UpdateWithAudit 自动填充
             connection.UpdateWithAudit(user, UserId.ToString());
-            return new ResultModel().SetMessage("修改成功");
+            return new ResultModel().SetMessage(Lang.Get("demo:update_success"));
         }
 
         /// <summary>

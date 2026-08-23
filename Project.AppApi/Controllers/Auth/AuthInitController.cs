@@ -100,12 +100,12 @@ namespace Project.AppApi.Controllers.Auth
                     END", "SystemLog.AuthType/AuthIdentity 列");
 
                 result.Success = true;
-                result.Message = "Auth tables initialized: " + string.Join(", ", messages);
+                result.Message = Lang.Get("db_demo:init_success");
             }
             catch (Exception ex)
             {
                 result.Success = false;
-                result.Message = "初始化失败: " + ex.Message;
+                result.Message = Lang.GetFormat("db_demo:init_failed", ex.Message);
             }
 
             return result;

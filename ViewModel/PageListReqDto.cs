@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Core.Validation;
 
 namespace ViewModel
 {
@@ -19,19 +20,19 @@ namespace ViewModel
 		/// <summary>
 		/// 顯示數
 		/// </summary>
-		[Range(1, 100, ErrorMessage = "pageSize 必须在 1-100 之间")]
+		[LocalizedRange(1, 100, "validation:pagesize_range")]
 		public int pageSize { get; set; } = 20;
 
 		/// <summary>
 		/// 排序字段（白名单：仅允许字母/数字/下划线/逗号/点，防止 SQL 注入）
 		/// </summary>
-		[RegularExpression(@"^[A-Za-z0-9_,.\s]+$", ErrorMessage = "排序字段不合法")]
+		[LocalizedRegularExpression(@"^[A-Za-z0-9_,.\s]+$", "validation:sort_field_invalid")]
 		public string sort { get; set; } = "Id";
 
 		/// <summary>
 		/// 排序方式（白名单：asc / desc）
 		/// </summary>
-		[RegularExpression(@"^(asc|desc)$", ErrorMessage = "排序方式不合法")]
+		[LocalizedRegularExpression(@"^(asc|desc)$", "validation:sort_order_invalid")]
 		public string sortOrder { get; set; } = "asc";
 
 		/// <summary>

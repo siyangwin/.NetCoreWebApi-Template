@@ -4,6 +4,7 @@ using Model.EnumModel;
 using Microsoft.AspNetCore.Authorization;
 using MvcCore.Extension.Filter;
 using MvcCore.Extension.Auth;
+using Core;
 
 namespace Project.AppApi.Controllers
 {
@@ -28,9 +29,14 @@ namespace Project.AppApi.Controllers
 		public string Token { get => _token; }
 
 		/// <summary>
-		/// 語言
+		/// 語言枚举（内部使用）
 		/// </summary>
-		public LanguageEnum Language { get => !string.IsNullOrEmpty(_language) ? (LanguageEnum)Convert.ToInt32(_language) : LanguageEnum.CN; }
+		public LanguageEnum Language { get => !string.IsNullOrEmpty(_language) ? LanguageHelper.Parse(_language) : LanguageHelper.DefaultLanguage; }
+
+		/// <summary>
+		/// 当前语言代码（zh/en/ja），用于 Lang.Get() 和数据库翻译表查询
+		/// </summary>
+		public string LanguageCode { get => LanguageHelper.ToCode(Language); }
 
 		/// <summary>
 		/// 静态构造函数：仅订阅一次 SqlMapper.Aop 事件，避免实例构造函数重复订阅导致的内存泄漏
